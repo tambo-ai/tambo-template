@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "@tambo-ai/react": "^0.15.0",
+    "class-variance-authority": "^0.7.1",
     "next": "15.2.3",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "sanitize-html": "^2.14.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -20,8 +22,13 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/sanitize-html": "^2.13.0",
+    "autoprefixer": "^10.4.21",
+    "clsx": "^2.1.1",
     "eslint": "^9",
     "eslint-config-next": "15.2.3",
+    "postcss": "^8.5.3",
+    "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
