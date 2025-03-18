@@ -28,7 +28,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <TamboProvider apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}>
+        <TamboProvider
+          apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}
+          tamboUrl="http://localhost:3001"
+        >
           {children}
         </TamboProvider>
       </body>
