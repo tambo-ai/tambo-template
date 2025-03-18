@@ -1,3 +1,4 @@
+import { TamboProvider } from "@tambo-ai/react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -27,7 +28,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <TamboProvider apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}>
+          {children}
+        </TamboProvider>
       </body>
     </html>
   );
