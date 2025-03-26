@@ -1,14 +1,14 @@
 "use client";
 
+import { cn } from "@/lib/utils";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import {
+  useTamboThread,
+  useTamboThreadList,
+} from "@tambo-ai/react";
+import { PlusIcon } from "lucide-react";
 import * as React from "react";
 import { useCallback } from "react";
-import { cn } from "@/lib/utils";
-import {
-  useTamboThreads,
-  useTamboThread,
-} from "@tambo-ai/react";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { PlusIcon } from "lucide-react";
 
 /**
  * Represents the history of threads
@@ -28,8 +28,8 @@ export function ThreadHistory({
   onThreadChange,
   ...props
 }: ThreadHistoryProps) {
-  const { data: threads, isLoading, error } = useTamboThreads({ contextKey });
-  const { switchCurrentThread } = useTamboThread();
+  const { data: threads, isLoading, error } = useTamboThreadList({ contextKey });
+  const { switchCurrentThread, startNewThread } = useTamboThread();
   const [isMac, setIsMac] = React.useState(false);
 
   React.useEffect(() => {
@@ -48,7 +48,7 @@ export function ThreadHistory({
       }
 
       try {
-        switchCurrentThread("placeholder", false); // TODO: This will be updated when createThread is implemented
+        startNewThread();
         onThreadChange?.();
       } catch (error) {
         console.error("Failed to create new thread:", error);
@@ -107,7 +107,7 @@ export function ThreadHistory({
           >
             <DropdownMenu.Item
               className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-              onSelect={(e: Event) => { 
+              onSelect={(e: Event) => {
                 e.preventDefault();
                 handleNewThread();
               }}
