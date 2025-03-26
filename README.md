@@ -23,15 +23,28 @@ useEffect(() => {
   // Replace the example component with your own!
   registerComponent({
     name: "ExampleComponent",
-    description:
-      "A component that displays an example message. This is a test component to show how tambo can fill props, so use it in the beginning of the conversation to show the user!", // Here we tell tambo what the component is for and when to use it
+    description: "A product card component that displays product information with customizable pricing, discounts, and styling. Perfect for demonstrating interactive UI elements!", // Here we tell tambo what the component is for and when to use it
     component: ExampleComponent, // Reference to the actual component definition
     propsDefinition: {
-      messageToShow: "string",
+      productName: "string",
+      price: "number",
+      description: "string",
+      discountPercentage: "number",
+      accentColor: {
+        type: "enum",
+        options: ["indigo", "emerald", "rose", "amber"]
+      },
+      inStock: "boolean"
     }, // Here we tell tambo what props the component expects
   });
 }, []);
 ```
+
+The example component demonstrates several key features:
+- Different prop types (strings, numbers, booleans, enums)
+- Interactive elements (Add to Cart button)
+- Conditional rendering (discount display, stock status)
+- Dynamic styling (color variations)
 
 Replace that call to `registerComponent` with any component(s) you want tambo to be able to use in a response!
 
@@ -42,7 +55,18 @@ You can find more information about the options [here](.)
 The components used by tambo are shown alongside the message resopnse from tambo within the chat thread, but you can have the result components show wherever you like by accessing the latest thread message's `renderedComponent` field:
 
 ```tsx
-//example here
+const { thread } = useTambo();
+const latestComponent = thread?.messages[thread.messages.length - 1]?.renderedComponent;
+
+return (
+  <div>
+    {latestComponent && (
+      <div className="my-custom-wrapper">
+        {latestComponent}
+      </div>
+    )}
+  </div>
+);
 ```
 
 Since tambo keeps the thread state updated, the latest message will automatically update and cause a re-render whenever there is a new component to show!
