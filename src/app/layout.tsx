@@ -30,6 +30,7 @@ export default function RootLayout({
       >
         <TamboProvider
           apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}
+          tamboUrl={process.env.NEXT_PUBLIC_TAMBO_URL!}
         >
           {children}
         </TamboProvider>

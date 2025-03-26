@@ -1,56 +1,74 @@
 "use client";
 
-import * as React from "react";
-import type { VariantProps } from "class-variance-authority";
-import { cva } from "class-variance-authority";
+import { MessageInput } from "@/components/ui/message-input";
+import { MessageSuggestions } from "@/components/ui/message-suggestions";
+import { ThreadContent } from "@/components/ui/thread-content";
+import { ThreadHistory } from "@/components/ui/thread-history";
 import { cn } from "@/lib/utils";
-import { ChatThread } from "@/components/ui/chat-thread";
-import { ChatInput } from "@/components/ui/chat-input";
-
-const messageThreadFullVariants = cva("flex flex-col w-full h-full", {
-  variants: {
-    variant: {
-      default: "bg-background",
-      solid: "bg-muted/50",
-      bordered: "border rounded-lg p-4",
-    },
-  },
-  defaultVariants: {
-    variant: "default",
-  },
-});
+import { useTambo } from "@tambo-ai/react";
+import * as React from "react";
+import { useEffect, useRef } from "react";
 
 /**
  * Represents a full message thread component
  * @property {string} className - Optional className for custom styling
- * @property {VariantProps<typeof messageThreadFullVariants>["variant"]} variant - Optional variant for custom styling
  */
 
 export interface MessageThreadFullProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: VariantProps<typeof messageThreadFullVariants>["variant"];
   contextKey?: string;
 }
 
 const MessageThreadFull = React.forwardRef<
   HTMLDivElement,
   MessageThreadFullProps
->(({ className, variant, contextKey, ...props }, ref) => {
+>(({ className, contextKey, ...props }, ref) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { thread } = useTambo();
+
+  useEffect(() => {
+    if (scrollContainerRef.current && thread?.messages?.length) {
+      const timeoutId = setTimeout(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTo({
+            top: scrollContainerRef.current.scrollHeight,
+            behavior: "smooth",
+          });
+        }
+      }, 100);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [thread?.messages]);
+
   return (
     <div
       ref={ref}
-      className={cn(messageThreadFullVariants({ variant }), className)}
+      className={cn(
+        "flex flex-col bg-white rounded-lg shadow-sm overflow-hidden bg-background border border-gray-200",
+        "h-[90vh] sm:h-[85vh] md:h-[80vh]",
+        "w-full max-w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl mx-auto",
+        className,
+      )}
       {...props}
     >
-      <div className="flex-1 overflow-y-auto p-4">
-        <ChatThread variant={variant} />
+      <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+        <h2 className="font-semibold text-lg">Use AI</h2>
+        <ThreadHistory contextKey={contextKey} />
       </div>
-      <div className="p-4 border-t">
-        <ChatInput variant={variant} contextKey={contextKey} />
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto px-4 [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-thumb]:bg-gray-300"
+      >
+        <ThreadContent className="py-4" />
+      </div>
+      <MessageSuggestions />
+      <div className="p-4 border-t border-gray-200">
+        <MessageInput contextKey={contextKey} />
       </div>
     </div>
   );
 });
 MessageThreadFull.displayName = "MessageThreadFull";
 
-export { MessageThreadFull, messageThreadFullVariants };
+export { MessageThreadFull };
