@@ -6,7 +6,7 @@ This is a starter NextJS app with Tambo hooked up to get your AI app development
 
 1. `npm install`
 
-2. Rename `example.env.local` to `.env.local` and add your real tambo API key. You can get a tambo API key for free [here](.)
+2. Rename `example.env.local` to `.env.local` and add your real tambo API key. You can get a tambo API key for free [here](https://tambo.co/dashboard), or by running `npx tambo init`
 
 3. Run `npm run dev` and go to `localhost:3000` to use the app!
 
@@ -23,7 +23,8 @@ useEffect(() => {
   // Replace the example component with your own!
   registerComponent({
     name: "ExampleComponent",
-    description: "A product card component that displays product information with customizable pricing, discounts, and styling. Perfect for demonstrating interactive UI elements!", // Here we tell tambo what the component is for and when to use it
+    description:
+      "A product card component that displays product information with customizable pricing, discounts, and styling. Perfect for demonstrating interactive UI elements!", // Here we tell tambo what the component is for and when to use it
     component: ExampleComponent, // Reference to the actual component definition
     propsDefinition: {
       productName: "string",
@@ -32,15 +33,16 @@ useEffect(() => {
       discountPercentage: "number",
       accentColor: {
         type: "enum",
-        options: ["indigo", "emerald", "rose", "amber"]
+        options: ["indigo", "emerald", "rose", "amber"],
       },
-      inStock: "boolean"
+      inStock: "boolean",
     }, // Here we tell tambo what props the component expects
   });
 }, []);
 ```
 
 The example component demonstrates several key features:
+
 - Different prop types (strings, numbers, booleans, enums)
 - Interactive elements (Add to Cart button)
 - Conditional rendering (discount display, stock status)
@@ -48,7 +50,7 @@ The example component demonstrates several key features:
 
 Replace that call to `registerComponent` with any component(s) you want tambo to be able to use in a response!
 
-You can find more information about the options [here](.)
+You can find more information about the options [here](https://tambo.co/docs/concepts/registering-components)
 
 ### Change where component responses are shown
 
@@ -56,14 +58,13 @@ The components used by tambo are shown alongside the message resopnse from tambo
 
 ```tsx
 const { thread } = useTambo();
-const latestComponent = thread?.messages[thread.messages.length - 1]?.renderedComponent;
+const latestComponent =
+  thread?.messages[thread.messages.length - 1]?.renderedComponent;
 
 return (
   <div>
     {latestComponent && (
-      <div className="my-custom-wrapper">
-        {latestComponent}
-      </div>
+      <div className="my-custom-wrapper">{latestComponent}</div>
     )}
   </div>
 );
