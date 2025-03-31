@@ -50,7 +50,7 @@ The example component demonstrates several key features:
 
 Replace that call to `registerComponent` with any component(s) you want tambo to be able to use in a response!
 
-You can find more information about the options [here](.)
+You can find more information about the options [here](https://tambo.co/docs/concepts/registering-components)
 
 ### Change where component responses are shown
 
