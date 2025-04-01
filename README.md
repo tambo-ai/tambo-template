@@ -14,41 +14,48 @@ This is a starter NextJS app with Tambo hooked up to get your AI app development
 
 ### Change what components tambo can control
 
-You can see how the `ExampleComponent` is registered with tambo in `src/app/page.tsx`:
+You can see how the `ProductCard` is registered with tambo in `src/app/layout.tsx`:
 
 ```tsx
-const { registerComponent } = useTambo();
-
-useEffect(() => {
-  // Replace the example component with your own!
-  registerComponent({
-    name: "ExampleComponent",
-    description:
-      "A product card component that displays product information with customizable pricing, discounts, and styling. Perfect for demonstrating interactive UI elements!", // Here we tell tambo what the component is for and when to use it
-    component: ExampleComponent, // Reference to the actual component definition
+const tamboComponents: TamboComponent[] = [
+  {
+    name: "ProductCard",
+    description: "A product card component that displays product information with customizable pricing, discounts, and styling. Perfect for demonstrating interactive UI elements!", // Here we tell tambo what the component is for and when to use it
+    component: ProductCard, // Reference to the actual component definition
     propsDefinition: {
-      productName: "string",
+      name: "string",
       price: "number",
       description: "string",
       discountPercentage: "number",
       accentColor: {
         type: "enum",
-        options: ["indigo", "emerald", "rose", "amber"],
+        options: ["indigo", "emerald", "rose", "amber"]
       },
-      inStock: "boolean",
+      inStock: "boolean"
     }, // Here we tell tambo what props the component expects
-  });
-}, []);
+    associatedTools: [productsTool] // associate the products tool with the component so Tambo fetches real products when generating this component's props
+  },
+  // Add more components for Tambo to control here!
+];
+
+...
+
+        <TamboProvider
+          apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}
+          components={tamboComponents}
+        >
+          {children}
+        </TamboProvider>
 ```
 
-The example component demonstrates several key features:
+The example ProductCard component demonstrates several key features:
 
 - Different prop types (strings, numbers, booleans, enums)
 - Interactive elements (Add to Cart button)
 - Conditional rendering (discount display, stock status)
 - Dynamic styling (color variations)
 
-Replace that call to `registerComponent` with any component(s) you want tambo to be able to use in a response!
+Update the `tamboComponents` array with any component(s) you want tambo to be able to use in a response!
 
 You can find more information about the options [here](https://tambo.co/docs/concepts/registering-components)
 

@@ -33,7 +33,7 @@ const productsTool: TamboTool = {
 
 const tamboComponents: TamboComponent[] = [
   {
-    name: "ExampleComponent",
+    name: "ProductCard",
     description: "A product card component that displays product information with customizable pricing, discounts, and styling. Perfect for demonstrating interactive UI elements!", // Here we tell tambo what the component is for and when to use it
     component: ProductCard, // Reference to the actual component definition
     propsDefinition: {
