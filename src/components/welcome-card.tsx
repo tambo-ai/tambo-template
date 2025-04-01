@@ -1,8 +1,13 @@
+import { useState } from 'react';
+
 export const WelcomeCard = () => {
   const exampleMessage = 'Show me a product card for a gaming laptop priced at $1299 with emerald accent color and 20% discount';
+  const [isCopied, setIsCopied] = useState(false);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(exampleMessage);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
   };
 
   return (
@@ -23,9 +28,9 @@ export const WelcomeCard = () => {
           <p className="text-gray-800 font-mono text-sm break-all">{exampleMessage}</p>
           <button
             onClick={copyToClipboard}
-            className="flex-shrink-0 text-xs px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+            className="flex-shrink-0 text-xs px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded transition-colors min-w-[4rem]"
           >
-            Copy
+            {isCopied ? 'Copied ✓' : 'Copy'}
           </button>
         </div>
       </div>
