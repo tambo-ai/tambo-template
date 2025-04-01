@@ -1,23 +1,17 @@
 'use client'
 
 import { useState } from "react";
+import { Product } from "../services/product-service";
 
 // A customizable product card component to demonstrate Tambo's prop-filling capabilities
-export const ExampleComponent = ({
-  productName,
+export const ProductCard = ({
+  name,
   price,
   description,
   discountPercentage,
   accentColor,
   inStock
-}: {
-  productName: string;
-  price?: number;
-  description: string;
-  discountPercentage?: number;
-  accentColor: 'indigo' | 'emerald' | 'rose' | 'amber';
-  inStock?: boolean;
-}) => {
+}: Pick<Product, 'name' | 'price' | 'description' | 'discountPercentage' | 'accentColor' | 'inStock'>) => {
   const [isAdded, setIsAdded] = useState(false);
 
   const colorClasses = {
@@ -38,7 +32,7 @@ export const ExampleComponent = ({
   return (
     <div className="w-full max-w-sm rounded-xl shadow-lg overflow-hidden bg-white p-6 space-y-4">
       <div className="flex justify-between items-start">
-        <h2 className="text-xl font-bold text-gray-900">{productName}</h2>
+        <h2 className="text-xl font-bold text-gray-900">{name}</h2>
         {discountPercentage !== undefined && discountPercentage > 0 && (
           <span className="bg-red-500 text-white px-2 py-1 rounded-md text-sm font-bold">
             {discountPercentage}% OFF
