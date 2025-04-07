@@ -8,11 +8,11 @@
  * Read more about Tambo at https://tambo.co/docs
  */
 
-import type { TamboComponent } from "@tambo-ai/react";
 import { ProductCard } from "@/components/product-card";
 import { getProducts } from "@/services/product-service";
-import { z } from "zod";
+import type { TamboComponent } from "@tambo-ai/react";
 import { TamboTool } from "@tambo-ai/react";
+import { z } from "zod";
 
 /**
  * productsTool
@@ -55,17 +55,14 @@ export const components: TamboComponent[] = [
     description:
       "A product card component that displays product information with customizable pricing, discounts, and styling. Perfect for demonstrating interactive UI elements!",
     component: ProductCard,
-    propsDefinition: {
-      name: "string",
-      price: "number",
-      description: "string",
-      discountPercentage: "number",
-      accentColor: {
-        type: "enum",
-        options: ["indigo", "emerald", "rose", "amber"],
-      },
-      inStock: "boolean",
-    },
+    propsSchema: z.object({
+      name: z.string().describe("The name of the product"),
+      price: z.number().describe("The price of the product"),
+      description: z.string().describe("The description of the product"),
+      discountPercentage: z.number().describe("The discount percentage of the product"),
+      accentColor: z.enum(["indigo", "emerald", "rose", "amber"]).describe("The accent color of the product"),
+      inStock: z.boolean().describe("Whether the product is in stock"),
+    }),
     associatedTools: [productsTool],
   },
   // Add more components here
