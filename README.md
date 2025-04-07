@@ -22,17 +22,14 @@ const tamboComponents: TamboComponent[] = [
     name: "ProductCard",
     description: "A product card component that displays product information with customizable pricing, discounts, and styling. Perfect for demonstrating interactive UI elements!", // Here we tell tambo what the component is for and when to use it
     component: ProductCard, // Reference to the actual component definition
-    propsDefinition: {
-      name: "string",
-      price: "number",
-      description: "string",
-      discountPercentage: "number",
-      accentColor: {
-        type: "enum",
-        options: ["indigo", "emerald", "rose", "amber"]
-      },
-      inStock: "boolean"
-    }, // Here we tell tambo what props the component expects
+    propsSchema: z.object({
+      name: z.string().describe("The name of the product"),
+      price: z.number().describe("The price of the product"),
+      description: z.string().describe("The description of the product"),
+      discountPercentage: z.number().describe("The discount percentage of the product"),
+      accentColor: z.enum(["indigo", "emerald", "rose", "amber"]).describe("The accent color of the product"),
+      inStock: z.boolean().describe("Whether the product is in stock"),
+    }), // Here we tell tambo what props the component expects
     associatedTools: [productsTool] // associate the products tool with the component so Tambo fetches real products when generating this component's props
   },
   // Add more components for Tambo to control here!
