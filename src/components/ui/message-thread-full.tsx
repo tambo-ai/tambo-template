@@ -10,16 +10,28 @@ import * as React from "react";
 import { useEffect, useRef } from "react";
 
 /**
- * Represents a full message thread component
- * @property {string} className - Optional className for custom styling
+ * Props for the MessageThreadFull component
+ * @interface
+ * @extends React.HTMLAttributes<HTMLDivElement>
  */
-
 export interface MessageThreadFullProps
   extends React.HTMLAttributes<HTMLDivElement> {
+  /** Optional context key for the thread */
   contextKey?: string;
 }
 
-const MessageThreadFull = React.forwardRef<
+/**
+ * A full-screen chat thread component with message history, input, and suggestions
+ * @component
+ * @example
+ * ```tsx
+ * <MessageThreadFull
+ *   contextKey="my-thread"
+ *   className="custom-styles"
+ * />
+ * ```
+ */
+export const MessageThreadFull = React.forwardRef<
   HTMLDivElement,
   MessageThreadFullProps
 >(({ className, contextKey, ...props }, ref) => {
@@ -45,14 +57,14 @@ const MessageThreadFull = React.forwardRef<
     <div
       ref={ref}
       className={cn(
-        "flex flex-col bg-white rounded-lg shadow-sm overflow-hidden bg-background border border-gray-200",
+        "flex flex-col bg-white rounded-lg overflow-hidden bg-background",
         "h-[90vh] sm:h-[85vh] md:h-[80vh]",
         "w-full max-w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl mx-auto",
         className,
       )}
       {...props}
     >
-      <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+      <div className="p-4 flex items-center justify-between">
         <h2 className="font-semibold text-lg">Use AI</h2>
         <ThreadHistory contextKey={contextKey} />
       </div>
@@ -63,12 +75,10 @@ const MessageThreadFull = React.forwardRef<
         <ThreadContent className="py-4" />
       </div>
       <MessageSuggestions />
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4">
         <MessageInput contextKey={contextKey} />
       </div>
     </div>
   );
 });
 MessageThreadFull.displayName = "MessageThreadFull";
-
-export { MessageThreadFull };

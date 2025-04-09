@@ -1,12 +1,12 @@
 "use client";
 
-import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { MessageGenerationStage } from "@/components/ui/message-generation-stage";
+import { Tooltip, TooltipProvider } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import { useTambo, useTamboSuggestions } from "@tambo-ai/react";
 import { Loader2Icon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Tooltip, TooltipProvider } from "@/components/ui/tooltip";
-import { MessageGenerationStage } from "@/components/ui/message-generation-stage";
+import * as React from "react";
+import { useEffect, useRef } from "react";
 
 /**
  * Represents the suggestions for a message
@@ -14,16 +14,32 @@ import { MessageGenerationStage } from "@/components/ui/message-generation-stage
  * @property {number} maxSuggestions - Maximum number of suggestions to show
  */
 
+/**
+ * Props for the MessageSuggestions component
+ * @interface
+ * @extends React.HTMLAttributes<HTMLDivElement>
+ */
 export interface MessageSuggestionsProps
   extends React.HTMLAttributes<HTMLDivElement> {
+  /** Maximum number of suggestions to display (default: 3) */
   maxSuggestions?: number;
 }
 
-export function MessageSuggestions({
-  className,
-  maxSuggestions = 3,
-  ...props
-}: MessageSuggestionsProps) {
+/**
+ * A component that displays AI-generated message suggestions with keyboard shortcuts
+ * @component
+ * @example
+ * ```tsx
+ * <MessageSuggestions
+ *   maxSuggestions={3}
+ *   className="custom-styles"
+ * />
+ * ```
+ */
+export const MessageSuggestions = React.forwardRef<
+  HTMLDivElement,
+  MessageSuggestionsProps
+>(({ className, maxSuggestions = 3, ...props }, ref) => {
   const { thread } = useTambo();
   const {
     suggestions,
@@ -33,7 +49,8 @@ export function MessageSuggestions({
   } = useTamboSuggestions({
     maxSuggestions,
   });
-  const [isMac, setIsMac] = useState(false);
+  const isMac =
+    typeof navigator !== "undefined" && navigator.platform.startsWith("Mac");
 
   // Track the last AI message ID to detect new messages
   const lastAiMessageIdRef = useRef<string | null>(null);
@@ -63,13 +80,6 @@ export function MessageSuggestions({
       }
     };
   }, [lastAiMessage, suggestions.length]);
-
-  useEffect(() => {
-    const isMacOS =
-      typeof navigator !== "undefined" &&
-      navigator.platform.toUpperCase().includes("MAC");
-    setIsMac(isMacOS);
-  }, []);
 
   useEffect(() => {
     if (!suggestions || suggestions.length === 0) return;
@@ -107,10 +117,7 @@ export function MessageSuggestions({
   // Basic container layout
   return (
     <TooltipProvider>
-      <div
-        className={cn("px-4 py-2 border-t border-gray-200", className)}
-        {...props}
-      >
+      <div className={cn("px-4 py-2", className)} ref={ref} {...props}>
         {/* Error state */}
         {error && (
           <div className="p-2 rounded-md text-sm bg-red-50 text-red-500">
@@ -145,12 +152,16 @@ export function MessageSuggestions({
                   {suggestions.map((suggestion, index) => (
                     <Tooltip
                       key={suggestion.id}
-                      content={`${modKey}+${altKey}+${index + 1}`}
+                      content={
+                        <span suppressHydrationWarning>
+                          {modKey}+{altKey}+{index + 1}
+                        </span>
+                      }
                       side="top"
                     >
                       <button
                         className={cn(
-                          "py-1 px-2.5 rounded-full text-xs transition-colors",
+                          "py-2 px-2.5 rounded-full text-xs transition-colors",
                           "border border-input",
                           isGenerating
                             ? "bg-muted/50 text-muted-foreground"
@@ -175,4 +186,5 @@ export function MessageSuggestions({
       </div>
     </TooltipProvider>
   );
-}
+});
+MessageSuggestions.displayName = "MessageSuggestions";
