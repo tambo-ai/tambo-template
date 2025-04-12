@@ -61,9 +61,9 @@ You can find more information about the options [here](https://tambo.co/docs/con
 The components used by tambo are shown alongside the message resopnse from tambo within the chat thread, but you can have the result components show wherever you like by accessing the latest thread message's `renderedComponent` field:
 
 ```tsx
-const { thread } = useTambo();
+const { thread } = useTambo()
 const latestComponent =
-  thread?.messages[thread.messages.length - 1]?.renderedComponent;
+  thread?.messages[thread.messages.length - 1]?.renderedComponent
 
 return (
   <div>
@@ -71,7 +71,7 @@ return (
       <div className="my-custom-wrapper">{latestComponent}</div>
     )}
   </div>
-);
+)
 ```
 
 Since tambo keeps the thread state updated, the latest message will automatically update and cause a re-render whenever there is a new component to show!

@@ -8,11 +8,11 @@
  * Read more about Tambo at https://tambo.co/docs
  */
 
-import { ProductCard } from "@/components/product-card";
-import { getProducts } from "@/services/product-service";
-import type { TamboComponent } from "@tambo-ai/react";
-import { TamboTool } from "@tambo-ai/react";
-import { z } from "zod";
+import { ProductCard } from '@/components/product-card'
+import { getProducts } from '@/services/product-service'
+import type { TamboComponent } from '@tambo-ai/react'
+import { TamboTool } from '@tambo-ai/react'
+import { z } from 'zod'
 
 /**
  * productsTool
@@ -22,8 +22,8 @@ import { z } from "zod";
  * to provide dynamic data fetching capabilities.
  */
 export const productsTool: TamboTool = {
-  name: "products",
-  description: "A tool to get products from the database",
+  name: 'products',
+  description: 'A tool to get products from the database',
   tool: getProducts,
   toolSchema: z.function().returns(
     z.array(
@@ -35,10 +35,10 @@ export const productsTool: TamboTool = {
         discountPercentage: z.number().optional(),
         accentColor: z.string(),
         inStock: z.boolean().optional(),
-      })
-    )
+      }),
+    ),
   ),
-};
+}
 
 // Add more tools here
 
@@ -51,19 +51,23 @@ export const productsTool: TamboTool = {
  */
 export const components: TamboComponent[] = [
   {
-    name: "ProductCard",
+    name: 'ProductCard',
     description:
-      "A product card component that displays product information with customizable pricing, discounts, and styling. Perfect for demonstrating interactive UI elements!",
+      'A product card component that displays product information with customizable pricing, discounts, and styling. Perfect for demonstrating interactive UI elements!',
     component: ProductCard,
     propsSchema: z.object({
-      name: z.string().describe("The name of the product"),
-      price: z.number().describe("The price of the product"),
-      description: z.string().describe("The description of the product"),
-      discountPercentage: z.number().describe("The discount percentage of the product"),
-      accentColor: z.enum(["indigo", "emerald", "rose", "amber"]).describe("The accent color of the product"),
-      inStock: z.boolean().describe("Whether the product is in stock"),
+      name: z.string().describe('The name of the product'),
+      price: z.number().describe('The price of the product'),
+      description: z.string().describe('The description of the product'),
+      discountPercentage: z
+        .number()
+        .describe('The discount percentage of the product'),
+      accentColor: z
+        .enum(['indigo', 'emerald', 'rose', 'amber'])
+        .describe('The accent color of the product'),
+      inStock: z.boolean().describe('Whether the product is in stock'),
     }),
     associatedTools: [productsTool],
   },
   // Add more components here
-];
+]

@@ -1,11 +1,11 @@
-"use client";
+'use client'
 
-import { cn } from "@/lib/utils";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { useTamboThread, useTamboThreadList } from "@tambo-ai/react";
-import { PlusIcon } from "lucide-react";
-import * as React from "react";
-import { useCallback } from "react";
+import { cn } from '@/lib/utils'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import { useTamboThread, useTamboThreadList } from '@tambo-ai/react'
+import { PlusIcon } from 'lucide-react'
+import * as React from 'react'
+import { useCallback } from 'react'
 
 /**
  * Represents the history of threads
@@ -15,8 +15,8 @@ import { useCallback } from "react";
  */
 export interface ThreadHistoryProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  contextKey?: string;
-  onThreadChange?: () => void;
+  contextKey?: string
+  onThreadChange?: () => void
 }
 
 export function ThreadHistory({
@@ -30,66 +30,66 @@ export function ThreadHistory({
     isLoading,
     error,
     refetch,
-  } = useTamboThreadList({ contextKey });
-  const { switchCurrentThread, startNewThread } = useTamboThread();
-  const [isMac, setIsMac] = React.useState(false);
+  } = useTamboThreadList({ contextKey })
+  const { switchCurrentThread, startNewThread } = useTamboThread()
+  const [isMac, setIsMac] = React.useState(false)
 
   React.useEffect(() => {
     const isMacOS =
-      typeof navigator !== "undefined" &&
-      navigator.platform.toUpperCase().includes("MAC");
-    setIsMac(isMacOS);
-  }, []);
+      typeof navigator !== 'undefined' &&
+      navigator.platform.toUpperCase().includes('MAC')
+    setIsMac(isMacOS)
+  }, [])
 
-  const modKey = isMac ? "⌥" : "Alt";
+  const modKey = isMac ? '⌥' : 'Alt'
 
   const handleNewThread = useCallback(
     async (e?: React.MouseEvent) => {
       if (e) {
-        e.stopPropagation();
+        e.stopPropagation()
       }
 
       try {
-        await startNewThread();
-        await refetch();
-        onThreadChange?.();
+        await startNewThread()
+        await refetch()
+        onThreadChange?.()
       } catch (error) {
-        console.error("Failed to create new thread:", error);
+        console.error('Failed to create new thread:', error)
       }
     },
     [onThreadChange, startNewThread, refetch],
-  );
+  )
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.altKey && event.shiftKey && event.key === "n") {
-        event.preventDefault();
-        handleNewThread();
+      if (event.altKey && event.shiftKey && event.key === 'n') {
+        event.preventDefault()
+        handleNewThread()
       }
-    };
+    }
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown)
 
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [handleNewThread]);
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [handleNewThread])
 
   const handleSwitchThread = async (threadId: string, e?: React.MouseEvent) => {
     if (e) {
-      e.stopPropagation();
+      e.stopPropagation()
     }
 
     try {
-      switchCurrentThread(threadId);
-      onThreadChange?.();
+      switchCurrentThread(threadId)
+      onThreadChange?.()
     } catch (error) {
-      console.error("Failed to switch thread:", error);
+      console.error('Failed to switch thread:', error)
     }
-  };
+  }
 
   return (
-    <div className={cn("relative", className)} {...props}>
+    <div className={cn('relative', className)} {...props}>
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
           <div
@@ -111,8 +111,8 @@ export function ThreadHistory({
             <DropdownMenu.Item
               className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
               onSelect={(e: Event) => {
-                e.preventDefault();
-                handleNewThread();
+                e.preventDefault()
+                handleNewThread()
               }}
             >
               <div className="flex items-center">
@@ -153,8 +153,8 @@ export function ThreadHistory({
                   key={thread.id}
                   className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
                   onSelect={(e: Event) => {
-                    e.preventDefault();
-                    handleSwitchThread(thread.id);
+                    e.preventDefault()
+                    handleSwitchThread(thread.id)
                   }}
                 >
                   <span className="truncate max-w-[180px]">
@@ -167,5 +167,5 @@ export function ThreadHistory({
         </DropdownMenu.Portal>
       </DropdownMenu.Root>
     </div>
-  );
+  )
 }

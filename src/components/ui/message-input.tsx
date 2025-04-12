@@ -1,10 +1,10 @@
-"use client";
+'use client'
 
-import { cn } from "@/lib/utils";
-import { useTamboThreadInput } from "@tambo-ai/react";
-import { cva, type VariantProps } from "class-variance-authority";
-import { ArrowUp } from "lucide-react";
-import * as React from "react";
+import { cn } from '@/lib/utils'
+import { useTamboThreadInput } from '@tambo-ai/react'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { ArrowUp } from 'lucide-react'
+import * as React from 'react'
 
 /**
  * CSS variants for the message input container
@@ -13,21 +13,21 @@ import * as React from "react";
  * @property {string} solid - Solid styling with shadow effects
  * @property {string} bordered - Bordered styling with border emphasis
  */
-const messageInputVariants = cva("w-full", {
+const messageInputVariants = cva('w-full', {
   variants: {
     variant: {
-      default: "",
+      default: '',
       solid: [
-        "shadow shadow-zinc-900/10 dark:shadow-zinc-900/20",
-        "[&_input]:bg-muted [&_input]:dark:bg-muted",
-      ].join(" "),
-      bordered: ["[&_input]:border-2", "[&_input]:border-border"].join(" "),
+        'shadow shadow-zinc-900/10 dark:shadow-zinc-900/20',
+        '[&_input]:bg-muted [&_input]:dark:bg-muted',
+      ].join(' '),
+      bordered: ['[&_input]:border-2', '[&_input]:border-border'].join(' '),
     },
   },
   defaultVariants: {
-    variant: "default",
+    variant: 'default',
   },
-});
+})
 
 /**
  * Props for the MessageInput component
@@ -36,12 +36,12 @@ const messageInputVariants = cva("w-full", {
 export interface MessageInputProps
   extends React.HTMLAttributes<HTMLFormElement> {
   /** Optional styling variant for the input container */
-  variant?: VariantProps<typeof messageInputVariants>["variant"];
+  variant?: VariantProps<typeof messageInputVariants>['variant']
   /**
    * Tambo thread context key for message routing
    * Used to identify which thread the message should be sent to
    */
-  contextKey: string | undefined;
+  contextKey: string | undefined
 }
 
 /**
@@ -61,65 +61,65 @@ export const MessageInput = React.forwardRef<
   MessageInputProps
 >(({ className, variant, contextKey, ...props }, ref) => {
   const { value, setValue, submit, isPending, error } =
-    useTamboThreadInput(contextKey);
-  const [displayValue, setDisplayValue] = React.useState("");
-  const [submitError, setSubmitError] = React.useState<string | null>(null);
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+    useTamboThreadInput(contextKey)
+  const [displayValue, setDisplayValue] = React.useState('')
+  const [submitError, setSubmitError] = React.useState<string | null>(null)
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null)
 
   // Handle the forwarded ref
-  React.useImperativeHandle(ref, () => textareaRef.current!, []);
+  React.useImperativeHandle(ref, () => textareaRef.current!, [])
 
   React.useEffect(() => {
-    setDisplayValue(value);
+    setDisplayValue(value)
     // Focus the textarea when value changes and is not empty
     if (value && textareaRef.current) {
-      textareaRef.current.focus();
+      textareaRef.current.focus()
     }
-  }, [value]);
+  }, [value])
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setValue(e.target.value);
-    setDisplayValue(e.target.value);
-  };
+    setValue(e.target.value)
+    setDisplayValue(e.target.value)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!value.trim()) return;
+    e.preventDefault()
+    if (!value.trim()) return
 
-    setSubmitError(null);
-    setDisplayValue("");
+    setSubmitError(null)
+    setDisplayValue('')
     try {
       await submit({
         contextKey,
         streamResponse: true,
-      });
-      setValue("");
+      })
+      setValue('')
       setTimeout(() => {
-        textareaRef.current?.focus();
-      }, 0);
+        textareaRef.current?.focus()
+      }, 0)
     } catch (error) {
-      console.error("Failed to submit message:", error);
-      setDisplayValue(value);
+      console.error('Failed to submit message:', error)
+      setDisplayValue(value)
       setSubmitError(
         error instanceof Error
           ? error.message
-          : "Failed to send message. Please try again.",
-      );
+          : 'Failed to send message. Please try again.',
+      )
     }
-  };
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
       if (value.trim()) {
-        handleSubmit(e as unknown as React.FormEvent);
+        handleSubmit(e as unknown as React.FormEvent)
       }
     }
-  };
+  }
 
   const Spinner = () => (
     <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-  );
+  )
 
   return (
     <form
@@ -160,8 +160,8 @@ export const MessageInput = React.forwardRef<
         </p>
       )}
     </form>
-  );
-});
-MessageInput.displayName = "MessageInput";
+  )
+})
+MessageInput.displayName = 'MessageInput'
 
-export { messageInputVariants };
+export { messageInputVariants }

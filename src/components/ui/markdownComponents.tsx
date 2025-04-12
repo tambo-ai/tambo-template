@@ -1,14 +1,14 @@
-"use client";
+'use client'
 
-import * as React from "react";
-import { cn } from "@/lib/utils";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import * as React from 'react'
+import { cn } from '@/lib/utils'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import {
   oneLight,
   vscDarkPlus,
-} from "react-syntax-highlighter/dist/esm/styles/prism";
-import type { Components } from "react-markdown";
-import { Copy, Check } from "lucide-react";
+} from 'react-syntax-highlighter/dist/esm/styles/prism'
+import type { Components } from 'react-markdown'
+import { Copy, Check } from 'lucide-react'
 
 const looksLikeCode = (text: string): boolean => {
   const codeIndicators = [
@@ -23,21 +23,21 @@ const looksLikeCode = (text: string): boolean => {
     /^\s*\/\*/m,
     /=>/,
     /^export\s+/m,
-  ];
-  return codeIndicators.some((pattern) => pattern.test(text));
-};
+  ]
+  return codeIndicators.some((pattern) => pattern.test(text))
+}
 
-export const createMarkdownComponents = (theme = "light"): Components => ({
+export const createMarkdownComponents = (theme = 'light'): Components => ({
   code: function Code({ className, children, ...props }) {
-    const match = /language-(\w+)/.exec(className ?? "");
-    const content = String(children).replace(/\n$/, "");
-    const [copied, setCopied] = React.useState(false);
+    const match = /language-(\w+)/.exec(className ?? '')
+    const content = String(children).replace(/\n$/, '')
+    const [copied, setCopied] = React.useState(false)
 
     const copyToClipboard = () => {
-      navigator.clipboard.writeText(content);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    };
+      navigator.clipboard.writeText(content)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
 
     if (match && looksLikeCode(content)) {
       return (
@@ -56,29 +56,29 @@ export const createMarkdownComponents = (theme = "light"): Components => ({
             )}
           </button>
           <SyntaxHighlighter
-            style={theme === "light" ? oneLight : vscDarkPlus}
+            style={theme === 'light' ? oneLight : vscDarkPlus}
             language={match[1]}
             PreTag="div"
             customStyle={{
               margin: 0,
-              padding: "1rem",
-              fontSize: "0.875rem",
-              borderRadius: "0.375rem",
+              padding: '1rem',
+              fontSize: '0.875rem',
+              borderRadius: '0.375rem',
             }}
           >
             {content}
           </SyntaxHighlighter>
         </div>
-      );
+      )
     }
     return (
       <code
-        className={cn("bg-muted px-1.5 py-0.5 rounded text-sm", className)}
+        className={cn('bg-muted px-1.5 py-0.5 rounded text-sm', className)}
         {...props}
       >
         {children}
       </code>
-    );
+    )
   },
   p: ({ children }) => <p className="my-0">{children}</p>,
   h1: ({ children }) => (
@@ -125,4 +125,4 @@ export const createMarkdownComponents = (theme = "light"): Components => ({
   td: ({ children }) => (
     <td className="border border-border px-4 py-2">{children}</td>
   ),
-});
+})
