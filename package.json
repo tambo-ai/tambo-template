@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint --ext .js,.jsx,.ts,.tsx",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@tambo-ai/react": "^0.19.8",
@@ -28,11 +29,18 @@
     "@types/react-dom": "^19",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@types/sanitize-html": "^2.13.0",
+    "@typescript-eslint/eslint-plugin": "^8.29.1",
+    "@typescript-eslint/parser": "^8.29.1",
     "autoprefixer": "^10.4.21",
     "clsx": "^2.1.1",
-    "eslint": "^9",
+    "eslint": "^9.24.0",
     "eslint-config-next": "15.2.3",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "postcss": "^8.5.3",
+    "prettier": "^3.5.3",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4",
     "typescript": "^5"
