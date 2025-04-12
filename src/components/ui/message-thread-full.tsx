@@ -1,13 +1,13 @@
-"use client";
+'use client'
 
-import { MessageInput } from "@/components/ui/message-input";
-import { MessageSuggestions } from "@/components/ui/message-suggestions";
-import { ThreadContent } from "@/components/ui/thread-content";
-import { ThreadHistory } from "@/components/ui/thread-history";
-import { cn } from "@/lib/utils";
-import { useTambo } from "@tambo-ai/react";
-import * as React from "react";
-import { useEffect, useRef } from "react";
+import { MessageInput } from '@/components/ui/message-input'
+import { MessageSuggestions } from '@/components/ui/message-suggestions'
+import { ThreadContent } from '@/components/ui/thread-content'
+import { ThreadHistory } from '@/components/ui/thread-history'
+import { cn } from '@/lib/utils'
+import { useTambo } from '@tambo-ai/react'
+import * as React from 'react'
+import { useEffect, useRef } from 'react'
 
 /**
  * Props for the MessageThreadFull component
@@ -17,7 +17,7 @@ import { useEffect, useRef } from "react";
 export interface MessageThreadFullProps
   extends React.HTMLAttributes<HTMLDivElement> {
   /** Optional context key for the thread */
-  contextKey?: string;
+  contextKey?: string
 }
 
 /**
@@ -35,8 +35,8 @@ export const MessageThreadFull = React.forwardRef<
   HTMLDivElement,
   MessageThreadFullProps
 >(({ className, contextKey, ...props }, ref) => {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const { thread } = useTambo();
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const { thread } = useTambo()
 
   useEffect(() => {
     if (scrollContainerRef.current && thread?.messages?.length) {
@@ -44,22 +44,22 @@ export const MessageThreadFull = React.forwardRef<
         if (scrollContainerRef.current) {
           scrollContainerRef.current.scrollTo({
             top: scrollContainerRef.current.scrollHeight,
-            behavior: "smooth",
-          });
+            behavior: 'smooth',
+          })
         }
-      }, 100);
+      }, 100)
 
-      return () => clearTimeout(timeoutId);
+      return () => clearTimeout(timeoutId)
     }
-  }, [thread?.messages]);
+  }, [thread?.messages])
 
   return (
     <div
       ref={ref}
       className={cn(
-        "flex flex-col bg-white rounded-lg overflow-hidden bg-background",
-        "h-[90vh] sm:h-[85vh] md:h-[80vh]",
-        "w-full max-w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl mx-auto",
+        'flex flex-col bg-white rounded-lg overflow-hidden bg-background',
+        'h-[90vh] sm:h-[85vh] md:h-[80vh]',
+        'w-full max-w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl mx-auto',
         className,
       )}
       {...props}
@@ -79,6 +79,6 @@ export const MessageThreadFull = React.forwardRef<
         <MessageInput contextKey={contextKey} />
       </div>
     </div>
-  );
-});
-MessageThreadFull.displayName = "MessageThreadFull";
+  )
+})
+MessageThreadFull.displayName = 'MessageThreadFull'

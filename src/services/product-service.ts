@@ -1,14 +1,14 @@
 // This is a mock product service that would be used to fetch products from an api, which Tambo would use to get real product data. For now, we're just using a local static list of products.
 
 interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  discountPercentage?: number;
-  accentColor: 'indigo' | 'emerald' | 'rose' | 'amber';
-  inStock?: boolean;
+  id: string
+  name: string
+  description: string
+  price: number
+  category: string
+  discountPercentage?: number
+  accentColor: 'indigo' | 'emerald' | 'rose' | 'amber'
+  inStock?: boolean
 }
 
 const mockProducts: Product[] = [
@@ -20,7 +20,7 @@ const mockProducts: Product[] = [
     category: 'Electronics',
     discountPercentage: 10,
     accentColor: 'indigo',
-    inStock: true
+    inStock: true,
   },
   {
     id: '2',
@@ -30,7 +30,7 @@ const mockProducts: Product[] = [
     category: 'Electronics',
     discountPercentage: 5,
     accentColor: 'emerald',
-    inStock: true
+    inStock: true,
   },
   {
     id: '3',
@@ -40,7 +40,7 @@ const mockProducts: Product[] = [
     category: 'Sports',
     discountPercentage: 20,
     accentColor: 'rose',
-    inStock: false
+    inStock: false,
   },
   {
     id: '4',
@@ -50,7 +50,7 @@ const mockProducts: Product[] = [
     category: 'Home',
     discountPercentage: 15,
     accentColor: 'amber',
-    inStock: true
+    inStock: true,
   },
   {
     id: '5',
@@ -60,13 +60,12 @@ const mockProducts: Product[] = [
     category: 'Sports',
     discountPercentage: 30,
     accentColor: 'indigo',
-    inStock: true
-  }
-];
+    inStock: true,
+  },
+]
 
 export const getProducts = async (): Promise<Product[]> => {
-  return mockProducts;
-};
+  return mockProducts
+}
 
-export type { Product };
-
+export type { Product }

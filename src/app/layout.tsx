@@ -1,25 +1,25 @@
-"use client";
+'use client'
 // import { ProductCard } from "@/components/product-card";
 // import { TamboComponent } from "@tambo-ai/react";
-import { TamboProvider } from "@tambo-ai/react";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { components } from "@/lib/tambo";
+import { TamboProvider } from '@tambo-ai/react'
+import { Geist, Geist_Mono } from 'next/font/google'
+import './globals.css'
+import { components } from '@/lib/tambo'
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+})
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+})
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang="en">
@@ -34,5 +34,5 @@ export default function RootLayout({
         </TamboProvider>
       </body>
     </html>
-  );
+  )
 }

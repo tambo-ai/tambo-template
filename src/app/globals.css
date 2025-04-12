@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme inline {
   --color-background: var(--background);
@@ -13,8 +13,8 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-@layer base{
-  :root{
+@layer base {
+  :root {
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
@@ -40,8 +40,8 @@ body {
     --chart-5: 280 64.7% 60%;
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
-}
-  .dark{
+  }
+  .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
@@ -61,92 +61,91 @@ body {
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
-}
+  }
 }
 
-@layer utilities{
-
-  .bg-background{
+@layer utilities {
+  .bg-background {
     background-color: hsl(var(--background));
   }
 
-  .text-foreground{
+  .text-foreground {
     color: hsl(var(--foreground));
   }
 
-  .bg-card{
+  .bg-card {
     background-color: hsl(var(--card));
   }
 
-  .text-card-foreground{
+  .text-card-foreground {
     color: hsl(var(--card-foreground));
   }
 
-  .bg-popover{
+  .bg-popover {
     background-color: hsl(var(--popover));
   }
 
-  .text-popover-foreground{
+  .text-popover-foreground {
     color: hsl(var(--popover-foreground));
   }
 
-  .bg-primary{
+  .bg-primary {
     background-color: hsl(var(--primary));
   }
 
-  .text-primary-foreground{
+  .text-primary-foreground {
     color: hsl(var(--primary-foreground));
   }
 
-  .bg-secondary{
+  .bg-secondary {
     background-color: hsl(var(--secondary));
   }
 
-  .text-secondary-foreground{
+  .text-secondary-foreground {
     color: hsl(var(--secondary-foreground));
   }
 
-  .bg-muted{
+  .bg-muted {
     background-color: hsl(var(--muted));
   }
 
-  .text-muted-foreground{
+  .text-muted-foreground {
     color: hsl(var(--muted-foreground));
   }
 
-  .bg-accent{
+  .bg-accent {
     background-color: hsl(var(--accent));
   }
 
-  .text-accent-foreground{
+  .text-accent-foreground {
     color: hsl(var(--accent-foreground));
   }
 
-  .bg-destructive{
+  .bg-destructive {
     background-color: hsl(var(--destructive));
   }
 
-  .text-destructive-foreground{
+  .text-destructive-foreground {
     color: hsl(var(--destructive-foreground));
   }
 
-  .border-border{
+  .border-border {
     border-color: hsl(var(--border));
   }
 
-  .bg-input{
+  .bg-input {
     background-color: hsl(var(--input));
   }
 
-  .ring-ring{
+  .ring-ring {
     --tw-ring-color: hsl(var(--ring));
   }
 
-  .hover\:bg-primary\/90:hover{
+  .hover\:bg-primary\/90:hover {
     background-color: hsl(var(--primary) / 0.9);
   }
 
-  .hover\:bg-muted\/90:hover{
+  .hover\:bg-muted\/90:hover {
     background-color: hsl(var(--muted) / 0.9);
   }
 }
