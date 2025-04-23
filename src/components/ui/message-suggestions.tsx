@@ -71,7 +71,7 @@ export const MessageSuggestions = React.forwardRef<
         clearTimeout(loadingTimeoutRef.current);
       }
 
-      loadingTimeoutRef.current = setTimeout(() => {}, 5000);
+      loadingTimeoutRef.current = setTimeout(() => { }, 5000);
     }
 
     return () => {
@@ -162,19 +162,19 @@ export const MessageSuggestions = React.forwardRef<
                       <button
                         className={cn(
                           "py-2 px-2.5 rounded-full text-xs transition-colors",
-                          "border border-input",
+                          "border border-gray-300 shadow-sm cursor-pointer hover:opacity-80",
                           isGenerating
                             ? "bg-muted/50 text-muted-foreground"
                             : selectedSuggestionId === suggestion.id
                               ? "bg-accent text-accent-foreground"
-                              : "bg-background hover:bg-accent hover:text-accent-foreground",
+                              : "bg-background hover:bg-accent hover:text-accent-foreground ",
                         )}
                         onClick={async () =>
                           !isGenerating && (await accept({ suggestion }))
                         }
                         disabled={isGenerating}
                       >
-                        <span className="font-medium">{suggestion.title}</span>
+                        <span className="font-medium text-gray-600">{suggestion.title}</span>
                       </button>
                     </Tooltip>
                   ))}
