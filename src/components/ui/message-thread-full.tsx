@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useTambo } from "@tambo-ai/react";
 import * as React from "react";
 import { useEffect, useRef } from "react";
+import { WelcomeCard } from "../welcome-card";
 
 /**
  * Props for the MessageThreadFull component
@@ -72,6 +73,11 @@ export const MessageThreadFull = React.forwardRef<
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto px-4 [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-thumb]:bg-gray-300"
       >
+        {(!thread || thread.messages.length === 0) && (
+          <div className="w-full min-w-xl">
+            <WelcomeCard />
+          </div>
+        )}
         <ThreadContent className="py-4" />
       </div>
       <MessageSuggestions />
