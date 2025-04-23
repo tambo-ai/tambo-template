@@ -1,11 +1,11 @@
 "use client";
 
-import * as React from "react";
-import ReactMarkdown from "react-markdown";
+import { createMarkdownComponents } from "@/components/ui/markdownComponents";
+import { cn } from "@/lib/utils";
 import type { TamboThreadMessage } from "@tambo-ai/react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "@/lib/utils";
-import { createMarkdownComponents } from "@/components/ui/markdownComponents";
+import * as React from "react";
+import ReactMarkdown from "react-markdown";
 
 /**
  * Represents a message component
@@ -46,8 +46,8 @@ const bubbleVariants = cva(
   {
     variants: {
       role: {
-        user: "bg-primary text-primary-foreground hover:bg-primary/90",
-        assistant: "bg-muted text-foreground hover:bg-muted/90",
+        user: "bg-muted text-gray-700 hover:bg-muted/90",
+        assistant: "text-foreground",
       },
     },
     defaultVariants: {
@@ -86,7 +86,7 @@ const Message = React.forwardRef<HTMLDivElement, MessageProps>(
           <div className={cn(bubbleVariants({ role }))}>
             <div className="break-words whitespace-pre-wrap">
               <div className="text-sm mb-1 opacity-50">
-                {role === "user" ? "You" : "Tambo AI"}
+                {/* {role === "user" ? "You" : "Tambo AI"} */}
               </div>
               {!content ? (
                 <span className="text-muted-foreground italic">

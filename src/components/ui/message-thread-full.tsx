@@ -66,7 +66,7 @@ export const MessageThreadFull = React.forwardRef<
       {...props}
     >
       <div className="p-4 flex items-center justify-between">
-        <h2 className="font-semibold text-lg">Use AI</h2>
+        <h2 className="font-semibold text-lg"></h2>
         <ThreadHistory contextKey={contextKey} />
       </div>
       <div
