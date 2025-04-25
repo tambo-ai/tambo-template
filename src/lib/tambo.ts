@@ -59,11 +59,14 @@ export const components: TamboComponent[] = [
       name: z.string().describe("The name of the product"),
       price: z.number().describe("The price of the product"),
       description: z.string().describe("The description of the product"),
-      discountPercentage: z.number().describe("The discount percentage of the product"),
-      accentColor: z.enum(["indigo", "emerald", "rose", "amber"]).describe("The accent color of the product"),
+      discountPercentage: z
+        .number()
+        .describe("The discount percentage of the product"),
+      accentColor: z
+        .enum(["indigo", "emerald", "rose", "amber"])
+        .describe("The accent color of the product"),
       inStock: z.boolean().describe("Whether the product is in stock"),
     }),
-    associatedTools: [productsTool],
   },
   // Add more components here
 ];
