@@ -29,8 +29,7 @@ const tamboComponents: TamboComponent[] = [
       discountPercentage: z.number().describe("The discount percentage of the product"),
       accentColor: z.enum(["indigo", "emerald", "rose", "amber"]).describe("The accent color of the product"),
       inStock: z.boolean().describe("Whether the product is in stock"),
-    }), // Here we tell tambo what props the component expects
-    associatedTools: [productsTool] // associate the products tool with the component so Tambo fetches real products when generating this component's props
+    }) // Here we tell tambo what props the component expects
   },
   // Add more components for Tambo to control here!
 ];
@@ -55,6 +54,39 @@ The example ProductCard component demonstrates several key features:
 Update the `tamboComponents` array with any component(s) you want tambo to be able to use in a response!
 
 You can find more information about the options [here](https://tambo.co/docs/concepts/registering-components)
+
+### Add tools for tambo to use
+
+```tsx
+export const productsTool: TamboTool = {
+  name: "products",
+  description: "A tool to get products from the database",
+  tool: getProducts,
+  toolSchema: z.function().returns(
+    z.array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        description: z.string(),
+        price: z.number(),
+        discountPercentage: z.number().optional(),
+        accentColor: z.string(),
+        inStock: z.boolean().optional(),
+      })
+    )
+  ),
+};
+
+...
+
+  const { registerTool } = useTambo();
+
+  useEffect(() => {
+    registerTool(productsTool);
+  }, []);
+```
+
+Find more information about tools [here.](https://tambo.co/docs/concepts/tools)
 
 ### Change where component responses are shown
 
