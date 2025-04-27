@@ -14,7 +14,7 @@ This is a starter NextJS app with Tambo hooked up to get your AI app development
 
 ### Change what components tambo can control
 
-You can see how the `ProductCard` is registered with tambo in `src/app/layout.tsx`:
+You can see how the `ProductCard` is registered with tambo in `src/lib/tambo.ts`:
 
 ```tsx
 const tamboComponents: TamboComponent[] = [
