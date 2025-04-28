@@ -61,7 +61,7 @@ export const MessageThreadFull = React.forwardRef<
         "flex flex-col bg-white rounded-lg overflow-hidden bg-background",
         "h-[90vh] sm:h-[85vh] md:h-[80vh]",
         "w-full max-w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl mx-auto",
-        className,
+        className
       )}
       {...props}
     >
@@ -74,7 +74,7 @@ export const MessageThreadFull = React.forwardRef<
         className="flex-1 overflow-y-auto px-4 [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-thumb]:bg-gray-300"
       >
         {(!thread || thread.messages.length === 0) && (
-          <div className="w-full min-w-xl">
+          <div className="w-full min-w-xl ">
             <WelcomeCard />
           </div>
         )}

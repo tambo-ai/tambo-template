@@ -1,10 +1,10 @@
 "use client";
 // import { ProductCard } from "@/components/product-card";
 // import { TamboComponent } from "@tambo-ai/react";
+import { components } from "@/lib/tambo";
 import { TamboProvider } from "@tambo-ai/react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { components } from "@/lib/tambo";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
