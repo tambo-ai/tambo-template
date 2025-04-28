@@ -1,6 +1,6 @@
 "use client";
 import { MessageThreadFull } from "@/components/ui/message-thread-full";
-import { productsTool } from "@/lib/tambo";
+import { countryPopulationTool, globalPopulationTool } from "@/lib/tambo";
 import { useTambo } from "@tambo-ai/react";
 import { useEffect } from "react";
 
@@ -8,7 +8,8 @@ export default function Home() {
   const { registerTool } = useTambo();
 
   useEffect(() => {
-    registerTool(productsTool);
+    registerTool(countryPopulationTool);
+    registerTool(globalPopulationTool);
   }, []);
 
   return (
