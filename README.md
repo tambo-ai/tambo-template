@@ -14,79 +14,121 @@ This is a starter NextJS app with Tambo hooked up to get your AI app development
 
 ### Change what components tambo can control
 
-You can see how the `ProductCard` is registered with tambo in `src/lib/tambo.ts`:
+You can see how the `Graph` component is registered with tambo in `src/lib/tambo.ts`:
 
 ```tsx
-const tamboComponents: TamboComponent[] = [
+const components: TamboComponent[] = [
   {
-    name: "ProductCard",
-    description: "A product card component that displays product information with customizable pricing, discounts, and styling. Perfect for demonstrating interactive UI elements!", // Here we tell tambo what the component is for and when to use it
-    component: ProductCard, // Reference to the actual component definition
+    name: "Graph",
+    description:
+      "A component that renders various types of charts (bar, line, pie) using Recharts. Supports customizable data visualization with labels, datasets, and styling options.",
+    component: Graph,
     propsSchema: z.object({
-      name: z.string().describe("The name of the product"),
-      price: z.number().describe("The price of the product"),
-      description: z.string().describe("The description of the product"),
-      discountPercentage: z.number().describe("The discount percentage of the product"),
-      accentColor: z.enum(["indigo", "emerald", "rose", "amber"]).describe("The accent color of the product"),
-      inStock: z.boolean().describe("Whether the product is in stock"),
-    }) // Here we tell tambo what props the component expects
+      data: z
+        .object({
+          type: z
+            .enum(["bar", "line", "pie"])
+            .describe("Type of graph to render"),
+          labels: z.array(z.string()).describe("Labels for the graph"),
+          datasets: z
+            .array(
+              z.object({
+                label: z.string().describe("Label for the dataset"),
+                data: z
+                  .array(z.number())
+                  .describe("Data points for the dataset"),
+                color: z
+                  .string()
+                  .optional()
+                  .describe("Optional color for the dataset"),
+              })
+            )
+            .describe("Data for the graph"),
+        })
+        .describe("Data object containing chart configuration and values"),
+      title: z.string().optional().describe("Optional title for the chart"),
+      showLegend: z
+        .boolean()
+        .optional()
+        .describe("Whether to show the legend (default: true)"),
+      variant: z
+        .enum(["default", "solid", "bordered"])
+        .optional()
+        .describe("Visual style variant of the graph"),
+      size: z
+        .enum(["default", "sm", "lg"])
+        .optional()
+        .describe("Size of the graph"),
+    }),
   },
   // Add more components for Tambo to control here!
 ];
-
-...
-
-        <TamboProvider
-          apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}
-          components={tamboComponents}
-        >
-          {children}
-        </TamboProvider>
 ```
 
-The example ProductCard component demonstrates several key features:
+p.s. you can install this graph component into any tambo project with:
 
-- Different prop types (strings, numbers, booleans, enums)
-- Interactive elements (Add to Cart button)
-- Conditional rendering (discount display, stock status)
-- Dynamic styling (color variations)
+```bash
+npx tambo add graph
+```
 
-Update the `tamboComponents` array with any component(s) you want tambo to be able to use in a response!
+The example Graph component demonstrates several key features:
+
+- Different prop types (strings, arrays, enums, nested objects)
+- Multiple chart types (bar, line, pie)
+- Customizable styling (variants, sizes)
+- Optional configurations (title, legend, colors)
+- Data visualization capabilities
+
+Update the `components` array with any component(s) you want tambo to be able to use in a response!
 
 You can find more information about the options [here](https://tambo.co/docs/concepts/registering-components)
 
 ### Add tools for tambo to use
 
 ```tsx
-export const productsTool: TamboTool = {
-  name: "products",
-  description: "A tool to get products from the database",
-  tool: getProducts,
-  toolSchema: z.function().returns(
-    z.array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        description: z.string(),
-        price: z.number(),
-        discountPercentage: z.number().optional(),
-        accentColor: z.string(),
-        inStock: z.boolean().optional(),
+export const globalPopulationTool: TamboTool = {
+  name: "globalPopulation",
+  description:
+    "A tool to get global population trends with optional year range filtering",
+  tool: getGlobalPopulationTrend,
+  toolSchema: z.function().args(
+    z
+      .object({
+        startYear: z.number().optional(),
+        endYear: z.number().optional(),
       })
-    )
+      .optional()
   ),
 };
+```
 
+```tsx
 ...
 
   const { registerTool } = useTambo();
 
   useEffect(() => {
-    registerTool(productsTool);
+    registerTool(globalPopulationTool);
   }, []);
 ```
 
 Find more information about tools [here.](https://tambo.co/docs/concepts/tools)
+
+### The Magic of Tambo Requires the TamboProvider
+
+Make sure in the TamboProvider wrapped around your app:
+
+```tsx
+...
+<TamboProvider
+  apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}
+  components={components}
+>
+  {children}
+</TamboProvider>
+```
+
+In this example we do this in the `Layout.tsx` file, but you can do it anywhere in your app that is a client component.
 
 ### Change where component responses are shown
 
@@ -106,4 +148,4 @@ return (
 );
 ```
 
-Since tambo keeps the thread state updated, the latest message will automatically update and cause a re-render whenever there is a new component to show!
+For more detailed documentation, visit [Tambo's official docs](https://tambo.co/docs).
