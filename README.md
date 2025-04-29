@@ -4,13 +4,13 @@ This is a starter NextJS app with Tambo hooked up to get your AI app development
 
 ## Get Started
 
-1. Run 'npm create-tambo@latest'
+1. Run `npm create-tambo@latest my-tambo-app` for a new project
 
 2. `npm install`
 
 3. `npx tambo init`
 
-> or rename `example.env.local` to `.env.local` and add your tambo API key you can get for free [here](https://tambo.co/dashboard).
+- or rename `example.env.local` to `.env.local` and add your tambo API key you can get for free [here](https://tambo.co/dashboard).
 
 4. Run `npm run dev` and go to `localhost:3000` to use the app!
 
