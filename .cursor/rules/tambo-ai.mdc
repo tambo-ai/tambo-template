@@ -3,22 +3,27 @@ description: working with tambo-ai, llms, generative UI/UX, or AI agents/assista
 globs: 
 alwaysApply: false
 ---
-
 # Using tambo-ai to build AI powered chat experiences with generative UI/UX
+
+version: 0.21.1
 
 ## Quick Setup
 
 1. Initialize a new Tambo project:
 ```bash
-npx tambo init
+npm create tambo-app@latest my-tambo-app for a new project
+
+npx tambo init // to get tambo-ai api key
+
+npx tambo full-send // to add to an existing project & include tambo-ai api key
 ``
 
-3. Alternative setup:
+Alternative manual setup to get key:
    - Rename `example.env.local` to `.env.local`
    - Add your Tambo API key from tambo.co/cli-auth
 
 ```
-4. Wrap your app in the TamboProvider:
+2. Wrap your app in the TamboProvider:
 Needs to be a client component:
 
 ```typescript
@@ -31,13 +36,13 @@ Needs to be a client component:
 
 ```
 
-5. Register your tools:
+3. Register your tools:
 
 ```typescript
 const { registerTool } = useTambo();
 
 useEffect(() => {
-  registerTool(globalPopulationTool);
+  registerTool(//insert tool here);
 }, []);
 
 Add tambo-components to your project:
@@ -69,7 +74,7 @@ src/
 tailwind.config.ts          # Tailwind CSS configuration
 ```
 
-## Recomendations
+## Recommendations
 - use zod for defining tool and component schemas
 
 ## Core React Hooks
@@ -234,4 +239,3 @@ The `generationStage` from `useTamboThread` can be:
 - `STREAMING_RESPONSE`: Actively streaming
 - `COMPLETE`: Generation finished
 - `ERROR`: Error occurred
-
