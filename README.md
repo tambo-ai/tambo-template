@@ -4,11 +4,15 @@ This is a starter NextJS app with Tambo hooked up to get your AI app development
 
 ## Get Started
 
-1. `npm install`
+1. Run `npm create-tambo@latest my-tambo-app` for a new project
 
-2. Rename `example.env.local` to `.env.local` and add your real tambo API key. You can get a tambo API key for free [here](https://tambo.co/dashboard), or by running `npx tambo init`
+2. `npm install`
 
-3. Run `npm run dev` and go to `localhost:3000` to use the app!
+3. `npx tambo init`
+
+- or rename `example.env.local` to `.env.local` and add your tambo API key you can get for free [here](https://tambo.co/dashboard).
+
+4. Run `npm run dev` and go to `localhost:3000` to use the app!
 
 ## Customizing
 
@@ -65,7 +69,7 @@ const components: TamboComponent[] = [
 ];
 ```
 
-p.s. you can install this graph component into any tambo project with:
+You can install this graph component into any project with:
 
 ```bash
 npx tambo add graph
