@@ -8,39 +8,61 @@
  * Read more about Tambo at https://tambo.co/docs
  */
 
-import { ProductCard } from "@/components/product-card";
-import { getProducts } from "@/services/product-service";
+import { Graph } from "@/components/ui/graph";
+import {
+  getCountryPopulations,
+  getGlobalPopulationTrend,
+} from "@/services/population-stats";
 import type { TamboComponent } from "@tambo-ai/react";
 import { TamboTool } from "@tambo-ai/react";
 import { z } from "zod";
 
 /**
- * productsTool
+ * globalPopulationTool
  *
- * This tool is used to fetch products from the database. It is defined using a Zod schema
- * to ensure the data structure is validated. This tool can be associated with components
- * to provide dynamic data fetching capabilities.
+ * This tool fetches global population trends over the last 20 years. It provides
+ * yearly population data with growth rates. Supports filtering by year range.
  */
-export const productsTool: TamboTool = {
-  name: "products",
-  description: "A tool to get products from the database",
-  tool: getProducts,
-  toolSchema: z.function().returns(
-    z.array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        description: z.string(),
-        price: z.number(),
-        discountPercentage: z.number().optional(),
-        accentColor: z.string(),
-        inStock: z.boolean().optional(),
+export const globalPopulationTool: TamboTool = {
+  name: "globalPopulation",
+  description:
+    "A tool to get global population trends with optional year range filtering",
+  tool: getGlobalPopulationTrend,
+  toolSchema: z.function().args(
+    z
+      .object({
+        startYear: z.number().optional(),
+        endYear: z.number().optional(),
       })
-    )
+      .optional()
   ),
 };
 
-// Add more tools here
+/**
+ * countryPopulationTool
+ *
+ * This tool fetches population data for different countries, with filtering options for:
+ * - Continent
+ * - Sorting by population or growth rate
+ * - Limiting results (e.g., top 10, bottom 10)
+ * - Sort order (ascending/descending)
+ */
+export const countryPopulationTool: TamboTool = {
+  name: "countryPopulation",
+  description:
+    "A tool to get population statistics by country with advanced filtering options",
+  tool: getCountryPopulations,
+  toolSchema: z.function().args(
+    z
+      .object({
+        continent: z.string().optional(),
+        sortBy: z.enum(["population", "growthRate"]).optional(),
+        limit: z.number().optional(),
+        order: z.enum(["asc", "desc"]).optional(),
+      })
+      .optional()
+  ),
+};
 
 /**
  * components
@@ -51,21 +73,46 @@ export const productsTool: TamboTool = {
  */
 export const components: TamboComponent[] = [
   {
-    name: "ProductCard",
+    name: "Graph",
     description:
-      "A product card component that displays product information with customizable pricing, discounts, and styling. Perfect for demonstrating interactive UI elements!",
-    component: ProductCard,
+      "A component that renders various types of charts (bar, line, pie) using Recharts. Supports customizable data visualization with labels, datasets, and styling options.",
+    component: Graph,
     propsSchema: z.object({
-      name: z.string().describe("The name of the product"),
-      price: z.number().describe("The price of the product"),
-      description: z.string().describe("The description of the product"),
-      discountPercentage: z
-        .number()
-        .describe("The discount percentage of the product"),
-      accentColor: z
-        .enum(["indigo", "emerald", "rose", "amber"])
-        .describe("The accent color of the product"),
-      inStock: z.boolean().describe("Whether the product is in stock"),
+      data: z
+        .object({
+          type: z
+            .enum(["bar", "line", "pie"])
+            .describe("Type of graph to render"),
+          labels: z.array(z.string()).describe("Labels for the graph"),
+          datasets: z
+            .array(
+              z.object({
+                label: z.string().describe("Label for the dataset"),
+                data: z
+                  .array(z.number())
+                  .describe("Data points for the dataset"),
+                color: z
+                  .string()
+                  .optional()
+                  .describe("Optional color for the dataset"),
+              })
+            )
+            .describe("Data for the graph"),
+        })
+        .describe("Data object containing chart configuration and values"),
+      title: z.string().optional().describe("Optional title for the chart"),
+      showLegend: z
+        .boolean()
+        .optional()
+        .describe("Whether to show the legend (default: true)"),
+      variant: z
+        .enum(["default", "solid", "bordered"])
+        .optional()
+        .describe("Visual style variant of the graph"),
+      size: z
+        .enum(["default", "sm", "lg"])
+        .optional()
+        .describe("Size of the graph"),
     }),
   },
   // Add more components here

@@ -110,16 +110,18 @@ const KeyFilesSection = () => (
         <span>📄</span>
         <span>
           <code className="font-medium font-mono">
-            /components/ui/product-card.tsx
+            /components/ui/graph.tsx
           </code>{" "}
-          - Example Generative UI Component
+          - A generative graph component
         </span>
       </li>
       <li className="flex items-start gap-2">
         <span className="text-blue-500">📄</span>
         <span>
-          <code className="font-medium font-mono">services/products.ts</code> -
-          Example tool implementation
+          <code className="font-medium font-mono">
+            services/population-stats.ts
+          </code>{" "}
+          - An example tool implementation
         </span>
       </li>
       <li className="flex items-start gap-2">
@@ -127,6 +129,13 @@ const KeyFilesSection = () => (
         <span>
           <code className="font-medium font-mono">tambo.ts</code> - Component
           and tool registration
+        </span>
+      </li>
+      <li className="flex items-start gap-2">
+        <span className="text-blue-500">📄</span>
+        <span>
+          <code className="font-medium font-mono">README.md</code> - For more
+          details check out the README
         </span>
       </li>
     </ul>
