@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "init": "npx tambo init"
   },
   "dependencies": {
     "@tambo-ai/react": "^0.21.0",
