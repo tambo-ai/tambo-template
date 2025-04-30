@@ -23,7 +23,7 @@ import { z } from "zod";
  * This tool fetches global population trends over the last 20 years. It provides
  * yearly population data with growth rates. Supports filtering by year range.
  */
-export const globalPopulationTool: TamboTool = {
+const globalPopulationTool: TamboTool = {
   name: "globalPopulation",
   description:
     "A tool to get global population trends with optional year range filtering",
@@ -47,7 +47,7 @@ export const globalPopulationTool: TamboTool = {
  * - Limiting results (e.g., top 10, bottom 10)
  * - Sort order (ascending/descending)
  */
-export const countryPopulationTool: TamboTool = {
+const countryPopulationTool: TamboTool = {
   name: "countryPopulation",
   description:
     "A tool to get population statistics by country with advanced filtering options",
@@ -64,6 +64,7 @@ export const countryPopulationTool: TamboTool = {
   ),
 };
 
+export const tools: TamboTool[] = [globalPopulationTool, countryPopulationTool];
 /**
  * components
  *
