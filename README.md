@@ -90,30 +90,22 @@ You can find more information about the options [here](https://tambo.co/docs/con
 ### Add tools for tambo to use
 
 ```tsx
-export const globalPopulationTool: TamboTool = {
-  name: "globalPopulation",
-  description:
-    "A tool to get global population trends with optional year range filtering",
-  tool: getGlobalPopulationTrend,
-  toolSchema: z.function().args(
-    z
-      .object({
-        startYear: z.number().optional(),
-        endYear: z.number().optional(),
-      })
-      .optional()
-  ),
-};
-```
-
-```tsx
-...
-
-  const { registerTool } = useTambo();
-
-  useEffect(() => {
-    registerTool(globalPopulationTool);
-  }, []);
+export const tools: TamboTool[] = [
+  {
+    name: "globalPopulation",
+    description:
+      "A tool to get global population trends with optional year range filtering",
+    tool: getGlobalPopulationTrend,
+    toolSchema: z.function().args(
+      z
+        .object({
+          startYear: z.number().optional(),
+          endYear: z.number().optional(),
+        })
+        .optional()
+    ),
+  },
+];
 ```
 
 Find more information about tools [here.](https://tambo.co/docs/concepts/tools)
@@ -126,7 +118,8 @@ Make sure in the TamboProvider wrapped around your app:
 ...
 <TamboProvider
   apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}
-  components={components}
+  components={components} // Array of components to control
+  tools={tools} // Array of tools it can use
 >
   {children}
 </TamboProvider>

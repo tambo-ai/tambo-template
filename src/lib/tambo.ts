@@ -18,51 +18,46 @@ import { TamboTool } from "@tambo-ai/react";
 import { z } from "zod";
 
 /**
- * globalPopulationTool
+ * tools
  *
- * This tool fetches global population trends over the last 20 years. It provides
- * yearly population data with growth rates. Supports filtering by year range.
+ * This array contains all the Tambo tools that are registered for use within the application.
+ * Each tool is defined with its name, description, and expected props. The tools
+ * can be controlled by AI to dynamically fetch data based on user interactions.
  */
-export const globalPopulationTool: TamboTool = {
-  name: "globalPopulation",
-  description:
-    "A tool to get global population trends with optional year range filtering",
-  tool: getGlobalPopulationTrend,
-  toolSchema: z.function().args(
-    z
-      .object({
-        startYear: z.number().optional(),
-        endYear: z.number().optional(),
-      })
-      .optional()
-  ),
-};
 
-/**
- * countryPopulationTool
- *
- * This tool fetches population data for different countries, with filtering options for:
- * - Continent
- * - Sorting by population or growth rate
- * - Limiting results (e.g., top 10, bottom 10)
- * - Sort order (ascending/descending)
- */
-export const countryPopulationTool: TamboTool = {
-  name: "countryPopulation",
-  description:
-    "A tool to get population statistics by country with advanced filtering options",
-  tool: getCountryPopulations,
-  toolSchema: z.function().args(
-    z
-      .object({
-        continent: z.string().optional(),
-        sortBy: z.enum(["population", "growthRate"]).optional(),
-        limit: z.number().optional(),
-        order: z.enum(["asc", "desc"]).optional(),
-      })
-      .optional()
-  ),
-};
+export const tools: TamboTool[] = [
+  {
+    name: "countryPopulation",
+    description:
+      "A tool to get population statistics by country with advanced filtering options",
+    tool: getCountryPopulations,
+    toolSchema: z.function().args(
+      z
+        .object({
+          continent: z.string().optional(),
+          sortBy: z.enum(["population", "growthRate"]).optional(),
+          limit: z.number().optional(),
+          order: z.enum(["asc", "desc"]).optional(),
+        })
+        .optional()
+    ),
+  },
+  {
+    name: "globalPopulation",
+    description:
+      "A tool to get global population trends with optional year range filtering",
+    tool: getGlobalPopulationTrend,
+    toolSchema: z.function().args(
+      z
+        .object({
+          startYear: z.number().optional(),
+          endYear: z.number().optional(),
+        })
+        .optional()
+    ),
+  },
+  // Add more tools here
+];
 
 /**
  * components
