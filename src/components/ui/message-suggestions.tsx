@@ -3,7 +3,7 @@
 import { MessageGenerationStage } from "@/components/ui/message-generation-stage";
 import { Tooltip, TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { useTambo, useTamboSuggestions } from "@tambo-ai/react";
+import { Suggestion, useTambo, useTamboSuggestions } from "@tambo-ai/react";
 import { Loader2Icon } from "lucide-react";
 import * as React from "react";
 import { useEffect, useRef } from "react";
@@ -60,6 +60,8 @@ export interface MessageSuggestionsProps
   maxSuggestions?: number;
   /** The child elements to render within the container. */
   children?: React.ReactNode;
+  /** Pre-seeded suggestions to display initially */
+  initialSuggestions?: Suggestion[];
 }
 
 /**
@@ -77,14 +79,24 @@ export interface MessageSuggestionsProps
 const MessageSuggestions = React.forwardRef<
   HTMLDivElement,
   MessageSuggestionsProps
->(({ children, className, maxSuggestions = 3, ...props }, ref) => {
+>(({ children, className, maxSuggestions = 3, initialSuggestions = [], ...props }, ref) => {
   const { thread } = useTambo();
   const {
-    suggestions,
+    suggestions: generatedSuggestions,
     selectedSuggestionId,
     accept,
     generateResult: { isPending: isGenerating, error },
   } = useTamboSuggestions({ maxSuggestions });
+
+  // Combine initial and generated suggestions, but only use initial ones when thread is empty
+  const suggestions = React.useMemo(() => {
+    // Only use pre-seeded suggestions if thread is empty
+    if (!thread?.messages?.length && initialSuggestions.length > 0) {
+      return initialSuggestions.slice(0, maxSuggestions);
+    }
+    // Otherwise use generated suggestions
+    return generatedSuggestions;
+  }, [thread?.messages?.length, generatedSuggestions, initialSuggestions, maxSuggestions]);
 
   const isMac =
     typeof navigator !== "undefined" && navigator.platform.startsWith("Mac");
@@ -152,7 +164,7 @@ const MessageSuggestions = React.forwardRef<
         if (!isNaN(keyNum) && keyNum > 0 && keyNum <= suggestions.length) {
           event.preventDefault();
           const suggestionIndex = keyNum - 1;
-          accept({ suggestion: suggestions[suggestionIndex] });
+          accept({ suggestion: suggestions[suggestionIndex] as Suggestion });
         }
       }
     };
@@ -164,8 +176,8 @@ const MessageSuggestions = React.forwardRef<
     };
   }, [suggestions, accept, isMac]);
 
-  // If we have no messages yet, render nothing
-  if (!thread?.messages?.length) {
+  // If we have no messages yet and no initial suggestions, render nothing
+  if (!thread?.messages?.length && initialSuggestions.length === 0) {
     return null;
   }
 
@@ -211,15 +223,14 @@ const MessageSuggestionsStatus = React.forwardRef<
 >(({ className, ...props }, ref) => {
   const { error, isGenerating, thread } = useMessageSuggestionsContext();
 
-  // No status to display
-  if (!error && !isGenerating && !thread?.generationStage) {
-    return null;
-  }
-
   return (
     <div
       ref={ref}
-      className={cn("p-2 rounded-md text-sm bg-muted/30", className)}
+      className={cn(
+        "p-2 rounded-md text-sm bg-muted/30", 
+        (!error && !isGenerating && (!thread?.generationStage || thread.generationStage === "COMPLETE")) ? "p-0 min-h-0 mb-0" : "",
+        className
+      )}
       data-slot="message-suggestions-status"
       {...props}
     >
@@ -230,17 +241,17 @@ const MessageSuggestionsStatus = React.forwardRef<
         </div>
       )}
 
-      {/* First show generation stage until complete, then show loading state if generating suggestions */}
-      {thread?.generationStage && thread.generationStage !== "COMPLETE" ? (
-        <MessageGenerationStage />
-      ) : (
-        isGenerating && (
-          <div className="flex items-center gap-2 text-muted-foreground mb-2">
+      {/* Always render a container for generation stage to prevent layout shifts */}
+      <div className="generation-stage-container">
+        {thread?.generationStage && thread.generationStage !== "COMPLETE" ? (
+          <MessageGenerationStage />
+        ) : isGenerating ? (
+          <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2Icon className="h-4 w-4 animate-spin" />
             <p>Generating suggestions...</p>
           </div>
-        )
-      )}
+        ) : null}
+      </div>
     </div>
   );
 });
@@ -271,55 +282,67 @@ const MessageSuggestionsList = React.forwardRef<
   const { suggestions, selectedSuggestionId, accept, isGenerating, isMac } =
     useMessageSuggestionsContext();
 
-  if (suggestions.length === 0) {
-    return null;
-  }
-
   const modKey = isMac ? "⌘" : "Ctrl";
   const altKey = isMac ? "⌥" : "Alt";
+
+  // Create placeholder suggestions when there are no real suggestions
+  const placeholders = Array(3).fill(null);
 
   return (
     <div
       ref={ref}
       className={cn(
-        "flex space-x-2 overflow-x-auto pb-2 rounded-md bg-muted/30",
+        "flex space-x-2 overflow-x-auto pb-2 rounded-md bg-muted/30 min-h-[2.5rem]",
         isGenerating ? "opacity-70" : "",
         className,
       )}
       data-slot="message-suggestions-list"
       {...props}
     >
-      {suggestions.map((suggestion, index) => (
-        <Tooltip
-          key={suggestion.id}
-          content={
-            <span suppressHydrationWarning>
-              {modKey}+{altKey}+{index + 1}
-            </span>
-          }
-          side="top"
-        >
-          <button
-            className={cn(
-              "py-2 px-2.5 rounded-2xl text-xs transition-colors",
-              "border border-flat",
-              isGenerating
-                ? "bg-muted/50 text-muted-foreground"
-                : selectedSuggestionId === suggestion.id
-                  ? "bg-accent text-accent-foreground"
-                  : "bg-background hover:bg-accent hover:text-accent-foreground",
-            )}
-            onClick={async () =>
-              !isGenerating && (await accept({ suggestion }))
+      {suggestions.length > 0 ? (
+        suggestions.map((suggestion, index) => (
+          <Tooltip
+            key={suggestion.id}
+            content={
+              <span suppressHydrationWarning>
+                {modKey}+{altKey}+{index + 1}
+              </span>
             }
-            disabled={isGenerating}
-            data-suggestion-id={suggestion.id}
-            data-suggestion-index={index}
+            side="top"
           >
-            <span className="font-medium">{suggestion.title}</span>
-          </button>
-        </Tooltip>
-      ))}
+            <button
+              className={cn(
+                "py-2 px-2.5 rounded-2xl text-xs transition-colors",
+                "border border-flat",
+                isGenerating
+                  ? "bg-muted/50 text-muted-foreground"
+                  : selectedSuggestionId === suggestion.id
+                    ? "bg-accent text-accent-foreground"
+                    : "bg-background hover:bg-accent hover:text-accent-foreground",
+              )}
+              onClick={async () =>
+                !isGenerating && (await accept({ suggestion }))
+              }
+              disabled={isGenerating}
+              data-suggestion-id={suggestion.id}
+              data-suggestion-index={index}
+            >
+              <span className="font-medium">{suggestion.title}</span>
+            </button>
+          </Tooltip>
+        ))
+      ) : (
+        // Render placeholder buttons when no suggestions are available
+        placeholders.map((_, index) => (
+          <div
+            key={`placeholder-${index}`}
+            className="py-2 px-2.5 rounded-2xl text-xs border border-flat bg-muted/20 text-transparent animate-pulse"
+            data-placeholder-index={index}
+          >
+            <span className="invisible">Placeholder</span>
+          </div>
+        ))
+      )}
     </div>
   );
 });
