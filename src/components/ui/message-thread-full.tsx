@@ -27,6 +27,7 @@ import {
   ThreadHistoryList,
 } from "@/components/ui/thread-history";
 import { ScrollableMessageContainer } from "@/components/ui/scrollable-message-container";
+import { WelcomeCard } from "../welcome-card";
 import { cn } from "@/lib/utils";
 import {
   useMergedRef,
@@ -120,6 +121,11 @@ export const MessageThreadFull = React.forwardRef<
       >
         {/* Message thread content */}
         <ScrollableMessageContainer className="p-4">
+        {(!thread || thread.messages.length === 0) && (
+          <div className="w-full min-w-xl p-4">
+            <WelcomeCard />
+          </div>
+        )}
           <div className="py-4">
             {messages.map((message, index) => (
               <div
