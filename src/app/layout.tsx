@@ -1,6 +1,3 @@
-"use client";
-// import { ProductCard } from "@/components/product-card";
-// import { TamboComponent } from "@tambo-ai/react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
