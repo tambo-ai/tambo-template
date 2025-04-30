@@ -4,10 +4,6 @@
     {
       "command": "npm install",
       "name": "Installing Dependencies"
-    },
-    {
-      "command": "npx tambo init",
-      "name": "npx tambo init"
     }
   ],
 
