@@ -334,7 +334,7 @@ const MessageInputError = React.forwardRef<
 >(({ className, ...props }, ref) => {
   const { error, submitError } = useMessageInputContext();
 
-  if (!error || !submitError) {
+  if (!error && !submitError) {
     return null;
   }
 
