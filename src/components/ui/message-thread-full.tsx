@@ -1,90 +1,189 @@
 "use client";
 
-import { MessageInput } from "@/components/ui/message-input";
-import { MessageSuggestions } from "@/components/ui/message-suggestions";
-import { ThreadContent } from "@/components/ui/thread-content";
-import { ThreadHistory } from "@/components/ui/thread-history";
+import {
+  MessageInput,
+  MessageInputTextarea,
+  MessageInputToolbar,
+  MessageInputSubmitButton,
+  MessageInputError,
+} from "@/components/ui/message-input";
+import {
+  MessageSuggestions,
+  MessageSuggestionsStatus,
+  MessageSuggestionsList,
+} from "@/components/ui/message-suggestions";
+import type {
+  messageVariants} from "@/components/ui/message";
+import {
+  Message,
+  MessageRenderedComponentArea,
+  MessageContent,
+} from "@/components/ui/message";
+import {
+  ThreadHistory,
+  ThreadHistoryHeader,
+  ThreadHistoryNewButton,
+  ThreadHistorySearch,
+  ThreadHistoryList,
+} from "@/components/ui/thread-history";
+import { ScrollableMessageContainer } from "@/components/ui/scrollable-message-container";
 import { cn } from "@/lib/utils";
+import {
+  useMergedRef,
+  useCanvasDetection,
+  usePositioning,
+} from "@/lib/thread-hooks";
 import { useTambo } from "@tambo-ai/react";
+import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
-import { useEffect, useRef } from "react";
-import { WelcomeCard } from "../welcome-card";
+import { useRef } from "react";
 
 /**
  * Props for the MessageThreadFull component
- * @interface
- * @extends React.HTMLAttributes<HTMLDivElement>
  */
 export interface MessageThreadFullProps
   extends React.HTMLAttributes<HTMLDivElement> {
   /** Optional context key for the thread */
   contextKey?: string;
+  /**
+   * Controls the visual styling of messages in the thread.
+   * Possible values include: "default", "compact", etc.
+   * These values are defined in messageVariants from "@/components/ui/message".
+   * @example variant="compact"
+   */
+  variant?: VariantProps<typeof messageVariants>["variant"];
 }
 
 /**
  * A full-screen chat thread component with message history, input, and suggestions
- * @component
- * @example
- * ```tsx
- * <MessageThreadFull
- *   contextKey="my-thread"
- *   className="custom-styles"
- * />
- * ```
  */
 export const MessageThreadFull = React.forwardRef<
   HTMLDivElement,
   MessageThreadFullProps
->(({ className, contextKey, ...props }, ref) => {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const { thread } = useTambo();
+>(({ className, contextKey, variant, ...props }, ref) => {
+  const threadRef = useRef<HTMLDivElement>(null);
+  const { hasCanvasSpace, canvasIsOnLeft } = useCanvasDetection(threadRef);
+  const { isLeftPanel, historyPosition } = usePositioning(
+    className,
+    canvasIsOnLeft,
+    hasCanvasSpace,
+  );
+  const mergedRef = useMergedRef<HTMLDivElement | null>(ref, threadRef);
 
-  useEffect(() => {
-    if (scrollContainerRef.current && thread?.messages?.length) {
-      const timeoutId = setTimeout(() => {
-        if (scrollContainerRef.current) {
-          scrollContainerRef.current.scrollTo({
-            top: scrollContainerRef.current.scrollHeight,
-            behavior: "smooth",
-          });
-        }
-      }, 100);
+  // Get message data from Tambo
+  const { thread, generationStage } = useTambo();
+  const messages = thread?.messages ?? [];
+  const isGenerating = generationStage === "STREAMING_RESPONSE";
 
-      return () => clearTimeout(timeoutId);
-    }
-  }, [thread?.messages]);
+  const threadHistorySidebar = (
+    <ThreadHistory contextKey={contextKey} position={historyPosition}>
+      <ThreadHistoryHeader />
+      <ThreadHistoryNewButton />
+      <ThreadHistorySearch />
+      <ThreadHistoryList />
+    </ThreadHistory>
+  );
 
   return (
-    <div
-      ref={ref}
-      className={cn(
-        "flex flex-col bg-white rounded-lg overflow-hidden bg-background",
-        "h-[90vh] sm:h-[85vh] md:h-[80vh]",
-        "w-full max-w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl mx-auto",
-        className
-      )}
-      {...props}
-    >
-      <div className="p-4 flex items-center justify-between">
-        <h2 className="font-semibold text-lg"></h2>
-        <ThreadHistory contextKey={contextKey} />
-      </div>
+    <>
+      {/* Thread History Sidebar - rendered first if history is on the left */}
+      {historyPosition === "left" && threadHistorySidebar}
+
       <div
-        ref={scrollContainerRef}
-        className="flex-1 overflow-y-auto px-4 [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-thumb]:bg-gray-300"
-      >
-        {(!thread || thread.messages.length === 0) && (
-          <div className="w-full min-w-xl ">
-            <WelcomeCard />
-          </div>
+        ref={mergedRef}
+        className={cn(
+          // Base layout and styling
+          "flex flex-col bg-white overflow-hidden bg-background", // Flex column layout with white background
+          "h-screen", // Full viewport height
+
+          // Sidebar spacing based on history position
+          historyPosition === "right"
+            ? "mr-[var(--sidebar-width,16rem)]" // Margin right when history is on right
+            : "ml-[var(--sidebar-width,16rem)]", // Margin left when history is on left
+
+          // Width constraints based on canvas presence
+          hasCanvasSpace
+            ? "max-w-3xl"
+            : "w-[calc(100%-var(--sidebar-width,16rem))]", // Max width with canvas, full width minus sidebar without
+
+          // Border styling when canvas is present
+          hasCanvasSpace && (canvasIsOnLeft ? "border-l" : "border-r"), // Left/right border based on canvas position
+          hasCanvasSpace && "border-border", // Border color
+
+          // Right alignment when specified
+          !isLeftPanel && "ml-auto", // Auto margin left to push to right when right class is specified
+
+          // Custom classes passed via props
+          className,
         )}
-        <ThreadContent className="py-4" />
+        {...props}
+      >
+        {/* Message thread content */}
+        <ScrollableMessageContainer className="p-4">
+          <div className="py-4">
+            {messages.map((message, index) => (
+              <div
+                key={message.id ?? `${message.role}-${index}`}
+                className={cn(
+                  isGenerating && "animate-in fade-in-0 slide-in-from-bottom-2",
+                  "duration-200 ease-out",
+                )}
+                style={
+                  isGenerating
+                    ? { animationDelay: `${index * 40}ms` }
+                    : undefined
+                }
+              >
+                <Message
+                  message={message}
+                  role={message.role === "assistant" ? "assistant" : "user"}
+                  variant={variant}
+                  isLoading={isGenerating && index === messages.length - 1}
+                  className={
+                    message.role === "assistant"
+                      ? "flex justify-start"
+                      : "flex justify-end"
+                  }
+                >
+                  <div className="flex flex-col">
+                    <MessageContent
+                      className={
+                        message.role === "assistant"
+                          ? "text-primary font-sans"
+                          : "text-primary bg-container hover:bg-backdrop font-sans"
+                      }
+                      content={message.content}
+                    />
+                    {/* Rendered component area determines if the message is a canvas message */}
+                    <MessageRenderedComponentArea />
+                  </div>
+                </Message>
+              </div>
+            ))}
+          </div>
+        </ScrollableMessageContainer>
+
+        {/* Message input */}
+        <div className="p-4">
+          <MessageInput contextKey={contextKey}>
+            <MessageInputTextarea />
+            <MessageInputToolbar>
+              <MessageInputSubmitButton />
+            </MessageInputToolbar>
+            <MessageInputError />
+          </MessageInput>
+        </div>
+
+        {/* Message suggestions */}
+        <MessageSuggestions>
+          <MessageSuggestionsStatus />
+          <MessageSuggestionsList />
+        </MessageSuggestions>
       </div>
-      <MessageSuggestions />
-      <div className="p-4">
-        <MessageInput contextKey={contextKey} />
-      </div>
-    </div>
+
+      {/* Thread History Sidebar - rendered last if history is on the right */}
+      {historyPosition === "right" && threadHistorySidebar}
+    </>
   );
 });
 MessageThreadFull.displayName = "MessageThreadFull";

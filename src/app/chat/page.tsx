@@ -13,11 +13,11 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen p-8 sm:p-20">
-      <main className="flex flex-col items-center h-full w-full">
-        <MessageThreadFull contextKey="tambo-template" />
+    <div className="h-screen flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col items-center w-full overflow-hidden">
+        <MessageThreadFull contextKey="tambo-template" className="!h-auto flex-1" />
       </main>
-      <footer className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500">
+      <footer className="flex items-center justify-center gap-2 p-4 text-sm text-gray-500">
         Powered by{" "}
         <a
           href="https://tambo.co"
