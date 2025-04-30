@@ -141,7 +141,7 @@ export const MessageThreadFull = React.forwardRef<
             <WelcomeCard />
           </div>
         )}
-        <ThreadContent>
+        <ThreadContent variant={variant}>
           <ThreadContentMessages />
         </ThreadContent>
         </ScrollableMessageContainer>
