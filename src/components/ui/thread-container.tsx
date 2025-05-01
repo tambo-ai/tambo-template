@@ -10,13 +10,7 @@ import { useRef } from "react";
 /**
  * Props for the ThreadContainer component
  */
-export interface ThreadContainerProps
-  extends React.HTMLAttributes<HTMLDivElement> {
-  /**
-   * Optional context key for the thread
-   */
-  contextKey?: string;
-}
+export type ThreadContainerProps = React.HTMLAttributes<HTMLDivElement>;
 
 /**
  * A responsive container component for message threads that handles
