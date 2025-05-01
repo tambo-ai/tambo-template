@@ -12,8 +12,7 @@ import {
   MessageSuggestionsStatus,
   MessageSuggestionsList,
 } from "@/components/ui/message-suggestions";
-import type {
-  messageVariants} from "@/components/ui/message";
+import type { messageVariants } from "@/components/ui/message";
 import {
   ThreadHistory,
   ThreadHistoryHeader,
@@ -21,19 +20,20 @@ import {
   ThreadHistorySearch,
   ThreadHistoryList,
 } from "@/components/ui/thread-history";
+import {
+  ThreadContent,
+  ThreadContentMessages,
+} from "@/components/ui/thread-content";
+import {
+  ThreadContainer,
+  useThreadContainerContext,
+} from "@/components/ui/thread-container";
 import { ScrollableMessageContainer } from "@/components/ui/scrollable-message-container";
 import { WelcomeCard } from "../welcome-card";
-import { cn } from "@/lib/utils";
-import {
-  useMergedRef,
-  useCanvasDetection,
-  usePositioning,
-} from "@/lib/thread-hooks";
+import { useMergedRef } from "@/lib/thread-hooks"
 import { Suggestion, useTambo } from "@tambo-ai/react";
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
-import { useRef } from "react";
-import { ThreadContent, ThreadContentMessages } from "./thread-content";
 
 /**
  * Props for the MessageThreadFull component
@@ -58,14 +58,8 @@ export const MessageThreadFull = React.forwardRef<
   HTMLDivElement,
   MessageThreadFullProps
 >(({ className, contextKey, variant, ...props }, ref) => {
-  const threadRef = useRef<HTMLDivElement>(null);
-  const { hasCanvasSpace, canvasIsOnLeft } = useCanvasDetection(threadRef);
-  const { isLeftPanel, historyPosition } = usePositioning(
-    className,
-    canvasIsOnLeft,
-    hasCanvasSpace,
-  );
-  const mergedRef = useMergedRef<HTMLDivElement | null>(ref, threadRef);
+  const { containerRef, historyPosition } = useThreadContainerContext();
+  const mergedRef = useMergedRef<HTMLDivElement | null>(ref, containerRef);
 
   // Get MessageThread from Tambo
   const { thread } = useTambo();
@@ -105,45 +99,16 @@ export const MessageThreadFull = React.forwardRef<
       {/* Thread History Sidebar - rendered first if history is on the left */}
       {historyPosition === "left" && threadHistorySidebar}
 
-      <div
-        ref={mergedRef}
-        className={cn(
-          // Base layout and styling
-          "flex flex-col bg-white overflow-hidden bg-background", // Flex column layout with white background
-          "h-screen", // Full viewport height
-
-          // Sidebar spacing based on history position
-          historyPosition === "right"
-            ? "mr-[var(--sidebar-width,16rem)]" // Margin right when history is on right
-            : "ml-[var(--sidebar-width,16rem)]", // Margin left when history is on left
-
-          // Width constraints based on canvas presence
-          hasCanvasSpace
-            ? "max-w-3xl"
-            : "w-[calc(100%-var(--sidebar-width,16rem))]", // Max width with canvas, full width minus sidebar without
-
-          // Border styling when canvas is present
-          hasCanvasSpace && (canvasIsOnLeft ? "border-l" : "border-r"), // Left/right border based on canvas position
-          hasCanvasSpace && "border-border", // Border color
-
-          // Right alignment when specified
-          !isLeftPanel && "ml-auto", // Auto margin left to push to right when right class is specified
-
-          // Custom classes passed via props
-          className,
-        )}
-        {...props}
-      >
-        {/* Message thread content */}
+      <ThreadContainer ref={mergedRef} className={className} {...props}>
         <ScrollableMessageContainer className="p-4">
-        {(!thread || thread.messages.length === 0) && (
-          <div className="w-full min-w-xl p-4">
-            <WelcomeCard />
-          </div>
-        )}
-        <ThreadContent variant={variant}>
-          <ThreadContentMessages />
-        </ThreadContent>
+          {(!thread || thread.messages.length === 0) && (
+            <div className="w-full min-w-xl p-4">
+              <WelcomeCard />
+            </div>
+          )}
+          <ThreadContent variant={variant}>
+            <ThreadContentMessages />
+          </ThreadContent>
         </ScrollableMessageContainer>
 
         {/* Message suggestions status */}
@@ -166,7 +131,7 @@ export const MessageThreadFull = React.forwardRef<
         <MessageSuggestions initialSuggestions={populationSuggestions}>
           <MessageSuggestionsList />
         </MessageSuggestions>
-      </div>
+      </ThreadContainer>
 
       {/* Thread History Sidebar - rendered last if history is on the right */}
       {historyPosition === "right" && threadHistorySidebar}
