@@ -95,7 +95,7 @@ export const components: TamboComponent[] = [
             .describe("Data for the graph"),
         })
         .describe("Data object containing chart configuration and values"),
-      title: z.string().optional().describe("Optional title for the chart"),
+      title: z.string().describe("Title for the chart"),
       showLegend: z
         .boolean()
         .optional()
