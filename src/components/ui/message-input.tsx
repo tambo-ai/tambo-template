@@ -124,7 +124,7 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
       }
     }, [value]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = React.useCallback(async (e: React.FormEvent) => {
       e.preventDefault();
       if (!value.trim()) return;
 
@@ -148,7 +148,7 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
             : "Failed to send message. Please try again.",
         );
       }
-    };
+    }, [value, submit, contextKey, setValue, setDisplayValue, setSubmitError]);
 
     const contextValue = React.useMemo(
       () => ({
@@ -222,7 +222,8 @@ export interface MessageInputTextareaProps
 const MessageInputTextarea = React.forwardRef<
   HTMLTextAreaElement,
   MessageInputTextareaProps
->(({ className, placeholder = "What do you want to do?", ...props }, _) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+>(({ className, placeholder = "What do you want to do?", ...props }, ref) => {
   const { value, setValue, isPending, textareaRef, handleSubmit } =
     useMessageInputContext();
 
