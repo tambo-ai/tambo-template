@@ -31,9 +31,10 @@ export const tools: TamboTool[] = [
     description:
       "A tool to get population statistics by country with advanced filtering options",
     tool: getCountryPopulations,
-    toolSchema: z.function().args(
-      z
-        .object({
+    toolSchema: z.function()
+      .args(z.string().describe("The continent to filter countries by"))
+      .returns(
+        z.object({
           continent: z.string().optional(),
           sortBy: z.enum(["population", "growthRate"]).optional(),
           limit: z.number().optional(),
@@ -47,12 +48,14 @@ export const tools: TamboTool[] = [
     description:
       "A tool to get global population trends with optional year range filtering",
     tool: getGlobalPopulationTrend,
-    toolSchema: z.function().args(
-      z
-        .object({
-          startYear: z.number().optional(),
-          endYear: z.number().optional(),
-        })
+    toolSchema: z.function()
+      .args(z.string().describe("The continent to filter countries by"))
+      .returns(
+        z
+          .object({
+            startYear: z.number().optional(),
+            endYear: z.number().optional(),
+          })
         .optional()
     ),
   },
