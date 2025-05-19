@@ -103,11 +103,11 @@ export interface MessageProps
 const Message = React.forwardRef<HTMLDivElement, MessageProps>(
   (
     { children, className, role, variant, isLoading, message, ...props },
-    ref
+    ref,
   ) => {
     const contextValue = React.useMemo(
       () => ({ role, variant, isLoading, message }),
-      [role, variant, isLoading, message]
+      [role, variant, isLoading, message],
     );
 
     return (
@@ -123,7 +123,7 @@ const Message = React.forwardRef<HTMLDivElement, MessageProps>(
         </div>
       </MessageContext.Provider>
     );
-  }
+  },
 );
 Message.displayName = "Message";
 
@@ -164,7 +164,7 @@ LoadingIndicator.displayName = "LoadingIndicator";
  */
 function getToolStatusMessage(
   message: TamboThreadMessage,
-  isLoading: boolean | undefined
+  isLoading: boolean | undefined,
 ) {
   const isToolCall = message.actionType === "tool_call";
   if (!isToolCall) return null;
@@ -197,18 +197,18 @@ export interface MessageContentProps
 const MessageContent = React.forwardRef<HTMLDivElement, MessageContentProps>(
   (
     { className, children, content: contentProp, markdown = true, ...props },
-    ref
+    ref,
   ) => {
     const { message, isLoading } = useMessageContext();
     const contentToRender = children ?? contentProp ?? message.content;
 
     const safeContent = React.useMemo(
       () => getSafeContent(contentToRender as TamboThreadMessage["content"]),
-      [contentToRender]
+      [contentToRender],
     );
     const hasContent = React.useMemo(
       () => checkHasContent(contentToRender as TamboThreadMessage["content"]),
-      [contentToRender]
+      [contentToRender],
     );
 
     const showLoading = isLoading && !hasContent;
@@ -220,7 +220,7 @@ const MessageContent = React.forwardRef<HTMLDivElement, MessageContentProps>(
         ref={ref}
         className={cn(
           "relative inline-block rounded-3xl px-4 py-2 text-[15px] leading-relaxed transition-all duration-200 font-medium max-w-full [&_p]:my-1 [&_ul]:-my-5 [&_ol]:-my-5",
-          className
+          className,
         )}
         data-slot="message-content"
         {...props}
@@ -266,7 +266,7 @@ const MessageContent = React.forwardRef<HTMLDivElement, MessageContentProps>(
         )}
       </div>
     );
-  }
+  },
 );
 MessageContent.displayName = "MessageContent";
 
@@ -332,7 +332,7 @@ const MessageRenderedComponentArea = React.forwardRef<
                         messageId: message.id,
                         component: message.renderedComponent,
                       },
-                    })
+                    }),
                   );
                 }
               }}
