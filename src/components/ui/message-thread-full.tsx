@@ -65,7 +65,11 @@ export const MessageThreadFull = React.forwardRef<
   const { thread } = useTambo();
 
   const threadHistorySidebar = (
-    <ThreadHistory contextKey={contextKey} position={historyPosition}>
+    <ThreadHistory
+      contextKey={contextKey}
+      position={historyPosition}
+      defaultCollapsed={true}
+    >
       <ThreadHistoryHeader />
       <ThreadHistoryNewButton />
       <ThreadHistorySearch />
