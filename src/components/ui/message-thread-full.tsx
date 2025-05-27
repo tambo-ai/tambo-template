@@ -1,39 +1,39 @@
 "use client";
 
+import type { messageVariants } from "@/components/ui/message";
 import {
   MessageInput,
+  MessageInputError,
+  MessageInputSubmitButton,
   MessageInputTextarea,
   MessageInputToolbar,
-  MessageInputSubmitButton,
-  MessageInputError,
 } from "@/components/ui/message-input";
 import {
   MessageSuggestions,
-  MessageSuggestionsStatus,
   MessageSuggestionsList,
+  MessageSuggestionsStatus,
 } from "@/components/ui/message-suggestions";
-import type { messageVariants } from "@/components/ui/message";
+import { ScrollableMessageContainer } from "@/components/ui/scrollable-message-container";
 import {
-  ThreadHistory,
-  ThreadHistoryHeader,
-  ThreadHistoryNewButton,
-  ThreadHistorySearch,
-  ThreadHistoryList,
-} from "@/components/ui/thread-history";
+  ThreadContainer,
+  useThreadContainerContext,
+} from "@/components/ui/thread-container";
 import {
   ThreadContent,
   ThreadContentMessages,
 } from "@/components/ui/thread-content";
 import {
-  ThreadContainer,
-  useThreadContainerContext,
-} from "@/components/ui/thread-container";
-import { ScrollableMessageContainer } from "@/components/ui/scrollable-message-container";
-import { WelcomeCard } from "../welcome-card";
-import { useMergedRef } from "@/lib/thread-hooks"
+  ThreadHistory,
+  ThreadHistoryHeader,
+  ThreadHistoryList,
+  ThreadHistoryNewButton,
+  ThreadHistorySearch,
+} from "@/components/ui/thread-history";
+import { useMergedRef } from "@/lib/thread-hooks";
 import { Suggestion, useTambo } from "@tambo-ai/react";
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
+import { WelcomeCard } from "../welcome-card";
 
 /**
  * Props for the MessageThreadFull component
@@ -83,15 +83,17 @@ export const MessageThreadFull = React.forwardRef<
     {
       id: "pop-suggestion-2",
       title: "Population density comparison",
-      detailedSuggestion: "Compare population density of the top 10 most populous countries.",
+      detailedSuggestion:
+        "Compare population density of the top 10 most populous countries.",
       messageId: "population-query",
     },
     {
       id: "pop-suggestion-3",
       title: "Population growth trends",
-      detailedSuggestion: "What are the projected population growth trends for the top 10 most populated countries?",
+      detailedSuggestion:
+        "What are the projected population growth trends for the top 10 most populated countries?",
       messageId: "population-query",
-    }
+    },
   ];
 
   return (
@@ -102,7 +104,7 @@ export const MessageThreadFull = React.forwardRef<
       <ThreadContainer ref={mergedRef} className={className} {...props}>
         <ScrollableMessageContainer className="p-4">
           {(!thread || thread.messages.length === 0) && (
-            <div className="w-full min-w-xl p-4">
+            <div className="w-full min-w-xl p-4 h-full flex items-center justify-center">
               <WelcomeCard />
             </div>
           )}
