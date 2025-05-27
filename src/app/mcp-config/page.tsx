@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 // Define MCP transport types
-export enum MCPTransport {
+enum MCPTransport {
   SSE = "sse",
   HTTP = "http",
 }
@@ -29,7 +29,7 @@ const McpConfigPage = () => {
   const [serverUrl, setServerUrl] = useState("");
   const [serverName, setServerName] = useState("");
   const [transportType, setTransportType] = useState<MCPTransport>(
-    MCPTransport.HTTP
+    MCPTransport.HTTP,
   );
   const [savedSuccess, setSavedSuccess] = useState(false);
 
