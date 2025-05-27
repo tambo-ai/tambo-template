@@ -32,7 +32,6 @@
     "@types/react-dom": "^19",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@types/recharts": "^1.8.29",
-    "@types/sanitize-html": "^2.13.0",
     "autoprefixer": "^10.4.21",
     "clsx": "^2.1.1",
     "eslint": "^9",
