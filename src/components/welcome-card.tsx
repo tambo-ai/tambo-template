@@ -12,11 +12,8 @@ export const WelcomeCard = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 max-w-xl w-full mb-8">
+    <div className="bg-white rounded-lg shadow-sm p-6 max-w-xl w-full mb-8 border border-gray-200">
       <h2 className="text-xl font-bold mb-4">🐙 tambo-ai chat starter!</h2>
-      <p className="mb-4">
-        This app demonstrates an AI-powered product search using tambo-ai.
-      </p>
       <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
         <p className="text-gray-600 text-sm mb-2">Try this example message:</p>
         <div className="flex items-center gap-2">
