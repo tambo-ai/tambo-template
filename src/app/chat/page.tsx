@@ -5,7 +5,7 @@ import { TamboProvider } from "@tambo-ai/react";
 
 export default function Home() {
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="h-screen flex flex-col overflow-hidden max-w-6xl mx-auto">
       <TamboProvider
         apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}
         components={components}
