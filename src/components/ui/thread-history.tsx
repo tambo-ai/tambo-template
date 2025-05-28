@@ -12,7 +12,7 @@ import {
   ArrowLeftToLine,
   ArrowRightToLine,
 } from "lucide-react";
-import * as React from "react";
+import React, { useMemo } from "react";
 
 /**
  * Context for sharing thread history state and functions
@@ -344,10 +344,17 @@ const ThreadHistoryList = React.forwardRef<
   } = useThreadHistoryContext();
 
   // Filter threads based on search query
-  const filteredThreads =
-    threads?.items?.filter((thread: TamboThread) =>
-      thread.id.toLowerCase().includes(searchQuery.toLowerCase()),
-    ) ?? [];
+  const filteredThreads = useMemo(() => {
+    // While collapsed we do not need the list, avoid extra work.
+    if (isCollapsed) return [];
+
+    if (!threads?.items) return [];
+
+    const query = searchQuery.toLowerCase();
+    return threads.items.filter((thread: TamboThread) =>
+      thread.id.toLowerCase().includes(query),
+    );
+  }, [isCollapsed, threads, searchQuery]);
 
   const handleSwitchThread = async (threadId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -428,8 +435,8 @@ const ThreadHistoryList = React.forwardRef<
       ref={ref}
       className={cn(
         "overflow-y-auto flex-1 transition-all duration-300 ease-in-out",
-        isCollapsed 
-          ? "opacity-0 max-h-0 overflow-hidden pointer-events-none" 
+        isCollapsed
+          ? "opacity-0 max-h-0 overflow-hidden pointer-events-none"
           : "opacity-100 max-h-full pointer-events-auto",
         className,
       )}
