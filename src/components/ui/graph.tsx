@@ -23,14 +23,14 @@ export const graphDataSchema = z.object({
         label: z.string().describe("Label for the dataset"),
         data: z.array(z.number()).describe("Data points for the dataset"),
         color: z.string().optional().describe("Optional color for the dataset"),
-      })
+      }),
     )
     .describe("Data for the graph"),
 });
 
 export const graphSchema = z.object({
   data: graphDataSchema.describe(
-    "Data object containing chart configuration and values"
+    "Data object containing chart configuration and values",
   ),
   title: z.string().describe("Title for the chart"),
   showLegend: z
@@ -48,7 +48,7 @@ export const graphSchema = z.object({
 });
 
 // Define the base type from the Zod schema
-type GraphDataType = z.infer<typeof graphDataSchema>;
+export type GraphDataType = z.infer<typeof graphDataSchema>;
 
 // Extend the GraphProps with additional tambo properties
 export interface GraphProps
@@ -94,7 +94,7 @@ const graphVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
+  },
 );
 
 const defaultColors = [
@@ -139,7 +139,7 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
       _tambo_displayMessage = true,
       ...props
     },
-    ref
+    ref,
   ) => {
     // Get thread state
     const { thread } = useTambo();
@@ -156,8 +156,7 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
       generationStage !== "ERROR";
 
     const dataIsValid =
-      data &&
-      data.labels &&
+      data?.labels &&
       data.datasets &&
       Array.isArray(data.labels) &&
       Array.isArray(data.datasets);
@@ -198,7 +197,7 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
             !dataset.label ||
             !dataset.data ||
             !Array.isArray(dataset.data) ||
-            dataset.data.length !== data.labels.length
+            dataset.data.length !== data.labels.length,
         )
       ) {
         console.error("Invalid graph data structure (post-generation):", data);
@@ -228,7 +227,7 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
       const chartData = data.labels.map((label, index) => ({
         name: label,
         ...Object.fromEntries(
-          data.datasets.map((dataset) => [dataset.label, dataset.data[index]])
+          data.datasets.map((dataset) => [dataset.label, dataset.data[index]]),
         ),
       }));
 
@@ -361,9 +360,7 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
                   data={data.datasets[0].data.map((value, index) => ({
                     name: data.labels[index],
                     value,
-                    fill:
-                      data.datasets[0].color ??
-                      defaultColors[index % defaultColors.length],
+                    fill: defaultColors[index % defaultColors.length],
                   }))}
                   dataKey="value"
                   nameKey="name"
@@ -445,6 +442,6 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
         </div>
       );
     }
-  }
+  },
 );
 Graph.displayName = "Graph";

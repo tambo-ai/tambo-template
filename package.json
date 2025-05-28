@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@tailwindcss/oxide": "^4.1.4",
-    "@tambo-ai/react": "^0.26.1",
+    "@tambo-ai/react": "^0.26.3",
     "class-variance-authority": "^0.7.1",
     "dompurify": "^3.0.6",
     "highlight.js": "^11.11.1",
