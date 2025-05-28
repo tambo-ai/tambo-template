@@ -169,7 +169,7 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
                 <span className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.1s]"></span>
               </div>
               <span className="text-sm">
-                {isGenerating ? "Streaming data..." : "Data ready"}
+                {isGenerating ? "Streaming data..." : data ? "Data ready" : "Awaiting data"}
               </span>
             </div>
           </div>
