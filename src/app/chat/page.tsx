@@ -12,7 +12,9 @@ export default function Home() {
         tools={tools}
         tamboUrl={process.env.NEXT_PUBLIC_TAMBO_URL}
       >
-        <MessageThreadFull contextKey="tambo-template" />
+        <div className="max-w-6xl mx-auto">
+          <MessageThreadFull contextKey="tambo-template" />
+        </div>
       </TamboProvider>
     </div>
   );
