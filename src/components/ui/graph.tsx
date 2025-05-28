@@ -64,12 +64,6 @@ export interface GraphProps
   variant?: "default" | "solid" | "bordered";
   /** Size of the graph */
   size?: "default" | "sm" | "lg";
-  /** Whether to display the status and completion messages */
-  _tambo_displayMessage?: boolean;
-  /** Text to display as the status message */
-  _tambo_statusMessage?: string;
-  /** Text to display as the completion status message */
-  _tambo_completionStatusMessage?: string;
 }
 
 const graphVariants = cva(
@@ -134,9 +128,6 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
       data,
       title,
       showLegend = true,
-      _tambo_completionStatusMessage,
-      _tambo_statusMessage,
-      _tambo_displayMessage = true,
       ...props
     },
     ref,
@@ -177,10 +168,8 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
                 <span className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.2s]"></span>
                 <span className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.1s]"></span>
               </div>
-              {/* Use the specific status message if available, otherwise default */}
               <span className="text-sm">
-                {(_tambo_displayMessage && _tambo_statusMessage) ??
-                  "Streaming data..."}
+                {isGenerating ? "Streaming data..." : "Data ready"}
               </span>
             </div>
           </div>
@@ -213,9 +202,6 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
                 <p className="font-medium">Invalid Graph Data</p>
                 <p className="text-sm mt-1">
                   The final data structure is invalid.
-                  {_tambo_displayMessage &&
-                    _tambo_completionStatusMessage &&
-                    ` (${_tambo_completionStatusMessage})`}
                 </p>
               </div>
             </div>
@@ -414,12 +400,6 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
                 {renderChart()}
               </RechartsCore.ResponsiveContainer>
             </div>
-            {/* Optionally display completion message */}
-            {_tambo_displayMessage && _tambo_completionStatusMessage && (
-              <div className="text-xs text-muted-foreground text-center pt-2">
-                {_tambo_completionStatusMessage}
-              </div>
-            )}
           </div>
         </div>
       );

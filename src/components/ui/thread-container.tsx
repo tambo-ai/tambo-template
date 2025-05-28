@@ -38,6 +38,9 @@ export const ThreadContainer = React.forwardRef<
         // Base layout and styling
         "flex flex-col bg-white overflow-hidden bg-background",
         "h-screen",
+        
+        // Add smooth transitions for layout changes
+        "transition-all duration-200 ease-in-out",
 
         // Sidebar spacing based on history position
         historyPosition === "right"
