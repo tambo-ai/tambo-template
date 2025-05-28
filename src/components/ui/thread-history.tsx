@@ -64,7 +64,7 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
       className,
       contextKey,
       onThreadChange,
-      defaultCollapsed = false,
+      defaultCollapsed = true,
       position = "left",
       children,
       ...props
@@ -222,17 +222,20 @@ const ThreadHistoryNewButton = React.forwardRef<
   const { isCollapsed, startNewThread, refetch, onThreadChange } =
     useThreadHistoryContext();
 
-  const handleNewThread = React.useCallback(async (e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
+  const handleNewThread = React.useCallback(
+    async (e?: React.MouseEvent) => {
+      if (e) e.stopPropagation();
 
-    try {
-      await startNewThread();
-      await refetch();
-      onThreadChange?.();
-    } catch (error) {
-      console.error("Failed to create new thread:", error);
-    }
-  }, [startNewThread, refetch, onThreadChange]);
+      try {
+        await startNewThread();
+        await refetch();
+        onThreadChange?.();
+      } catch (error) {
+        console.error("Failed to create new thread:", error);
+      }
+    },
+    [startNewThread, refetch, onThreadChange],
+  );
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
