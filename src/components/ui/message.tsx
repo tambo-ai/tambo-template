@@ -5,8 +5,9 @@ import { checkHasContent, getSafeContent } from "@/lib/thread-hooks";
 import { cn } from "@/lib/utils";
 import type { TamboThreadMessage } from "@tambo-ai/react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { Check, ExternalLink, Loader2, X } from "lucide-react";
+import { Check, ChevronDown, ExternalLink, Loader2, X } from "lucide-react";
 import * as React from "react";
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 /**
@@ -199,6 +200,7 @@ const MessageContent = React.forwardRef<HTMLDivElement, MessageContentProps>(
     { className, children, content: contentProp, markdown = true, ...props },
     ref
   ) => {
+    const [isToolcallExpanded, setIsToolcallExpanded] = useState(false);
     const { message, isLoading } = useMessageContext();
     const contentToRender = children ?? contentProp ?? message.content;
 
@@ -254,7 +256,10 @@ const MessageContent = React.forwardRef<HTMLDivElement, MessageContentProps>(
         )}
         {toolStatusMessage && (
           <div className="flex flex-col items-start gap-2 text-xs opacity-50 mt-2">
-            <div className="flex items-center gap-1">
+            <div
+              className="flex items-center gap-1 cursor-pointer hover:bg-gray-100 rounded-md p-1"
+              onClick={() => setIsToolcallExpanded(!isToolcallExpanded)}
+            >
               {hasToolError ? (
                 <X className="w-3 h-3 text-bold text-red-500" />
               ) : isLoading ? (
@@ -263,16 +268,19 @@ const MessageContent = React.forwardRef<HTMLDivElement, MessageContentProps>(
                 <Check className="w-3 h-3 text-bold text-green-500" />
               )}
               <span>{toolStatusMessage}</span>
+              <ChevronDown
+                className={cn("w-3 h-3", !isToolcallExpanded && "-rotate-90")}
+              />
             </div>
-            <div className="flex flex-col gap-1 ml-4 ">
-              <span className="text-muted-foreground">
-                tool: {message.toolCallRequest?.toolName}
-              </span>
-              <span className="text-muted-foreground">
-                parameters:{" "}
-                {JSON.stringify(message.toolCallRequest?.parameters)}
-              </span>
-            </div>
+            {isToolcallExpanded && (
+              <div className="flex flex-col gap-1 ml-4">
+                <span>tool: {message.toolCallRequest?.toolName}</span>
+                <span>
+                  parameters:{" "}
+                  {JSON.stringify(message.toolCallRequest?.parameters)}
+                </span>
+              </div>
+            )}
           </div>
         )}
       </div>
