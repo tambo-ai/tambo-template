@@ -253,15 +253,26 @@ const MessageContent = React.forwardRef<HTMLDivElement, MessageContentProps>(
           </div>
         )}
         {toolStatusMessage && (
-          <div className="flex items-center gap-2 text-xs opacity-50 mt-2">
-            {hasToolError ? (
-              <X className="w-3 h-3 text-bold text-red-500" />
-            ) : isLoading ? (
-              <Loader2 className="w-3 h-3 text-muted-foreground text-bold animate-spin" />
-            ) : (
-              <Check className="w-3 h-3 text-bold text-green-500" />
-            )}
-            <span>{toolStatusMessage}</span>
+          <div className="flex flex-col items-start gap-2 text-xs opacity-50 mt-2">
+            <div className="flex items-center gap-1">
+              {hasToolError ? (
+                <X className="w-3 h-3 text-bold text-red-500" />
+              ) : isLoading ? (
+                <Loader2 className="w-3 h-3 text-muted-foreground text-bold animate-spin" />
+              ) : (
+                <Check className="w-3 h-3 text-bold text-green-500" />
+              )}
+              <span>{toolStatusMessage}</span>
+            </div>
+            <div className="flex flex-col gap-1 ml-4 ">
+              <span className="text-muted-foreground">
+                tool: {message.toolCallRequest?.toolName}
+              </span>
+              <span className="text-muted-foreground">
+                parameters:{" "}
+                {JSON.stringify(message.toolCallRequest?.parameters)}
+              </span>
+            </div>
           </div>
         )}
       </div>
