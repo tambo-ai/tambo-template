@@ -257,7 +257,7 @@ const MessageContent = React.forwardRef<HTMLDivElement, MessageContentProps>(
         {toolStatusMessage && (
           <div className="flex flex-col items-start gap-2 text-xs opacity-50 mt-2">
             <div
-              className="flex items-center gap-1 cursor-pointer hover:bg-gray-100 rounded-md p-1"
+              className="flex items-center gap-1 cursor-pointer hover:bg-gray-100 rounded-md p-1 select-none"
               onClick={() => setIsToolcallExpanded(!isToolcallExpanded)}
             >
               {hasToolError ? (
@@ -269,18 +269,24 @@ const MessageContent = React.forwardRef<HTMLDivElement, MessageContentProps>(
               )}
               <span>{toolStatusMessage}</span>
               <ChevronDown
-                className={cn("w-3 h-3", !isToolcallExpanded && "-rotate-90")}
+                className={cn(
+                  "w-3 h-3 transition-transform duration-200",
+                  !isToolcallExpanded && "-rotate-90"
+                )}
               />
             </div>
-            {isToolcallExpanded && (
-              <div className="flex flex-col gap-1 ml-4">
-                <span>tool: {message.toolCallRequest?.toolName}</span>
-                <span>
-                  parameters:{" "}
-                  {JSON.stringify(message.toolCallRequest?.parameters)}
-                </span>
-              </div>
-            )}
+            <div
+              className={cn(
+                "flex flex-col gap-1 ml-4 overflow-hidden transition-all duration-300",
+                isToolcallExpanded ? "h-auto opacity-100" : "h-0 opacity-0"
+              )}
+            >
+              <span>tool: {message.toolCallRequest?.toolName}</span>
+              <span>
+                parameters:{" "}
+                {JSON.stringify(message.toolCallRequest?.parameters)}
+              </span>
+            </div>
           </div>
         )}
       </div>
