@@ -94,15 +94,29 @@ const McpConfigPage = () => {
             Model Context Protocol Servers
           </h2>
           <p className="text-gray-600 mb-4">
-            Configure external MCP-compliant servers to extend the capabilities
-            of your Tambo application. The servers listed here will be available
-            as tool providers in your chat.
+            Configure client-side MCP servers to extend the capabilities of your
+            Tambo application. These servers will be connected{" "}
+            <i>from the browser</i> and exposed as tools to Tambo.
+          </p>
+
+          <p className="text-gray-600 mb-4">
+            For more information about MCP and the difference between
+            client-side and server-side MCP servers, see the{" "}
+            <a
+              href="https://tambo.co/docs/concepts/model-context-protocol"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              documentation
+            </a>
+            .
           </p>
 
           <form onSubmit={addServer} className="mb-6">
             <div className="flex flex-col space-y-2">
               <label htmlFor="server-url" className="font-medium text-gray-700">
-                Server URL
+                Server URL (must be accessible from the browser)
               </label>
               <input
                 id="server-url"
@@ -212,10 +226,18 @@ const McpConfigPage = () => {
         <div className="bg-gray-50 p-4 rounded-md">
           <h3 className="font-semibold mb-2">What is MCP?</h3>
           <p className="text-gray-600 text-sm">
-            The Model Context Protocol (MCP) is a standard that allows
-            applications to communicate with external tools and services. By
-            configuring MCP servers, you can extend your Tambo application with
-            additional capabilities provided by these servers.
+            The{" "}
+            <a
+              href="https://tambo.co/docs/concepts/model-context-protocol"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              Model Context Protocol (MCP)
+            </a>{" "}
+            is a standard that allows applications to communicate with external
+            tools and services. By configuring MCP servers, your Tambo
+            application will be able to make calls to these tools.
           </p>
         </div>
       </div>
