@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface ApiKeyCheckProps {
   children: React.ReactNode;
@@ -82,15 +82,7 @@ const CopyButton = ({ text }: { text: string }) => {
 };
 
 export function ApiKeyCheck({ children }: ApiKeyCheckProps) {
-  const [isApiKeyMissing, setIsApiKeyMissing] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_TAMBO_API_KEY) {
-      setIsApiKeyMissing(true);
-    } else {
-      setIsApiKeyMissing(false);
-    }
-  }, []);
+  const isApiKeyMissing = !process.env.NEXT_PUBLIC_TAMBO_API_KEY;
 
   return (
     <div className="flex items-start gap-4">
