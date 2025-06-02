@@ -86,7 +86,7 @@ export function ApiKeyCheck({ children }: ApiKeyCheckProps) {
 
   return (
     <div className="flex items-start gap-4">
-      <div className="flex-grow">
+      <div className="flex-grow flex flex-col gap-2">
         <div className="flex items-center gap-1">
           <div className="min-w-6">
             {isApiKeyMissing === null ? "⏳" : isApiKeyMissing ? "❌" : "✅"}

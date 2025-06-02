@@ -1,4 +1,5 @@
 import { ApiKeyCheck } from "@/components/ApiKeyCheck";
+import { ExternalLinkIcon } from "lucide-react";
 import Image from "next/image";
 
 export default function Home() {
@@ -19,16 +20,62 @@ export default function Home() {
         </div>
 
         <div className="w-full space-y-8">
-          <div className="bg-white px-8 py-4">
-            <h2 className="text-xl font-semibold mb-4">Setup Checklist</h2>
+          <div className="bg-white px-8 py-4 flex flex-col gap-4">
+            <h2 className="text-xl font-semibold">Setup Checklist</h2>
             <ApiKeyCheck>
-              <div className="flex gap-4 flex-wrap">
+              <h2 className="text-xl font-semibold">Next steps</h2>
+
+              <div className="flex gap-4 flex-wrap items-center">
+                <a
+                  href="/chat"
+                  className="px-6 py-3 rounded-md font-medium shadow-sm transition-colors text-lg bg-[#7FFFC3] hover:bg-[#72e6b0] text-gray-800"
+                >
+                  Go to Chat →
+                </a>
+                <p className="text-gray-600">Start chatting with Tambo</p>
+              </div>
+
+              <div className="flex gap-4 flex-wrap items-center">
+                <a
+                  href="https://tambo.co/dashboard"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-3 rounded-md font-medium shadow-sm transition-colors text-lg bg-[#7FFFC3] hover:bg-[#72e6b0] text-gray-800"
+                >
+                  Server-side MCP Config →
+                </a>
+                <p className="text-gray-600">
+                  Learn about{" "}
+                  <a
+                    href="https://tambo.co/docs/concepts/model-context-protocol#1-server-side-support"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                  >
+                    server-side MCP servers{" "}
+                    <ExternalLinkIcon className="w-4 h-4 inline-block" />
+                  </a>
+                </p>
+              </div>
+              <div className="flex gap-4 flex-wrap items-center">
                 <a
                   href="/mcp-config"
-                  className="px-6 py-3 rounded-md font-medium shadow-sm transition-colors text-lg mt-4 bg-[#7FFFC3] hover:bg-[#72e6b0] text-gray-800"
+                  className="px-6 py-3 rounded-md font-medium shadow-sm transition-colors text-lg bg-[#7FFFC3] hover:bg-[#72e6b0] text-gray-800"
                 >
-                  Go to MCP Config →
+                  Client-side MCP Config →
                 </a>
+                <p className="text-gray-600">
+                  Learn about{" "}
+                  <a
+                    href="https://tambo.co/docs/concepts/model-context-protocol#2-client-side-support"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                  >
+                    client-side MCP servers{" "}
+                    <ExternalLinkIcon className="w-4 h-4 inline-block" />
+                  </a>
+                </p>
               </div>
             </ApiKeyCheck>
           </div>
@@ -36,11 +83,19 @@ export default function Home() {
           <div className="bg-white px-8 py-4">
             <h2 className="text-xl font-semibold mb-4">How it works:</h2>
             <p className="text-gray-600 mb-4">
-              This is demo of how to build generative UI and MCP servers.
+              This is demo of how to build generative UI with MCP servers.
             </p>
             <p className="text-gray-600 mb-4">
-              Right now we only support clientside but server-side + auth is
-              coming soon.
+              We support both client-side and server-side MCP servers, see the
+              difference{" "}
+              <a
+                href="https://tambo.co/docs/concepts/model-context-protocol"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                here.
+              </a>
             </p>
             <div className="flex gap-4 flex-wrap mt-4">
               <a
