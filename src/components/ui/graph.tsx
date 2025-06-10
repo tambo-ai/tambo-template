@@ -121,15 +121,7 @@ const defaultColors = [
  */
 export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
   (
-    {
-      className,
-      variant,
-      size,
-      data,
-      title,
-      showLegend = true,
-      ...props
-    },
+    { className, variant, size, data, title, showLegend = true, ...props },
     ref,
   ) => {
     // Get thread state
@@ -169,7 +161,11 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
                 <span className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.1s]"></span>
               </div>
               <span className="text-sm">
-                {isGenerating ? "Streaming data..." : data ? "Data ready" : "Awaiting data"}
+                {isGenerating
+                  ? "Streaming data..."
+                  : data
+                    ? "Data ready"
+                    : "Awaiting data"}
               </span>
             </div>
           </div>
