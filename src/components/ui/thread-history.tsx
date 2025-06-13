@@ -355,6 +355,7 @@ const ThreadHistoryList = React.forwardRef<
     onThreadChange,
     updateThreadName,
     generateThreadName,
+    refetch,
   } = useThreadHistoryContext();
 
   const [editingThread, setEditingThread] = React.useState<TamboThread | null>(
@@ -438,6 +439,7 @@ const ThreadHistoryList = React.forwardRef<
   const handleGenerateName = async (thread: TamboThread) => {
     try {
       await generateThreadName(thread.id);
+      await refetch();
     } catch (error) {
       console.error("Failed to generate name:", error);
     }
@@ -449,6 +451,7 @@ const ThreadHistoryList = React.forwardRef<
 
     try {
       await updateThreadName(newName, editingThread.id);
+      await refetch();
       setEditingThread(null);
     } catch (error) {
       console.error("Failed to rename thread:", error);
