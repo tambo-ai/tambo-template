@@ -10,9 +10,11 @@ import {
 import {
   ArrowLeftToLine,
   ArrowRightToLine,
-  MoreVertical,
+  MoreHorizontal,
+  Pencil,
   PlusIcon,
   SearchIcon,
+  Sparkles,
 } from "lucide-react";
 import React, { useMemo } from "react";
 
@@ -488,7 +490,7 @@ const ThreadHistoryList = React.forwardRef<
                 </p>
               </div>
             )}
-            <ThreadHistoryDropdown
+            <ThreadOptionsDropdown
               thread={thread}
               onRename={handleRename}
               onGenerateName={handleGenerateName}
@@ -520,7 +522,7 @@ ThreadHistoryList.displayName = "ThreadHistory.List";
 /**
  * Dropdown menu component for thread actions
  */
-const ThreadHistoryDropdown = React.forwardRef<
+const ThreadOptionsDropdown = React.forwardRef<
   HTMLDivElement,
   {
     thread: TamboThread;
@@ -532,34 +534,36 @@ const ThreadHistoryDropdown = React.forwardRef<
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button
-          className="p-1 hover:bg-backdrop rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+          className="p-1 hover:bg-backdrop rounded-md opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
           onClick={(e) => e.stopPropagation()}
         >
-          <MoreVertical className="h-4 w-4 text-muted-foreground" />
+          <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          className="min-w-[160px] bg-popover rounded-md p-1 shadow-md border border-border"
+          className="min-w-[160px] text-xs bg-popover rounded-md p-1 shadow-md border border-border"
           sideOffset={5}
           align="end"
         >
           <DropdownMenu.Item
-            className="flex items-center px-2 py-1.5 text-sm text-foreground hover:bg-accent hover:text-accent-foreground rounded-sm cursor-pointer outline-none"
+            className="flex items-center gap-2 px-2 py-1.5 text-foreground hover:bg-backdrop rounded-sm cursor-pointer outline-none transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               onRename(thread);
             }}
           >
+            <Pencil className="h-3 w-3" />
             Rename
           </DropdownMenu.Item>
           <DropdownMenu.Item
-            className="flex items-center px-2 py-1.5 text-sm text-foreground hover:bg-accent hover:text-accent-foreground rounded-sm cursor-pointer outline-none"
+            className="flex items-center gap-2 px-2 py-1.5 text-foreground hover:bg-backdrop rounded-sm cursor-pointer outline-none transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               onGenerateName(thread);
             }}
           >
+            <Sparkles className="h-3 w-3" />
             Generate Name
           </DropdownMenu.Item>
         </DropdownMenu.Content>
@@ -567,13 +571,13 @@ const ThreadHistoryDropdown = React.forwardRef<
     </DropdownMenu.Root>
   );
 });
-ThreadHistoryDropdown.displayName = "ThreadHistory.Dropdown";
+ThreadOptionsDropdown.displayName = "ThreadHistory.Dropdown";
 
 export {
   ThreadHistory,
-  ThreadHistoryDropdown,
   ThreadHistoryHeader,
   ThreadHistoryList,
   ThreadHistoryNewButton,
   ThreadHistorySearch,
+  ThreadOptionsDropdown,
 };
