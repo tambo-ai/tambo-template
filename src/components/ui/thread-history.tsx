@@ -11,10 +11,8 @@ import {
   ArrowLeftToLine,
   ArrowRightToLine,
   MoreHorizontal,
-  Pencil,
   PlusIcon,
   SearchIcon,
-  Sparkles,
 } from "lucide-react";
 import React, { useMemo } from "react";
 
@@ -361,6 +359,22 @@ const ThreadHistoryList = React.forwardRef<
     null
   );
   const [newName, setNewName] = React.useState("");
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (editingThread) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [editingThread]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      setEditingThread(null);
+    }
+  };
 
   // Filter threads based on search query
   const filteredThreads = useMemo(() => {
@@ -467,12 +481,13 @@ const ThreadHistoryList = React.forwardRef<
             {editingThread?.id === thread.id ? (
               <form onSubmit={handleNameSubmit} className="flex-1">
                 <input
+                  ref={inputRef}
                   type="text"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   className="w-full bg-background border border-border rounded px-2 py-1 text-sm"
                   onClick={(e) => e.stopPropagation()}
-                  autoFocus
                 />
               </form>
             ) : (
@@ -547,23 +562,21 @@ const ThreadOptionsDropdown = React.forwardRef<
           align="end"
         >
           <DropdownMenu.Item
-            className="flex items-center gap-2 px-2 py-1.5 text-foreground hover:bg-backdrop rounded-sm cursor-pointer outline-none transition-colors"
+            className="flex items-center px-2 py-1.5 text-foreground hover:bg-backdrop rounded-sm cursor-pointer outline-none transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               onRename(thread);
             }}
           >
-            <Pencil className="h-3 w-3" />
             Rename
           </DropdownMenu.Item>
           <DropdownMenu.Item
-            className="flex items-center gap-2 px-2 py-1.5 text-foreground hover:bg-backdrop rounded-sm cursor-pointer outline-none transition-colors"
+            className="flex items-center px-2 py-1.5 text-foreground hover:bg-backdrop rounded-sm cursor-pointer outline-none transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               onGenerateName(thread);
             }}
           >
-            <Sparkles className="h-3 w-3" />
             Generate Name
           </DropdownMenu.Item>
         </DropdownMenu.Content>
