@@ -363,6 +363,25 @@ const ThreadHistoryList = React.forwardRef<
   const [newName, setNewName] = React.useState("");
   const inputRef = React.useRef<HTMLInputElement>(null);
 
+  // Handle click outside name editing input
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        editingThread &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setEditingThread(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [editingThread]);
+
+  // Focus input when entering edit mode
   React.useEffect(() => {
     if (editingThread) {
       const timer = setTimeout(() => {
@@ -488,7 +507,7 @@ const ThreadHistoryList = React.forwardRef<
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full bg-background rounded px-2 py-1 text-sm"
+                  className="w-full bg-background rounded px-2 py-1 text-sm focus:outline-none"
                   onClick={(e) => e.stopPropagation()}
                 />
               </form>
