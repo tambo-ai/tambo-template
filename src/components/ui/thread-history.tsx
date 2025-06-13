@@ -34,7 +34,7 @@ interface ThreadHistoryContextValue {
   onThreadChange?: () => void;
   contextKey?: string;
   position?: "left" | "right";
-  updateThreadName: (threadId: string, newName: string) => Promise<void>;
+  updateThreadName: (newName: string, threadId?: string) => Promise<void>;
   generateThreadName: (threadId: string) => Promise<TamboThread>;
 }
 
@@ -411,7 +411,7 @@ const ThreadHistoryList = React.forwardRef<
     if (!editingThread) return;
 
     try {
-      await updateThreadName(editingThread.id, newName);
+      await updateThreadName(newName, editingThread.id);
       setEditingThread(null);
     } catch (error) {
       console.error("Failed to rename thread:", error);
