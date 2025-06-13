@@ -433,7 +433,7 @@ const ThreadHistoryList = React.forwardRef<
 
   const handleRename = (thread: TamboThread) => {
     setEditingThread(thread);
-    setNewName(thread.name || "");
+    setNewName(thread.name ?? "");
   };
 
   const handleGenerateName = async (thread: TamboThread) => {
@@ -568,7 +568,7 @@ const ThreadOptionsDropdown = React.forwardRef<
     onRename: (thread: TamboThread) => void;
     onGenerateName: (thread: TamboThread) => void;
   } & React.HTMLAttributes<HTMLDivElement>
->(({ thread, onRename, onGenerateName, className, ...props }, ref) => {
+>(({ thread, onRename, onGenerateName }) => {
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
