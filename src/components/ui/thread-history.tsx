@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import {
   type TamboThread,
   useTamboThread,
@@ -9,6 +10,7 @@ import {
 import {
   ArrowLeftToLine,
   ArrowRightToLine,
+  MoreVertical,
   PlusIcon,
   SearchIcon,
 } from "lucide-react";
@@ -32,6 +34,8 @@ interface ThreadHistoryContextValue {
   onThreadChange?: () => void;
   contextKey?: string;
   position?: "left" | "right";
+  updateThreadName: (threadId: string, newName: string) => Promise<void>;
+  generateThreadName: (threadId: string) => Promise<TamboThread>;
 }
 
 const ThreadHistoryContext =
@@ -41,7 +45,7 @@ const useThreadHistoryContext = () => {
   const context = React.useContext(ThreadHistoryContext);
   if (!context) {
     throw new Error(
-      "ThreadHistory components must be used within ThreadHistory",
+      "ThreadHistory components must be used within ThreadHistory"
     );
   }
   return context;
@@ -69,7 +73,7 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
       children,
       ...props
     },
-    ref,
+    ref
   ) => {
     const [searchQuery, setSearchQuery] = React.useState("");
     const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
@@ -86,6 +90,8 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
       switchCurrentThread,
       startNewThread,
       thread: currentThread,
+      updateThreadName,
+      generateThreadName,
     } = useTamboThread();
 
     // Update CSS variable when sidebar collapses/expands
@@ -93,7 +99,7 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
       const sidebarWidth = isCollapsed ? "3rem" : "16rem";
       document.documentElement.style.setProperty(
         "--sidebar-width",
-        sidebarWidth,
+        sidebarWidth
       );
     }, [isCollapsed]);
 
@@ -120,6 +126,8 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
         onThreadChange,
         contextKey,
         position,
+        updateThreadName,
+        generateThreadName,
       }),
       [
         threads,
@@ -134,7 +142,9 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
         onThreadChange,
         contextKey,
         position,
-      ],
+        updateThreadName,
+        generateThreadName,
+      ]
     );
 
     return (
@@ -147,7 +157,7 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
             "border-flat bg-container h-screen fixed top-0 transition-all duration-300",
             position === "left" ? "border-r left-0" : "border-l right-0",
             isCollapsed ? "w-12" : "w-64",
-            className,
+            className
           )}
           {...props}
         >
@@ -159,7 +169,7 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
         </div>
       </ThreadHistoryContext.Provider>
     );
-  },
+  }
 );
 ThreadHistory.displayName = "ThreadHistory";
 
@@ -182,7 +192,7 @@ const ThreadHistoryHeader = React.forwardRef<
       className={cn(
         "flex items-center justify-between mb-4",
         isCollapsed ? "p-1" : "p-2",
-        className,
+        className
       )}
       {...props}
     >
@@ -193,7 +203,7 @@ const ThreadHistoryHeader = React.forwardRef<
         onClick={() => setIsCollapsed(!isCollapsed)}
         className={cn(
           "bg-container hover:bg-muted transition-colors p-1 hover:bg-backdrop rounded-md cursor-pointer",
-          position === "left" ? "ml-auto" : "",
+          position === "left" ? "ml-auto" : ""
         )}
         aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
@@ -234,7 +244,7 @@ const ThreadHistoryNewButton = React.forwardRef<
         console.error("Failed to create new thread:", error);
       }
     },
-    [startNewThread, refetch, onThreadChange],
+    [startNewThread, refetch, onThreadChange]
   );
 
   React.useEffect(() => {
@@ -255,7 +265,7 @@ const ThreadHistoryNewButton = React.forwardRef<
       onClick={handleNewThread}
       className={cn(
         "flex items-center gap-2 rounded-md mb-4 hover:bg-backdrop transition-colors cursor-pointer",
-        isCollapsed ? "p-1 justify-center" : "p-2",
+        isCollapsed ? "p-1 justify-center" : "p-2"
       )}
       title="New thread"
       {...props}
@@ -293,7 +303,7 @@ const ThreadHistorySearch = React.forwardRef<
       className={cn(
         "mb-4",
         isCollapsed ? "flex justify-center" : "relative",
-        className,
+        className
       )}
       {...props}
     >
@@ -341,7 +351,14 @@ const ThreadHistoryList = React.forwardRef<
     currentThread,
     switchCurrentThread,
     onThreadChange,
+    updateThreadName,
+    generateThreadName,
   } = useThreadHistoryContext();
+
+  const [editingThread, setEditingThread] = React.useState<TamboThread | null>(
+    null
+  );
+  const [newName, setNewName] = React.useState("");
 
   // Filter threads based on search query
   const filteredThreads = useMemo(() => {
@@ -358,8 +375,8 @@ const ThreadHistoryList = React.forwardRef<
         nameMatches ??
         thread.messages.some((message) =>
           message.content.some(
-            (content) => !!content.text?.toLowerCase().includes(query),
-          ),
+            (content) => !!content.text?.toLowerCase().includes(query)
+          )
         )
       );
     });
@@ -373,6 +390,31 @@ const ThreadHistoryList = React.forwardRef<
       onThreadChange?.();
     } catch (error) {
       console.error("Failed to switch thread:", error);
+    }
+  };
+
+  const handleRename = (thread: TamboThread) => {
+    setEditingThread(thread);
+    setNewName(thread.name || "");
+  };
+
+  const handleGenerateName = async (thread: TamboThread) => {
+    try {
+      await generateThreadName(thread.id);
+    } catch (error) {
+      console.error("Failed to generate name:", error);
+    }
+  };
+
+  const handleNameSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingThread) return;
+
+    try {
+      await updateThreadName(editingThread.id, newName);
+      setEditingThread(null);
+    } catch (error) {
+      console.error("Failed to rename thread:", error);
     }
   };
 
@@ -416,23 +458,41 @@ const ThreadHistoryList = React.forwardRef<
             key={thread.id}
             onClick={async () => await handleSwitchThread(thread.id)}
             className={cn(
-              "p-2 rounded-md hover:bg-backdrop cursor-pointer",
-              currentThread?.id === thread.id ? "bg-muted" : "",
+              "p-2 rounded-md hover:bg-backdrop cursor-pointer group flex items-center justify-between",
+              currentThread?.id === thread.id ? "bg-muted" : ""
             )}
           >
-            <div className="text-sm">
-              <span className="font-medium">
-                {thread.name ?? `Thread ${thread.id.substring(0, 8)}`}
-              </span>
-              <p className="text-xs text-muted-foreground truncate mt-1">
-                {new Date(thread.createdAt).toLocaleString(undefined, {
-                  month: "short",
-                  day: "numeric",
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
-              </p>
-            </div>
+            {editingThread?.id === thread.id ? (
+              <form onSubmit={handleNameSubmit} className="flex-1">
+                <input
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  className="w-full bg-background border border-border rounded px-2 py-1 text-sm"
+                  onClick={(e) => e.stopPropagation()}
+                  autoFocus
+                />
+              </form>
+            ) : (
+              <div className="text-sm flex-1">
+                <span className="font-medium">
+                  {thread.name ?? `Thread ${thread.id.substring(0, 8)}`}
+                </span>
+                <p className="text-xs text-muted-foreground truncate mt-1">
+                  {new Date(thread.createdAt).toLocaleString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit",
+                  })}
+                </p>
+              </div>
+            )}
+            <ThreadHistoryDropdown
+              thread={thread}
+              onRename={handleRename}
+              onGenerateName={handleGenerateName}
+            />
           </div>
         ))}
       </div>
@@ -447,7 +507,7 @@ const ThreadHistoryList = React.forwardRef<
         isCollapsed
           ? "opacity-0 max-h-0 overflow-hidden pointer-events-none"
           : "opacity-100 max-h-full pointer-events-auto",
-        className,
+        className
       )}
       {...props}
     >
@@ -457,8 +517,61 @@ const ThreadHistoryList = React.forwardRef<
 });
 ThreadHistoryList.displayName = "ThreadHistory.List";
 
+/**
+ * Dropdown menu component for thread actions
+ */
+const ThreadHistoryDropdown = React.forwardRef<
+  HTMLDivElement,
+  {
+    thread: TamboThread;
+    onRename: (thread: TamboThread) => void;
+    onGenerateName: (thread: TamboThread) => void;
+  } & React.HTMLAttributes<HTMLDivElement>
+>(({ thread, onRename, onGenerateName, className, ...props }, ref) => {
+  return (
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button
+          className="p-1 hover:bg-backdrop rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <MoreVertical className="h-4 w-4 text-muted-foreground" />
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          className="min-w-[160px] bg-popover rounded-md p-1 shadow-md border border-border"
+          sideOffset={5}
+          align="end"
+        >
+          <DropdownMenu.Item
+            className="flex items-center px-2 py-1.5 text-sm text-foreground hover:bg-accent hover:text-accent-foreground rounded-sm cursor-pointer outline-none"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRename(thread);
+            }}
+          >
+            Rename
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            className="flex items-center px-2 py-1.5 text-sm text-foreground hover:bg-accent hover:text-accent-foreground rounded-sm cursor-pointer outline-none"
+            onClick={(e) => {
+              e.stopPropagation();
+              onGenerateName(thread);
+            }}
+          >
+            Generate Name
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
+  );
+});
+ThreadHistoryDropdown.displayName = "ThreadHistory.Dropdown";
+
 export {
   ThreadHistory,
+  ThreadHistoryDropdown,
   ThreadHistoryHeader,
   ThreadHistoryList,
   ThreadHistoryNewButton,
