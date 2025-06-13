@@ -494,7 +494,7 @@ const ThreadHistoryList = React.forwardRef<
               </form>
             ) : (
               <div className="text-sm flex-1">
-                <span className="font-medium">
+                <span className="font-medium line-clamp-1">
                   {thread.name ?? `Thread ${thread.id.substring(0, 8)}`}
                 </span>
                 <p className="text-xs text-muted-foreground truncate mt-1">
