@@ -4,6 +4,7 @@ import {
   Message,
   MessageContent,
   MessageRenderedComponentArea,
+  ToolcallInfo,
   type messageVariants,
 } from "@/components/ui/message";
 import { cn } from "@/lib/utils";
@@ -150,9 +151,7 @@ const ThreadContentMessages = React.forwardRef<
               isLoading={isGenerating && index === messages.length - 1}
               className={cn(
                 "flex w-full",
-                message.role === "assistant"
-                  ? "justify-start"
-                  : "justify-end",
+                message.role === "assistant" ? "justify-start" : "justify-end",
               )}
             >
               <div
@@ -168,6 +167,7 @@ const ThreadContentMessages = React.forwardRef<
                       : "text-primary bg-container hover:bg-backdrop font-sans"
                   }
                 />
+                <ToolcallInfo />
                 <MessageRenderedComponentArea className="w-full" />
               </div>
             </Message>
