@@ -561,56 +561,58 @@ ThreadHistoryList.displayName = "ThreadHistory.List";
 /**
  * Dropdown menu component for thread actions
  */
-const ThreadOptionsDropdown = ({
-  thread,
-  onRename,
-  onGenerateName,
-}: {
-  thread: TamboThread;
-  onRename: (thread: TamboThread) => void;
-  onGenerateName: (thread: TamboThread) => void;
-}) => {
+const ThreadOptionsDropdown = React.forwardRef<
+  HTMLDivElement,
+  {
+    thread: TamboThread;
+    onRename: (thread: TamboThread) => void;
+    onGenerateName: (thread: TamboThread) => void;
+  } & React.HTMLAttributes<HTMLDivElement>
+>(({ thread, onRename, onGenerateName, ...props }, ref) => {
   return (
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger asChild>
-        <button
-          className="p-1 hover:bg-backdrop rounded-md opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
-        </button>
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Portal>
-        <DropdownMenu.Content
-          className="min-w-[160px] text-xs bg-popover rounded-md p-1 shadow-md border border-border"
-          sideOffset={5}
-          align="end"
-        >
-          <DropdownMenu.Item
-            className="flex items-center gap-2 px-2 py-1.5 text-foreground hover:bg-backdrop rounded-sm cursor-pointer outline-none transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              onRename(thread);
-            }}
+    <div ref={ref} {...props}>
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger asChild>
+          <button
+            className="p-1 hover:bg-backdrop rounded-md opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+            onClick={(e) => e.stopPropagation()}
           >
-            <Pencil className="h-3 w-3" />
-            Rename
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            className="flex items-center gap-2 px-2 py-1.5 text-foreground hover:bg-backdrop rounded-sm cursor-pointer outline-none transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              onGenerateName(thread);
-            }}
+            <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+          </button>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Portal>
+          <DropdownMenu.Content
+            className="min-w-[160px] text-xs bg-popover rounded-md p-1 shadow-md border border-border"
+            sideOffset={5}
+            align="end"
           >
-            <Sparkles className="h-3 w-3" />
-            Generate Name
-          </DropdownMenu.Item>
-        </DropdownMenu.Content>
-      </DropdownMenu.Portal>
-    </DropdownMenu.Root>
+            <DropdownMenu.Item
+              className="flex items-center gap-2 px-2 py-1.5 text-foreground hover:bg-backdrop rounded-sm cursor-pointer outline-none transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRename(thread);
+              }}
+            >
+              <Pencil className="h-3 w-3" />
+              Rename
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              className="flex items-center gap-2 px-2 py-1.5 text-foreground hover:bg-backdrop rounded-sm cursor-pointer outline-none transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                onGenerateName(thread);
+              }}
+            >
+              <Sparkles className="h-3 w-3" />
+              Generate Name
+            </DropdownMenu.Item>
+          </DropdownMenu.Content>
+        </DropdownMenu.Portal>
+      </DropdownMenu.Root>
+    </div>
   );
-};
+});
+ThreadOptionsDropdown.displayName = "ThreadHistory.Dropdown";
 
 export {
   ThreadHistory,

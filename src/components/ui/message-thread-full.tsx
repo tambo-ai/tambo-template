@@ -1,39 +1,38 @@
 "use client";
 
-import type { messageVariants } from "@/components/ui/message";
 import {
   MessageInput,
-  MessageInputError,
-  MessageInputSubmitButton,
   MessageInputTextarea,
   MessageInputToolbar,
+  MessageInputSubmitButton,
+  MessageInputError,
 } from "@/components/ui/message-input";
 import {
   MessageSuggestions,
-  MessageSuggestionsList,
   MessageSuggestionsStatus,
+  MessageSuggestionsList,
 } from "@/components/ui/message-suggestions";
-import { ScrollableMessageContainer } from "@/components/ui/scrollable-message-container";
+import type { messageVariants } from "@/components/ui/message";
 import {
-  ThreadContainer,
-  useThreadContainerContext,
-} from "@/components/ui/thread-container";
+  ThreadHistory,
+  ThreadHistoryHeader,
+  ThreadHistoryNewButton,
+  ThreadHistorySearch,
+  ThreadHistoryList,
+} from "@/components/ui/thread-history";
 import {
   ThreadContent,
   ThreadContentMessages,
 } from "@/components/ui/thread-content";
 import {
-  ThreadHistory,
-  ThreadHistoryHeader,
-  ThreadHistoryList,
-  ThreadHistoryNewButton,
-  ThreadHistorySearch,
-} from "@/components/ui/thread-history";
+  ThreadContainer,
+  useThreadContainerContext,
+} from "@/components/ui/thread-container";
+import { ScrollableMessageContainer } from "@/components/ui/scrollable-message-container";
 import { useMergedRef } from "@/lib/thread-hooks";
-import { Suggestion, useTambo } from "@tambo-ai/react";
+import type { Suggestion } from "@tambo-ai/react";
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
-import { WelcomeCard } from "../welcome-card";
 
 /**
  * Props for the MessageThreadFull component
@@ -61,15 +60,8 @@ export const MessageThreadFull = React.forwardRef<
   const { containerRef, historyPosition } = useThreadContainerContext();
   const mergedRef = useMergedRef<HTMLDivElement | null>(ref, containerRef);
 
-  // Get MessageThread from Tambo
-  const { thread } = useTambo();
-
   const threadHistorySidebar = (
-    <ThreadHistory
-      contextKey={contextKey}
-      position={historyPosition}
-      defaultCollapsed={true}
-    >
+    <ThreadHistory contextKey={contextKey} position={historyPosition}>
       <ThreadHistoryHeader />
       <ThreadHistoryNewButton />
       <ThreadHistorySearch />
@@ -77,26 +69,24 @@ export const MessageThreadFull = React.forwardRef<
     </ThreadHistory>
   );
 
-  const populationSuggestions: Suggestion[] = [
+  const defaultSuggestions: Suggestion[] = [
     {
-      id: "pop-suggestion-1",
-      title: "Top 10 countries by population",
-      detailedSuggestion: "Show me the top 10 countries by population in 2023.",
-      messageId: "population-query",
+      id: "suggestion-1",
+      title: "Get started",
+      detailedSuggestion: "What can you help me with?",
+      messageId: "welcome-query",
     },
     {
-      id: "pop-suggestion-2",
-      title: "Population density comparison",
-      detailedSuggestion:
-        "Compare population density of the top 10 most populous countries.",
-      messageId: "population-query",
+      id: "suggestion-2",
+      title: "Learn more",
+      detailedSuggestion: "Tell me about your capabilities.",
+      messageId: "capabilities-query",
     },
     {
-      id: "pop-suggestion-3",
-      title: "Population growth trends",
-      detailedSuggestion:
-        "What are the projected population growth trends for the top 10 most populated countries?",
-      messageId: "population-query",
+      id: "suggestion-3",
+      title: "Examples",
+      detailedSuggestion: "Show me some example queries I can try.",
+      messageId: "examples-query",
     },
   ];
 
@@ -107,11 +97,6 @@ export const MessageThreadFull = React.forwardRef<
 
       <ThreadContainer ref={mergedRef} className={className} {...props}>
         <ScrollableMessageContainer className="p-4">
-          {(!thread || thread.messages.length === 0) && (
-            <div className="w-full min-w-xl p-4 h-full flex items-center justify-center">
-              <WelcomeCard />
-            </div>
-          )}
           <ThreadContent variant={variant}>
             <ThreadContentMessages />
           </ThreadContent>
@@ -134,7 +119,7 @@ export const MessageThreadFull = React.forwardRef<
         </div>
 
         {/* Message suggestions */}
-        <MessageSuggestions initialSuggestions={populationSuggestions}>
+        <MessageSuggestions initialSuggestions={defaultSuggestions}>
           <MessageSuggestionsList />
         </MessageSuggestions>
       </ThreadContainer>

@@ -21,7 +21,7 @@ export function MessageGenerationStage({
   showLabel = true,
   ...props
 }: GenerationStageProps) {
-  const { thread, isIdle } = useTambo();
+  const { thread } = useTambo();
   const stage = thread?.generationStage;
 
   // Only render if we have a generation stage
@@ -44,15 +44,11 @@ export function MessageGenerationStage({
   const label =
     stageLabels[stage] || `${stage.charAt(0).toUpperCase() + stage.slice(1)}`;
 
-  if (isIdle) {
-    return null;
-  }
-
   return (
     <div
       className={cn(
         "inline-flex items-center gap-2 px-2 py-1 text-xs rounded-md bg-muted/30 text-muted-foreground",
-        className,
+        className
       )}
       {...props}
     >
