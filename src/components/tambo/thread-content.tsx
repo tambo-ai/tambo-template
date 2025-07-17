@@ -4,8 +4,9 @@ import {
   Message,
   MessageContent,
   MessageRenderedComponentArea,
+  ToolcallInfo,
   type messageVariants,
-} from "@/components/ui/message";
+} from "@/components/tambo/message";
 import { cn } from "@/lib/utils";
 import { type TamboThreadMessage, useTambo } from "@tambo-ai/react";
 import { type VariantProps } from "class-variance-authority";
@@ -166,6 +167,7 @@ const ThreadContentMessages = React.forwardRef<
                       : "text-primary bg-container hover:bg-backdrop font-sans"
                   }
                 />
+                <ToolcallInfo />
                 <MessageRenderedComponentArea className="w-full" />
               </div>
             </Message>

@@ -6,29 +6,29 @@ import {
   MessageInputToolbar,
   MessageInputSubmitButton,
   MessageInputError,
-} from "@/components/ui/message-input";
+} from "@/components/tambo/message-input";
 import {
   MessageSuggestions,
   MessageSuggestionsStatus,
   MessageSuggestionsList,
-} from "@/components/ui/message-suggestions";
-import type { messageVariants } from "@/components/ui/message";
+} from "@/components/tambo/message-suggestions";
+import type { messageVariants } from "@/components/tambo/message";
 import {
   ThreadHistory,
   ThreadHistoryHeader,
   ThreadHistoryNewButton,
   ThreadHistorySearch,
   ThreadHistoryList,
-} from "@/components/ui/thread-history";
+} from "@/components/tambo/thread-history";
 import {
   ThreadContent,
   ThreadContentMessages,
-} from "@/components/ui/thread-content";
+} from "@/components/tambo/thread-content";
 import {
   ThreadContainer,
   useThreadContainerContext,
-} from "@/components/ui/thread-container";
-import { ScrollableMessageContainer } from "@/components/ui/scrollable-message-container";
+} from "@/components/tambo/thread-container";
+import { ScrollableMessageContainer } from "@/components/tambo/scrollable-message-container";
 import { useMergedRef } from "@/lib/thread-hooks";
 import type { Suggestion } from "@tambo-ai/react";
 import type { VariantProps } from "class-variance-authority";
@@ -44,7 +44,7 @@ export interface MessageThreadFullProps
   /**
    * Controls the visual styling of messages in the thread.
    * Possible values include: "default", "compact", etc.
-   * These values are defined in messageVariants from "@/components/ui/message".
+   * These values are defined in messageVariants from "@/components/tambo/message".
    * @example variant="compact"
    */
   variant?: VariantProps<typeof messageVariants>["variant"];

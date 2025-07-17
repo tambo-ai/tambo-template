@@ -1,9 +1,9 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useTamboThreadInput } from "@tambo-ai/react";
+import { useTamboThread, useTamboThreadInput } from "@tambo-ai/react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Square } from "lucide-react";
 import * as React from "react";
 
 /**
@@ -18,10 +18,20 @@ const messageInputVariants = cva("w-full", {
     variant: {
       default: "",
       solid: [
-        "shadow shadow-zinc-900/10 dark:shadow-zinc-900/20",
-        "[&_input]:bg-muted [&_input]:dark:bg-muted",
+        "[&>div]:bg-background",
+        "[&>div]:border-0",
+        "[&>div]:shadow-xl [&>div]:shadow-black/5 [&>div]:dark:shadow-black/20",
+        "[&>div]:ring-1 [&>div]:ring-black/5 [&>div]:dark:ring-white/10",
+        "[&_textarea]:bg-transparent",
+        "[&_textarea]:rounded-lg",
       ].join(" "),
-      bordered: ["[&_input]:border-2", "[&_input]:border-border"].join(" "),
+      bordered: [
+        "[&>div]:bg-transparent",
+        "[&>div]:border-2 [&>div]:border-gray-300 [&>div]:dark:border-zinc-600",
+        "[&>div]:shadow-none",
+        "[&_textarea]:bg-transparent",
+        "[&_textarea]:border-0",
+      ].join(" "),
     },
   },
   defaultVariants: {
@@ -227,8 +237,10 @@ const MessageInputTextarea = ({
   placeholder = "What do you want to do?",
   ...props
 }: MessageInputTextareaProps) => {
-  const { value, setValue, isPending, textareaRef, handleSubmit } =
+  const { value, setValue, textareaRef, handleSubmit } =
     useMessageInputContext();
+  const { isIdle } = useTamboThread();
+  const isPending = !isIdle;
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setValue(e.target.value);
@@ -292,23 +304,32 @@ const MessageInputSubmitButton = React.forwardRef<
   MessageInputSubmitButtonProps
 >(({ className, children, ...props }, ref) => {
   const { isPending } = useMessageInputContext();
+  const { cancel } = useTamboThread();
+
+  const handleCancel = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    cancel();
+  };
+
+  const buttonClasses = cn(
+    "w-10 h-10 bg-black/80 text-white rounded-lg hover:bg-black/70 disabled:opacity-50 flex items-center justify-center cursor-pointer",
+    className,
+  );
 
   return (
     <button
       ref={ref}
-      type="submit"
-      disabled={isPending}
-      className={cn(
-        "w-10 h-10 bg-black/80 text-white rounded-lg hover:bg-black/70 disabled:opacity-50 flex items-center justify-center cursor-pointer",
-        className,
-      )}
-      aria-label="Send message"
-      data-slot="message-input-submit"
+      type={isPending ? "button" : "submit"}
+      onClick={isPending ? handleCancel : undefined}
+      className={buttonClasses}
+      aria-label={isPending ? "Cancel message" : "Send message"}
+      data-slot={isPending ? "message-input-cancel" : "message-input-submit"}
       {...props}
     >
       {children ??
         (isPending ? (
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+          <Square className="w-4 h-4" fill="currentColor" />
         ) : (
           <ArrowUp className="w-5 h-5" />
         ))}
@@ -392,10 +413,10 @@ MessageInputToolbar.displayName = "MessageInput.Toolbar";
 
 // --- Exports ---
 export {
-  messageInputVariants,
   MessageInput,
-  MessageInputTextarea,
-  MessageInputSubmitButton,
-  MessageInputToolbar,
   MessageInputError,
+  MessageInputSubmitButton,
+  MessageInputTextarea,
+  MessageInputToolbar,
+  messageInputVariants,
 };
