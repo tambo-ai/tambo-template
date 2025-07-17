@@ -6,7 +6,7 @@ import {
   MessageRenderedComponentArea,
   ToolcallInfo,
   type messageVariants,
-} from "@/components/ui/message";
+} from "@/components/tambo/message";
 import { cn } from "@/lib/utils";
 import { type TamboThreadMessage, useTambo } from "@tambo-ai/react";
 import { type VariantProps } from "class-variance-authority";

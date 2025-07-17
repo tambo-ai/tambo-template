@@ -47,7 +47,7 @@ const useThreadHistoryContext = () => {
   const context = React.useContext(ThreadHistoryContext);
   if (!context) {
     throw new Error(
-      "ThreadHistory components must be used within ThreadHistory"
+      "ThreadHistory components must be used within ThreadHistory",
     );
   }
   return context;
@@ -75,7 +75,7 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
       children,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [searchQuery, setSearchQuery] = React.useState("");
     const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
@@ -101,7 +101,7 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
       const sidebarWidth = isCollapsed ? "3rem" : "16rem";
       document.documentElement.style.setProperty(
         "--sidebar-width",
-        sidebarWidth
+        sidebarWidth,
       );
     }, [isCollapsed]);
 
@@ -146,7 +146,7 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
         position,
         updateThreadName,
         generateThreadName,
-      ]
+      ],
     );
 
     return (
@@ -159,7 +159,7 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
             "border-flat bg-container h-screen fixed top-0 transition-all duration-300",
             position === "left" ? "border-r left-0" : "border-l right-0",
             isCollapsed ? "w-12" : "w-64",
-            className
+            className,
           )}
           {...props}
         >
@@ -171,7 +171,7 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
         </div>
       </ThreadHistoryContext.Provider>
     );
-  }
+  },
 );
 ThreadHistory.displayName = "ThreadHistory";
 
@@ -194,7 +194,7 @@ const ThreadHistoryHeader = React.forwardRef<
       className={cn(
         "flex items-center justify-between mb-4",
         isCollapsed ? "p-1" : "p-2",
-        className
+        className,
       )}
       {...props}
     >
@@ -205,7 +205,7 @@ const ThreadHistoryHeader = React.forwardRef<
         onClick={() => setIsCollapsed(!isCollapsed)}
         className={cn(
           "bg-container hover:bg-muted transition-colors p-1 hover:bg-backdrop rounded-md cursor-pointer",
-          position === "left" ? "ml-auto" : ""
+          position === "left" ? "ml-auto" : "",
         )}
         aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
@@ -246,7 +246,7 @@ const ThreadHistoryNewButton = React.forwardRef<
         console.error("Failed to create new thread:", error);
       }
     },
-    [startNewThread, refetch, onThreadChange]
+    [startNewThread, refetch, onThreadChange],
   );
 
   React.useEffect(() => {
@@ -267,7 +267,7 @@ const ThreadHistoryNewButton = React.forwardRef<
       onClick={handleNewThread}
       className={cn(
         "flex items-center gap-2 rounded-md mb-4 hover:bg-backdrop transition-colors cursor-pointer",
-        isCollapsed ? "p-1 justify-center" : "p-2"
+        isCollapsed ? "p-1 justify-center" : "p-2",
       )}
       title="New thread"
       {...props}
@@ -305,7 +305,7 @@ const ThreadHistorySearch = React.forwardRef<
       className={cn(
         "mb-4",
         isCollapsed ? "flex justify-center" : "relative",
-        className
+        className,
       )}
       {...props}
     >
@@ -359,7 +359,7 @@ const ThreadHistoryList = React.forwardRef<
   } = useThreadHistoryContext();
 
   const [editingThread, setEditingThread] = React.useState<TamboThread | null>(
-    null
+    null,
   );
   const [newName, setNewName] = React.useState("");
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -413,8 +413,8 @@ const ThreadHistoryList = React.forwardRef<
         nameMatches ??
         thread.messages.some((message) =>
           message.content.some(
-            (content) => !!content.text?.toLowerCase().includes(query)
-          )
+            (content) => !!content.text?.toLowerCase().includes(query),
+          ),
         )
       );
     });
@@ -499,36 +499,51 @@ const ThreadHistoryList = React.forwardRef<
             onClick={async () => await handleSwitchThread(thread.id)}
             className={cn(
               "p-2 rounded-md hover:bg-backdrop cursor-pointer group flex items-center justify-between",
-              currentThread?.id === thread.id ? "bg-muted" : ""
+              currentThread?.id === thread.id ? "bg-muted" : "",
+              editingThread?.id === thread.id ? "bg-muted" : "",
             )}
           >
-            {editingThread?.id === thread.id ? (
-              <form onSubmit={handleNameSubmit} className="flex-1">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className="w-full bg-background rounded px-2 py-1 text-sm focus:outline-none"
-                  onClick={(e) => e.stopPropagation()}
-                />
-              </form>
-            ) : (
-              <div className="text-sm flex-1">
-                <span className="font-medium line-clamp-1">
-                  {thread.name ?? `Thread ${thread.id.substring(0, 8)}`}
-                </span>
-                <p className="text-xs text-muted-foreground truncate mt-1">
-                  {new Date(thread.createdAt).toLocaleString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
-                </p>
-              </div>
-            )}
+            <div className="text-sm flex-1">
+              {editingThread?.id === thread.id ? (
+                <form
+                  onSubmit={handleNameSubmit}
+                  className="flex flex-col gap-1"
+                >
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="w-full bg-background px-1 text-sm font-medium focus:outline-none rounded-sm"
+                    onClick={(e) => e.stopPropagation()}
+                    placeholder="Thread name..."
+                  />
+                  <p className="text-xs text-muted-foreground truncate">
+                    {new Date(thread.createdAt).toLocaleString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </form>
+              ) : (
+                <>
+                  <span className="font-medium line-clamp-1">
+                    {thread.name ?? `Thread ${thread.id.substring(0, 8)}`}
+                  </span>
+                  <p className="text-xs text-muted-foreground truncate mt-1">
+                    {new Date(thread.createdAt).toLocaleString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </>
+              )}
+            </div>
             <ThreadOptionsDropdown
               thread={thread}
               onRename={handleRename}
@@ -548,7 +563,7 @@ const ThreadHistoryList = React.forwardRef<
         isCollapsed
           ? "opacity-0 max-h-0 overflow-hidden pointer-events-none"
           : "opacity-100 max-h-full pointer-events-auto",
-        className
+        className,
       )}
       {...props}
     >

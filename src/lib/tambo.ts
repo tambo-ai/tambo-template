@@ -8,7 +8,7 @@
  * Read more about Tambo at https://tambo.co/docs
  */
 
-import { Graph } from "@/components/ui/graph";
+import { Graph } from "@/components/tambo/graph";
 import {
   getCountryPopulations,
   getGlobalPopulationTrend,
@@ -31,24 +31,27 @@ export const tools: TamboTool[] = [
     description:
       "A tool to get population statistics by country with advanced filtering options",
     tool: getCountryPopulations,
-    toolSchema: z.function()
+    toolSchema: z
+      .function()
       .args(z.string().describe("The continent to filter countries by"))
       .returns(
-        z.object({
-          continent: z.string().optional(),
-          sortBy: z.enum(["population", "growthRate"]).optional(),
-          limit: z.number().optional(),
-          order: z.enum(["asc", "desc"]).optional(),
-        })
-        .optional()
-    ),
+        z
+          .object({
+            continent: z.string().optional(),
+            sortBy: z.enum(["population", "growthRate"]).optional(),
+            limit: z.number().optional(),
+            order: z.enum(["asc", "desc"]).optional(),
+          })
+          .optional()
+      ),
   },
   {
     name: "globalPopulation",
     description:
       "A tool to get global population trends with optional year range filtering",
     tool: getGlobalPopulationTrend,
-    toolSchema: z.function()
+    toolSchema: z
+      .function()
       .args(z.string().describe("The continent to filter countries by"))
       .returns(
         z
@@ -56,8 +59,8 @@ export const tools: TamboTool[] = [
             startYear: z.number().optional(),
             endYear: z.number().optional(),
           })
-        .optional()
-    ),
+          .optional()
+      ),
   },
   // Add more tools here
 ];
