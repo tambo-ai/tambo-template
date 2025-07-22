@@ -111,6 +111,12 @@ export default function Home() {
                 >
                   Go to Chat →
                 </a>
+                <a
+                  href="/interactables"
+                  className="px-6 py-3 rounded-md font-medium shadow-sm transition-colors text-lg mt-4 bg-[#FFE17F] hover:bg-[#f5d570] text-gray-800"
+                >
+                  Interactables Demo →
+                </a>
               </div>
             </ApiKeyCheck>
           </div>
