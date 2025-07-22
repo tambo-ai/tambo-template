@@ -115,3 +115,22 @@
     font-family: Arial, Helvetica, sans-serif;
   }
 }
+
+/*
+This is a custom animation for the interactable components.
+It's used to highlight the fields that have been updated.
+You can remove this if you don't want to use it.
+*/
+
+@keyframes flash {
+  0%, 100% { 
+    background-color: transparent;
+  }
+  50% { 
+    background-color: rgb(59 130 246 / 0.3);
+  }
+}
+
+.animate-flash {
+  animation: flash 1s ease-in-out;
+}
