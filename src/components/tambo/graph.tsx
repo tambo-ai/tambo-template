@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useTambo, useTamboMessageContext } from "@tambo-ai/react";
+import { useTamboStreamStatus } from "@tambo-ai/react";
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 import * as RechartsCore from "recharts";
@@ -23,16 +23,16 @@ export const graphDataSchema = z.object({
         label: z.string().describe("Label for the dataset"),
         data: z.array(z.number()).describe("Data points for the dataset"),
         color: z.string().optional().describe("Optional color for the dataset"),
-      }),
+      })
     )
     .describe("Data for the graph"),
 });
 
 export const graphSchema = z.object({
-  data: graphDataSchema.describe(
-    "Data object containing chart configuration and values",
-  ),
   title: z.string().describe("Title for the chart"),
+  data: graphDataSchema.describe(
+    "Data object containing chart configuration and values"
+  ),
   showLegend: z
     .boolean()
     .optional()
@@ -88,7 +88,7 @@ const graphVariants = cva(
       variant: "default",
       size: "default",
     },
-  },
+  }
 );
 
 const defaultColors = [
@@ -122,21 +122,10 @@ const defaultColors = [
 export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
   (
     { className, variant, size, data, title, showLegend = true, ...props },
-    ref,
+    ref
   ) => {
-    // Get thread state
-    const { thread } = useTambo();
-    const { messageId } = useTamboMessageContext();
-
-    const message = thread?.messages[thread?.messages.length - 1];
-
-    const isLatestMessage = message?.id === messageId;
-
-    const generationStage = thread?.generationStage;
-    const isGenerating =
-      generationStage &&
-      generationStage !== "COMPLETE" &&
-      generationStage !== "ERROR";
+    // Get stream status
+    const { propStatus } = useTamboStreamStatus<GraphProps>();
 
     const dataIsValid =
       data?.labels &&
@@ -144,78 +133,97 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
       Array.isArray(data.labels) &&
       Array.isArray(data.datasets);
 
-    // For non-latest messages, show the graph immediately if data is valid
-    // For latest message, only show loading state while generating
-    if (!dataIsValid || (isLatestMessage && isGenerating)) {
-      return (
-        <div
-          ref={ref}
-          className={cn(graphVariants({ variant, size }), className)}
-          {...props}
-        >
-          <div className="p-4 h-full flex items-center justify-center">
-            <div className="flex flex-col items-center gap-2 text-muted-foreground">
-              <div className="flex items-center gap-1 h-4">
-                <span className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                <span className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.2s]"></span>
-                <span className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.1s]"></span>
-              </div>
-              <span className="text-sm">
-                {isGenerating
-                  ? "Streaming data..."
-                  : data
+    // Check if data is still streaming
+    const dataIsStreaming = propStatus?.data?.isStreaming || false;
+
+    // Calculate current data points count
+    const currentDataPoints = data?.datasets?.[0]?.data?.length || 0;
+
+    // Main render
+    return (
+      <div
+        ref={ref}
+        className={cn(graphVariants({ variant, size }), className)}
+        {...props}
+      >
+        <div className="p-4 h-full">
+          {title && (
+            <h3 className="text-lg font-medium mb-4 text-foreground">
+              {title}
+            </h3>
+          )}
+          {/* Show loading state for chart area while data is streaming */}
+          {!dataIsValid || dataIsStreaming ? (
+            <div className="w-full h-[calc(100%-2rem)] flex items-center justify-center">
+              <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                <div className="flex items-center gap-1 h-4">
+                  <span className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                  <span className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.2s]"></span>
+                  <span className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.1s]"></span>
+                </div>
+                <span className="text-sm">
+                  {dataIsStreaming
+                    ? `Loading chart: ${currentDataPoints} data point${
+                        currentDataPoints !== 1 ? "s" : ""
+                      }`
+                    : data
                     ? "Data ready"
                     : "Awaiting data"}
-              </span>
+                </span>
+              </div>
             </div>
+          ) : (
+            <RenderValidChart data={data!} showLegend={showLegend} />
+          )}
+        </div>
+      </div>
+    );
+  }
+);
+
+Graph.displayName = "Graph";
+
+// Helper component to render the chart when data is valid
+const RenderValidChart: React.FC<{ data: GraphDataType; showLegend?: boolean }> = ({ data, showLegend = true }) => {
+  try {
+    // Check for invalid data structure
+    if (
+      data.datasets.some(
+        (dataset) =>
+          !dataset.label ||
+          !dataset.data ||
+          !Array.isArray(dataset.data) ||
+          dataset.data.length !== data.labels.length
+      )
+    ) {
+      console.error("Invalid graph data structure:", data);
+      return (
+        <div className="w-full h-[calc(100%-2rem)] flex items-center justify-center">
+          <div className="text-destructive text-center">
+            <p className="font-medium">Invalid Graph Data</p>
+            <p className="text-sm mt-1">
+              The data structure is invalid.
+            </p>
           </div>
         </div>
       );
     }
 
-    // If not generating and basic structure exists, proceed with detailed validation and rendering
-    try {
-      // Check for invalid data structure *only after* generation should be complete
-      if (
-        data.datasets.some(
-          (dataset) =>
-            !dataset.label ||
-            !dataset.data ||
-            !Array.isArray(dataset.data) ||
-            dataset.data.length !== data.labels.length,
-        )
-      ) {
-        console.error("Invalid graph data structure (post-generation):", data);
-        // Render a specific error for invalid structure after completion
-        return (
-          <div
-            ref={ref}
-            className={cn(graphVariants({ variant, size }), className)}
-            {...props}
-          >
-            <div className="p-4 h-full flex items-center justify-center">
-              <div className="text-destructive text-center">
-                <p className="font-medium">Invalid Graph Data</p>
-                <p className="text-sm mt-1">
-                  The final data structure is invalid.
-                </p>
-              </div>
-            </div>
-          </div>
-        );
-      }
+    // Transform data for Recharts
+    const chartData = data.labels.map((label, index) => ({
+      name: label,
+      ...Object.fromEntries(
+        data.datasets.map((dataset) => [dataset.label, dataset.data[index]])
+      ),
+    }));
 
-      // Transform data for Recharts (only if structure is valid post-generation)
-      const chartData = data.labels.map((label, index) => ({
-        name: label,
-        ...Object.fromEntries(
-          data.datasets.map((dataset) => [dataset.label, dataset.data[index]]),
-        ),
-      }));
-
-      const renderChart = () => {
-        if (!data.type || !["bar", "line", "pie"].includes(data.type)) {
-          console.error("Invalid chart type:", data.type);
+    const renderChart = () => {
+        if (
+          !data ||
+          !data.type ||
+          !["bar", "line", "pie"].includes(data.type)
+        ) {
+          console.error("Invalid chart type:", data?.type);
           return (
             <div className="h-full flex items-center justify-center">
               <div className="text-destructive text-center">
@@ -268,7 +276,7 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
                     }}
                   />
                 )}
-                {data.datasets.map((dataset, index) => (
+                {data!.datasets.map((dataset, index) => (
                   <RechartsCore.Bar
                     key={dataset.label}
                     dataKey={dataset.label}
@@ -321,7 +329,7 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
                     }}
                   />
                 )}
-                {data.datasets.map((dataset, index) => (
+                {data!.datasets.map((dataset, index) => (
                   <RechartsCore.Line
                     key={dataset.label}
                     type="monotone"
@@ -340,8 +348,8 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
             return (
               <RechartsCore.PieChart>
                 <RechartsCore.Pie
-                  data={data.datasets[0].data.map((value, index) => ({
-                    name: data.labels[index],
+                  data={data!.datasets[0].data.map((value, index) => ({
+                    name: data!.labels[index],
                     value,
                     fill: defaultColors[index % defaultColors.length],
                   }))}
@@ -380,45 +388,24 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
         }
       };
 
-      return (
-        <div
-          ref={ref}
-          className={cn(graphVariants({ variant, size }), className)}
-          {...props}
-        >
-          <div className="p-4 h-full">
-            {title && (
-              <h3 className="text-lg font-medium mb-4 text-foreground">
-                {title}
-              </h3>
-            )}
-            <div className="w-full h-[calc(100%-2rem)]">
-              <RechartsCore.ResponsiveContainer width="100%" height="100%">
-                {renderChart()}
-              </RechartsCore.ResponsiveContainer>
-            </div>
-          </div>
+    return (
+      <div className="w-full h-[calc(100%-2rem)]">
+        <RechartsCore.ResponsiveContainer width="100%" height="100%">
+          {renderChart()}
+        </RechartsCore.ResponsiveContainer>
+      </div>
+    );
+  } catch (error) {
+    console.error("Error rendering chart:", error);
+    return (
+      <div className="w-full h-[calc(100%-2rem)] flex items-center justify-center">
+        <div className="text-destructive text-center">
+          <p className="font-medium">Error loading chart</p>
+          <p className="text-sm mt-1">
+            An error occurred while transforming data. Please try again later.
+          </p>
         </div>
-      );
-    } catch (error) {
-      console.error("Error rendering chart:", error);
-      return (
-        <div
-          className={cn(graphVariants({ variant, size }), className)}
-          {...props}
-        >
-          <div className="p-4 flex items-center justify-center h-full">
-            <div className="text-destructive text-center">
-              <p className="font-medium">Error loading chart</p>
-              <p className="text-sm mt-1">
-                An error occurred while transforming data. Please try again
-                later.
-              </p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-  },
-);
-Graph.displayName = "Graph";
+      </div>
+    );
+  }
+};
