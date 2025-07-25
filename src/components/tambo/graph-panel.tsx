@@ -85,7 +85,12 @@ function GraphPanelBase(props: GraphPanelProps) {
 
   // Show skeleton when values are empty
   const isEmpty =
-    !panelData.title || !panelData.summary || !panelData.graphProps;
+    !panelData.title || 
+    !panelData.summary || 
+    !panelData.graphProps ||
+    !panelData.graphProps.data ||
+    panelData.graphProps.data.labels.length === 0 ||
+    panelData.graphProps.data.datasets.length === 0;
 
   return (
     <div className="flex flex-col gap-2">

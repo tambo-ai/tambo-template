@@ -25,21 +25,18 @@ export default function InteractablesPage() {
   // Memoize empty props to prevent withInteractable re-renders during streaming
   const emptyBulletPoints = useMemo(() => [], []);
   const emptyCards = useMemo(() => [], []);
-  const emptyGraphProps = useMemo(
-    () => ({
+  const emptyGraphProps = useMemo(() => ({
+    title: "",
+    summary: "",
+    graphProps: {
       title: "",
-      summary: "",
-      graphProps: {
-        title: "",
-        data: {
-          type: "line" as const,
-          labels: [],
-          datasets: [],
-        },
+      data: {
+        type: "line" as const,
+        labels: [],
+        datasets: [],
       },
-    }),
-    []
-  );
+    },
+  }), []);
 
   return (
     <TamboProvider
