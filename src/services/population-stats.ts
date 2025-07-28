@@ -132,19 +132,19 @@ const mockCountryPopulation: CountryPopulation[] = [
 ];
 
 export const getGlobalPopulationTrend = async (
-  filter?: GlobalPopulationFilter
+  filter?: GlobalPopulationFilter,
 ): Promise<GlobalPopulation[]> => {
   let filteredData = [...mockGlobalPopulation];
 
   if (filter) {
     if (filter.startYear) {
       filteredData = filteredData.filter(
-        (data) => data.year >= filter.startYear!
+        (data) => data.year >= filter.startYear!,
       );
     }
     if (filter.endYear) {
       filteredData = filteredData.filter(
-        (data) => data.year <= filter.endYear!
+        (data) => data.year <= filter.endYear!,
       );
     }
   }
@@ -153,7 +153,7 @@ export const getGlobalPopulationTrend = async (
 };
 
 export const getCountryPopulations = async (
-  filter?: CountryPopulationFilter
+  filter?: CountryPopulationFilter,
 ): Promise<CountryPopulation[]> => {
   let filteredData = [...mockCountryPopulation];
 
@@ -161,7 +161,7 @@ export const getCountryPopulations = async (
     // Filter by continent
     if (filter.continent) {
       filteredData = filteredData.filter(
-        (country) => country.continent === filter.continent
+        (country) => country.continent === filter.continent,
       );
     }
 

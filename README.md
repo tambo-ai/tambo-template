@@ -45,7 +45,7 @@ const components: TamboComponent[] = [
                   .string()
                   .optional()
                   .describe("Optional color for the dataset"),
-              })
+              }),
             )
             .describe("Data for the graph"),
         })
@@ -102,7 +102,7 @@ export const tools: TamboTool[] = [
           startYear: z.number().optional(),
           endYear: z.number().optional(),
         })
-        .optional()
+        .optional(),
     ),
   },
 ];

@@ -95,8 +95,8 @@ export function ApiKeyCheck({ children }: ApiKeyCheckProps) {
             {isApiKeyMissing === null
               ? "Checking setup..."
               : isApiKeyMissing
-              ? "Tambo not initialized"
-              : "Tambo initialized"}
+                ? "Tambo not initialized"
+                : "Tambo initialized"}
           </p>
         </div>
         {isApiKeyMissing && <ApiKeyMissingAlert />}
