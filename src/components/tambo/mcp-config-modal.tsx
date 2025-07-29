@@ -4,6 +4,7 @@ import { McpServerInfo, MCPTransport } from "@tambo-ai/react/mcp";
 import { ChevronDown, X, Trash2 } from "lucide-react";
 import React from "react";
 import { createPortal } from "react-dom";
+import { motion } from "framer-motion";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -110,9 +111,12 @@ export const McpConfigModal = ({
   if (!isOpen) return null;
 
   const modalContent = (
-    <div
+    <motion.div
       className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
       onClick={handleBackdropClick}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
     >
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4">
@@ -134,8 +138,11 @@ export const McpConfigModal = ({
               Configure{" "}
               <span className="font-semibold text-gray-800">client-side</span>{" "}
               MCP servers to extend the capabilities of your tambo application.
-              These servers will be connected <i><b>from the browser</b></i> and
-              exposed as tools to tambo.
+              These servers will be connected{" "}
+              <i>
+                <b>from the browser</b>
+              </i>{" "}
+              and exposed as tools to tambo.
             </p>
           </div>
 
@@ -315,8 +322,8 @@ export const McpConfigModal = ({
           </div>
 
           <div className="mt-4">
-          <p className="text-sm text-gray-600">
-              <span className="font-semibold text-gray-800">Learn more:</span> {" "}
+            <p className="text-sm text-gray-600">
+              <span className="font-semibold text-gray-800">Learn more:</span>{" "}
               <a
                 href="https://docs.tambo.co/concepts/model-context-protocol/clientside-mcp-connection"
                 target="_blank"
@@ -324,8 +331,8 @@ export const McpConfigModal = ({
                 className="text-gray-600 hover:text-gray-700 underline underline-offset-2"
               >
                 client-side
-              </a>
-              {" "} | {" "}
+              </a>{" "}
+              |{" "}
               <a
                 href="https://docs.tambo.co/concepts/model-context-protocol/serverside-mcp-connection"
                 target="_blank"
@@ -333,13 +340,13 @@ export const McpConfigModal = ({
                 className="text-gray-600 hover:text-gray-700 underline underline-offset-2"
               >
                 server-side
-              </a>
-              {" "}MCP configuration.
+              </a>{" "}
+              MCP configuration.
             </p>
-            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 
   // Use portal to render outside current DOM tree to avoid nested forms
