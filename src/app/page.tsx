@@ -65,13 +65,6 @@ const KeyFilesSection = () => (
       <li className="flex items-start gap-2">
         <span className="text-blue-500">📄</span>
         <span>
-          <code className="font-medium font-mono">src/lib/mcp-utils.ts</code> -
-          MCP server configuration utilities
-        </span>
-      </li>
-      <li className="flex items-start gap-2">
-        <span className="text-blue-500">📄</span>
-        <span>
           <code className="font-medium font-mono">README.md</code> - For more
           details check out the README
         </span>
