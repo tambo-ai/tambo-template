@@ -145,4 +145,4 @@ return (
 );
 ```
 
-For more detailed documentation, visit [Tambo's official docs](https://tambo.co/docs).
+For more detailed documentation, visit [Tambo's official docs](https://docs.tambo.co).
