@@ -2,7 +2,7 @@
 
 import { MessageThreadFull } from "@/components/tambo/message-thread-full";
 import { loadMcpServers } from "@/lib/mcp-utils";
-import { components } from "@/lib/tambo";
+import { components, tools } from "@/lib/tambo";
 import { TamboProvider } from "@tambo-ai/react";
 import { TamboMcpProvider } from "@tambo-ai/react/mcp";
 
@@ -15,6 +15,7 @@ export default function Home() {
       <TamboProvider
         apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}
         components={components}
+        tools={tools}
         tamboUrl={process.env.NEXT_PUBLIC_TAMBO_URL}
       >
         <TamboMcpProvider mcpServers={mcpServers}>
