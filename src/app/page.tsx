@@ -8,50 +8,65 @@ const KeyFilesSection = () => (
       <li className="flex items-start gap-2">
         <span>📄</span>
         <span>
-          <code className="font-medium">src/layout.tsx</code> - Main layout with
-          TamboProvider
+          <code className="font-medium">src/app/layout.tsx</code> - Main layout
+          with TamboProvider
         </span>
       </li>
       <li className="flex items-start gap-2">
         <span>📄</span>
         <span>
-          <code className="font-medium font-mono">/chat/page.tsx</code> - Chat
-          page
+          <code className="font-medium font-mono">src/app/chat/page.tsx</code> -
+          Chat page with TamboProvider and MCP integration
         </span>
       </li>
       <li className="flex items-start gap-2">
         <span>📄</span>
         <span>
           <code className="font-medium font-mono">
-            /components/ui/message-thread-full.tsx
+            src/app/interactables/page.tsx
+          </code>{" "}
+          - Interactive demo page with tools and components
+        </span>
+      </li>
+      <li className="flex items-start gap-2">
+        <span>📄</span>
+        <span>
+          <code className="font-medium font-mono">
+            src/components/tambo/message-thread-full.tsx
           </code>{" "}
           - Chat UI
         </span>
       </li>
-
       <li className="flex items-start gap-2">
         <span>📄</span>
         <span>
           <code className="font-medium font-mono">
-            /components/ui/graph.tsx
+            src/components/tambo/graph.tsx
           </code>{" "}
           - A generative graph component
         </span>
       </li>
       <li className="flex items-start gap-2">
-        <span className="text-blue-500">📄</span>
+        <span>📄</span>
         <span>
           <code className="font-medium font-mono">
-            services/population-stats.ts
+            src/services/population-stats.ts
           </code>{" "}
-          - An example tool implementation
+          - Example tool implementation with mock population data
         </span>
       </li>
       <li className="flex items-start gap-2">
         <span className="text-blue-500">📄</span>
         <span>
-          <code className="font-medium font-mono">tambo.ts</code> - Component
-          and tool registration
+          <code className="font-medium font-mono">src/lib/tambo.ts</code> -
+          Component and tool registration
+        </span>
+      </li>
+      <li className="flex items-start gap-2">
+        <span className="text-blue-500">📄</span>
+        <span>
+          <code className="font-medium font-mono">src/lib/mcp-utils.ts</code> -
+          MCP server configuration utilities
         </span>
       </li>
       <li className="flex items-start gap-2">
@@ -64,7 +79,7 @@ const KeyFilesSection = () => (
     </ul>
     <div className="flex gap-4 flex-wrap mt-4">
       <a
-        href="https://tambo.co/docs"
+        href="https://docs.tambo.co"
         target="_blank"
         rel="noopener noreferrer"
         className="px-6 py-3 rounded-md font-medium transition-colors text-lg mt-4 border border-gray-300 hover:bg-gray-50"

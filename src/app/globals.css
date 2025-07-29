@@ -123,10 +123,11 @@ You can remove this if you don't want to use it.
 */
 
 @keyframes flash {
-  0%, 100% { 
+  0%,
+  100% {
     background-color: transparent;
   }
-  50% { 
+  50% {
     background-color: rgb(59 130 246 / 0.3);
   }
 }

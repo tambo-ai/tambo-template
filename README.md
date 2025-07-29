@@ -45,7 +45,7 @@ const components: TamboComponent[] = [
                   .string()
                   .optional()
                   .describe("Optional color for the dataset"),
-              })
+              }),
             )
             .describe("Data for the graph"),
         })
@@ -102,7 +102,7 @@ export const tools: TamboTool[] = [
           startYear: z.number().optional(),
           endYear: z.number().optional(),
         })
-        .optional()
+        .optional(),
     ),
   },
 ];
@@ -145,4 +145,4 @@ return (
 );
 ```
 
-For more detailed documentation, visit [Tambo's official docs](https://tambo.co/docs).
+For more detailed documentation, visit [Tambo's official docs](https://docs.tambo.co).

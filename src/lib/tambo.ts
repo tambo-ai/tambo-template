@@ -42,7 +42,7 @@ export const tools: TamboTool[] = [
             limit: z.number().optional(),
             order: z.enum(["asc", "desc"]).optional(),
           })
-          .optional()
+          .optional(),
       ),
   },
   {
@@ -59,7 +59,7 @@ export const tools: TamboTool[] = [
             startYear: z.number().optional(),
             endYear: z.number().optional(),
           })
-          .optional()
+          .optional(),
       ),
   },
   // Add more tools here
