@@ -1,5 +1,5 @@
 "use client";
-import { McpConfigButton } from "@/components/ui/mcp-config-button";
+
 import { MessageThreadFull } from "@/components/tambo/message-thread-full";
 import { loadMcpServers } from "@/lib/mcp-utils";
 import { components } from "@/lib/tambo";
@@ -12,9 +12,6 @@ export default function Home() {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden relative">
-      {/* MCP Config Button */}
-      <McpConfigButton />
-
       <TamboProvider
         apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}
         components={components}

@@ -117,12 +117,6 @@ export default function Home() {
                 >
                   Interactables Demo →
                 </a>
-                <a
-                  href="/mcp-config"
-                  className="px-6 py-3 rounded-md font-medium shadow-sm transition-colors text-lg mt-4 bg-[#FF7F7F] hover:bg-[#f57070] text-gray-800"
-                >
-                  MCP Config →
-                </a>
               </div>
             </ApiKeyCheck>
           </div>
