@@ -1,6 +1,6 @@
 "use client";
 
-import { McpServerInfo, MCPTransport } from "@tambo-ai/react/mcp";
+import { type McpServerInfo, MCPTransport } from "@tambo-ai/react/mcp";
 import { ChevronDown, X, Trash2 } from "lucide-react";
 import React from "react";
 import { createPortal } from "react-dom";
@@ -11,18 +11,35 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
+import { createMarkdownComponents } from "@/components/tambo/markdown-components";
+import Markdown from "react-markdown";
+import { cn } from "@/lib/utils";
 
+/**
+ * Modal component for configuring client-side MCP (Model Context Protocol) servers.
+ *
+ * This component provides a user interface for managing MCP server connections that
+ * will be used to extend the capabilities of the tambo application. The servers are
+ * stored in browser localStorage and connected directly from the client-side.
+ *
+ * @param props - Component props
+ * @param props.isOpen - Whether the modal is currently open/visible
+ * @param props.onClose - Callback function called when the modal should be closed
+ * @returns The modal component or null if not open
+ */
 export const McpConfigModal = ({
   isOpen,
   onClose,
+  className,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  className?: string;
 }) => {
   // Initialize from localStorage directly to avoid conflicts
   const initialMcpServers =
     typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("mcp-servers") || "[]")
+      ? JSON.parse(localStorage.getItem("mcp-servers") ?? "[]")
       : [];
 
   const [mcpServers, setMcpServers] =
@@ -33,6 +50,7 @@ export const McpConfigModal = ({
     MCPTransport.HTTP,
   );
   const [savedSuccess, setSavedSuccess] = React.useState(false);
+  const [showInstructions, setShowInstructions] = React.useState(false);
 
   // Handle Escape key to close modal
   React.useEffect(() => {
@@ -91,8 +109,8 @@ export const McpConfigModal = ({
     } else {
       return {
         url: server.url,
-        transport: server.transport || "SSE (default)",
-        name: server.name || null,
+        transport: server.transport ?? "SSE (default)",
+        name: server.name ?? null,
       };
     }
   };
@@ -110,20 +128,54 @@ export const McpConfigModal = ({
 
   if (!isOpen) return null;
 
+  const instructions = `
+###
+
+After configuring your MCP servers below, integrate them into your application.
+
+#### 1. Import the required components
+
+\`\`\`tsx
+import { loadMcpServers } from "@/components/tambo/mcp-config-modal";
+import { TamboMcpProvider } from "@tambo-ai/react/mcp";
+\`\`\`
+
+#### 2. Load MCP servers and wrap your components:
+
+\`\`\`tsx
+const mcpServers = loadMcpServers();
+\`\`\`
+
+#### 3. Example implementation:
+
+\`\`\`tsx
+const mcpServers = loadMcpServers();
+
+<TamboProvider apiKey={apiKey} components={components} tools={tools}>
+  <TamboMcpProvider mcpServers={mcpServers}>
+    {/* Your app components */}
+  </TamboMcpProvider>
+</TamboProvider>
+\`\`\`
+`;
+
   const modalContent = (
     <motion.div
-      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+      className={cn(
+        "fixed inset-0 bg-backdrop flex items-center justify-center z-50",
+        className,
+      )}
       onClick={handleBackdropClick}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
     >
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="bg-card rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4">
           <h2 className="text-lg font-semibold">MCP Server Configuration</h2>
           <button
             onClick={onClose}
-            className="hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+            className="hover:bg-muted rounded-lg transition-colors cursor-pointer"
             aria-label="Close modal"
           >
             <X className="w-4 h-4" />
@@ -132,11 +184,39 @@ export const McpConfigModal = ({
 
         {/* Content */}
         <div className="px-4 pb-4">
+          <div className="mb-6 bg-container border border-muted rounded-lg">
+            <button
+              onClick={() => setShowInstructions(!showInstructions)}
+              className="w-full flex items-center justify-between p-2 hover:bg-muted transition-colors cursor-pointer"
+              type="button"
+            >
+              <span className="text-sm font-semibold text-foreground">
+                Setup Instructions
+              </span>
+              <ChevronDown
+                className={`w-4 h-4 text-foreground transition-transform duration-200 ${
+                  showInstructions ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            {showInstructions && (
+              <motion.div
+                className="px-4 pb-4 border-t border-muted"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Markdown components={createMarkdownComponents()}>
+                  {instructions}
+                </Markdown>
+              </motion.div>
+            )}
+          </div>
           {/* Description */}
           <div className="mb-6">
-            <p className="text-gray-600 mb-3 text-sm leading-relaxed">
+            <p className="text-foreground mb-3 text-sm leading-relaxed">
               Configure{" "}
-              <span className="font-semibold text-gray-800">client-side</span>{" "}
+              <span className="font-semibold text-primary">client-side</span>{" "}
               MCP servers to extend the capabilities of your tambo application.
               These servers will be connected{" "}
               <i>
@@ -153,10 +233,10 @@ export const McpConfigModal = ({
               <div>
                 <label
                   htmlFor="server-url"
-                  className="block text-sm font-semibold text-gray-700 mb-2"
+                  className="block text-sm font-semibold text-foreground mb-2"
                 >
                   Server URL
-                  <span className="text-gray-500 font-normal ml-1">
+                  <span className="text-secondary font-normal ml-1">
                     (must be accessible from the browser)
                   </span>
                 </label>
@@ -166,7 +246,7 @@ export const McpConfigModal = ({
                   value={serverUrl}
                   onChange={(e) => setServerUrl(e.target.value)}
                   placeholder="https://your-mcp-server-url.com"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-150 text-sm"
+                  className="w-full px-3 py-2.5 border border-muted rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-150 text-sm"
                   required
                 />
               </div>
@@ -175,10 +255,10 @@ export const McpConfigModal = ({
               <div>
                 <label
                   htmlFor="server-name"
-                  className="block text-sm font-semibold text-gray-700 mb-2"
+                  className="block text-sm font-semibold text-foreground mb-2"
                 >
                   Server Name
-                  <span className="text-gray-500 font-normal ml-1">
+                  <span className="text-secondary font-normal ml-1">
                     (optional)
                   </span>
                 </label>
@@ -188,37 +268,37 @@ export const McpConfigModal = ({
                   value={serverName}
                   onChange={(e) => setServerName(e.target.value)}
                   placeholder="Custom server name"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-150 text-sm"
+                  className="w-full px-3 py-2.5 border border-muted rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-150 text-sm"
                 />
               </div>
 
               {/* Transport Type */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-foreground mb-2">
                   Transport Type
                 </label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 text-sm flex items-center justify-between hover:bg-gray-50 transition-all duration-150"
+                      className="w-full px-3 py-2.5 border border-muted rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-card text-foreground text-sm flex items-center justify-between hover:bg-muted-backdrop cursor-pointer transition-all duration-150"
                     >
                       <span>{getTransportDisplayText(transportType)}</span>
-                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                      <ChevronDown className="w-4 h-4 text-foreground" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
-                    className="w-full min-w-[200px] bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1 animate-in fade-in-0 zoom-in-95 duration-100"
+                    className="w-full min-w-[200px] bg-card border border-muted rounded-lg shadow-lg z-50 py-1 animate-in fade-in-0 zoom-in-95 duration-100"
                     align="start"
                   >
                     <DropdownMenuItem
-                      className="px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer focus:bg-gray-100 focus:outline-none"
+                      className="px-3 py-2 text-sm text-foreground hover:bg-muted-backdrop cursor-pointer focus:bg-muted-backdrop focus:outline-none"
                       onClick={() => setTransportType(MCPTransport.HTTP)}
                     >
                       HTTP (default)
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      className="px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer focus:bg-gray-100 focus:outline-none"
+                      className="px-3 py-2 text-sm text-foreground hover:bg-muted-backdrop cursor-pointer focus:bg-muted-backdrop focus:outline-none"
                       onClick={() => setTransportType(MCPTransport.SSE)}
                     >
                       SSE
@@ -230,7 +310,7 @@ export const McpConfigModal = ({
 
             <button
               type="submit"
-              className="mt-6 w-full px-4 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-all duration-150 font-medium"
+              className="mt-6 w-full px-4 py-2.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer transition-all duration-150 font-medium"
             >
               Add Server
             </button>
@@ -249,7 +329,7 @@ export const McpConfigModal = ({
           {/* Server List */}
           {mcpServers.length > 0 ? (
             <div>
-              <h4 className="font-medium mb-3 text-gray-900">
+              <h4 className="font-medium mb-3 text-foreground">
                 Connected Servers ({mcpServers.length})
               </h4>
               <div className="space-y-2">
@@ -258,23 +338,23 @@ export const McpConfigModal = ({
                   return (
                     <div
                       key={index}
-                      className="flex items-start justify-between p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors duration-150"
+                      className="flex items-start justify-between p-4 border border-muted rounded-lg hover:border-muted-backdrop transition-colors duration-150"
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center mb-1">
                           <div className="w-2 h-2 bg-green-500 rounded-full mr-3 flex-shrink-0"></div>
-                          <span className="text-gray-900 font-medium truncate">
+                          <span className="text-foreground font-medium truncate">
                             {serverInfo.url}
                           </span>
                         </div>
                         <div className="ml-5 space-y-1">
                           {serverInfo.name && (
-                            <div className="text-sm text-gray-600">
+                            <div className="text-sm text-secondary">
                               <span className="font-medium">Name:</span>{" "}
                               {serverInfo.name}
                             </div>
                           )}
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-secondary">
                             <span className="font-medium">Transport:</span>{" "}
                             {serverInfo.transport}
                           </div>
@@ -282,7 +362,7 @@ export const McpConfigModal = ({
                       </div>
                       <button
                         onClick={() => removeServer(index)}
-                        className="ml-4 px-3 py-1.5 text-sm bg-red-50 text-red-600 rounded-md hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-colors duration-150 flex-shrink-0"
+                        className="ml-4 px-3 py-1.5 text-sm bg-destructive/20 text-destructive rounded-md hover:bg-destructive/30 focus:outline-none focus:ring-2 focus:ring-destructive focus:ring-offset-1 transition-colors duration-150 flex-shrink-0"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -292,26 +372,26 @@ export const McpConfigModal = ({
               </div>
             </div>
           ) : (
-            <div className="text-center p-8 border-2 border-dashed border-gray-200 rounded-lg">
-              <p className="text-gray-500 text-sm">
+            <div className="text-center p-8 border-2 border-dashed border-muted rounded-lg">
+              <p className="text-secondary text-sm">
                 No MCP servers configured yet
               </p>
-              <p className="text-gray-400 text-xs mt-1">
+              <p className="text-secondary text-xs mt-1">
                 Add your first server above to get started
               </p>
             </div>
           )}
 
           {/* Info Section */}
-          <div className="mt-8 bg-gray-50 border border-gray-200 p-4 rounded-lg">
-            <h4 className="font-medium mb-2 text-gray-900">What is MCP?</h4>
-            <p className="text-gray-800 text-sm leading-relaxed">
+          <div className="mt-8 bg-container border border-muted p-4 rounded-lg">
+            <h4 className="font-medium mb-2 text-foreground">What is MCP?</h4>
+            <p className="text-foreground text-sm leading-relaxed">
               The{" "}
               <a
                 href="https://docs.tambo.co/concepts/model-context-protocol"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium underline underline-offset-2 hover:text-gray-900"
+                className="font-medium underline underline-offset-2 hover:text-foreground"
               >
                 Model Context Protocol (MCP)
               </a>{" "}
@@ -322,13 +402,13 @@ export const McpConfigModal = ({
           </div>
 
           <div className="mt-4">
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold text-gray-800">Learn more:</span>{" "}
+            <p className="text-sm text-secondary">
+              <span className="font-semibold text-foreground">Learn more:</span>{" "}
               <a
                 href="https://docs.tambo.co/concepts/model-context-protocol/clientside-mcp-connection"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-600 hover:text-gray-700 underline underline-offset-2"
+                className="text-secondary hover:text-foreground underline underline-offset-2"
               >
                 client-side
               </a>{" "}
@@ -337,7 +417,7 @@ export const McpConfigModal = ({
                 href="https://docs.tambo.co/concepts/model-context-protocol/serverside-mcp-connection"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-600 hover:text-gray-700 underline underline-offset-2"
+                className="text-secondary hover:text-foreground underline underline-offset-2"
               >
                 server-side
               </a>{" "}
@@ -354,3 +434,45 @@ export const McpConfigModal = ({
     ? createPortal(modalContent, document.body)
     : null;
 };
+
+/**
+ * Type for MCP Server entries
+ */
+export type McpServer = string | { url: string };
+
+/**
+ * Load and process MCP server configurations from browser localStorage.
+ *
+ * This function retrieves saved MCP server configurations, parses them from JSON,
+ * and deduplicates them by URL to prevent multiple tool registrations for the same server.
+ * It handles parsing errors gracefully and ensures server-side rendering compatibility.
+ *
+ * @returns Array of unique MCP server configurations, or empty array if none found or in SSR context
+ *
+ * @example
+ * ```ts
+ * const servers = loadMcpServers();
+ * // Returns: [{ url: "https://api.example.com" }, "https://api2.example.com"]
+ * ```
+ */
+export function loadMcpServers(): McpServer[] {
+  if (typeof window === "undefined") return [];
+
+  const savedServersData = localStorage.getItem("mcp-servers");
+  if (!savedServersData) return [];
+
+  try {
+    const servers = JSON.parse(savedServersData);
+    // Deduplicate servers by URL to prevent multiple tool registrations
+    const uniqueUrls = new Set();
+    return servers.filter((server: McpServer) => {
+      const url = typeof server === "string" ? server : server.url;
+      if (uniqueUrls.has(url)) return false;
+      uniqueUrls.add(url);
+      return true;
+    });
+  } catch (e) {
+    console.error("Failed to parse saved MCP servers", e);
+    return [];
+  }
+}

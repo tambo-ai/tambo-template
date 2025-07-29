@@ -5,8 +5,11 @@ import { useTamboThread, useTamboThreadInput } from "@tambo-ai/react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { ArrowUp, Server, Square } from "lucide-react";
 import * as React from "react";
-import { McpConfigModal } from "./mcp-config-modal";
-import { Tooltip, TooltipProvider } from "./suggestions-tooltip";
+import { McpConfigModal } from "@/components/tambo/mcp-config-modal";
+import {
+  Tooltip,
+  TooltipProvider,
+} from "@/components/tambo/suggestions-tooltip";
 
 /**
  * CSS variants for the message input container
