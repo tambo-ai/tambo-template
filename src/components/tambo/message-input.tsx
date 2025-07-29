@@ -459,14 +459,20 @@ const MessageInputToolbar = React.forwardRef<
   return (
     <div
       ref={ref}
-      className={cn("flex justify-between items-center mt-2 p-1 gap-2", className)}
+      className={cn(
+        "flex justify-between items-center mt-2 p-1 gap-2",
+        className,
+      )}
       data-slot="message-input-toolbar"
       {...props}
     >
       <div className="flex items-center gap-2">
         {/* Left side - everything except submit button */}
         {React.Children.map(children, (child) => {
-          if (React.isValidElement(child) && child.type === MessageInputSubmitButton) {
+          if (
+            React.isValidElement(child) &&
+            child.type === MessageInputSubmitButton
+          ) {
             return null; // Don't render submit button here
           }
           return child;
@@ -475,7 +481,10 @@ const MessageInputToolbar = React.forwardRef<
       <div className="flex items-center gap-2">
         {/* Right side - only submit button */}
         {React.Children.map(children, (child) => {
-          if (React.isValidElement(child) && child.type === MessageInputSubmitButton) {
+          if (
+            React.isValidElement(child) &&
+            child.type === MessageInputSubmitButton
+          ) {
             return child; // Only render submit button here
           }
           return null;
