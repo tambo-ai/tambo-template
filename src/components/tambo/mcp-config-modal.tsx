@@ -131,25 +131,11 @@ export const McpConfigModal = ({
           {/* Description */}
           <div className="mb-6">
             <p className="text-gray-600 mb-3 text-sm leading-relaxed">
-              Configure client-side MCP servers to extend the capabilities of
-              your Tambo application. These servers will be connected{" "}
-              <span className="font-semibold text-gray-800">
-                from the browser
-              </span>{" "}
-              and exposed as tools to Tambo.
-            </p>
-
-            <p className="text-gray-500 text-sm">
-              For more information, see the{" "}
-              <a
-                href="https://docs.tambo.co/concepts/model-context-protocol"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-700 underline underline-offset-2"
-              >
-                documentation
-              </a>
-              .
+              Configure{" "}
+              <span className="font-semibold text-gray-800">client-side</span>{" "}
+              MCP servers to extend the capabilities of your tambo application.
+              These servers will be connected <i><b>from the browser</b></i> and
+              exposed as tools to tambo.
             </p>
           </div>
 
@@ -327,6 +313,30 @@ export const McpConfigModal = ({
               tambo application will be able to make calls to these tools.
             </p>
           </div>
+
+          <div className="mt-4">
+          <p className="text-sm text-gray-600">
+              <span className="font-semibold text-gray-800">Learn more:</span> {" "}
+              <a
+                href="https://docs.tambo.co/concepts/model-context-protocol/clientside-mcp-connection"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-gray-700 underline underline-offset-2"
+              >
+                client-side
+              </a>
+              {" "} | {" "}
+              <a
+                href="https://docs.tambo.co/concepts/model-context-protocol/serverside-mcp-connection"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-gray-700 underline underline-offset-2"
+              >
+                server-side
+              </a>
+              {" "}MCP configuration.
+            </p>
+            </div>
         </div>
       </div>
     </div>
