@@ -128,8 +128,10 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
   ({ children, className, contextKey, variant, ...props }, ref) => {
     const { value, setValue, submit, isPending, error } =
       useTamboThreadInput(contextKey);
+    const { cancel } = useTamboThread();
     const [displayValue, setDisplayValue] = React.useState("");
     const [submitError, setSubmitError] = React.useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
     React.useEffect(() => {
@@ -142,10 +144,12 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
     const handleSubmit = React.useCallback(
       async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!value.trim()) return;
+        if (!value.trim() || isSubmitting) return;
 
         setSubmitError(null);
         setDisplayValue("");
+        setIsSubmitting(true);
+        
         try {
           await submit({
             contextKey,
@@ -163,9 +167,14 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
               ? error.message
               : "Failed to send message. Please try again.",
           );
+          
+          // Cancel the thread to reset loading state
+          cancel();
+        } finally {
+          setIsSubmitting(false);
         }
       },
-      [value, submit, contextKey, setValue, setDisplayValue, setSubmitError],
+      [value, submit, contextKey, setValue, setDisplayValue, setSubmitError, cancel, isSubmitting],
     );
 
     const contextValue = React.useMemo(
@@ -177,7 +186,7 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
         },
         submit,
         handleSubmit,
-        isPending,
+        isPending: isPending || isSubmitting, // Combine both loading states
         error,
         contextKey,
         textareaRef,
@@ -190,6 +199,7 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
         submit,
         handleSubmit,
         isPending,
+        isSubmitting, // Add to dependencies
         error,
         contextKey,
         submitError,
@@ -437,7 +447,7 @@ const MessageInputError = React.forwardRef<
   return (
     <p
       ref={ref}
-      className={cn("text-sm text-[hsl(var(--destructive))] mt-2", className)}
+      className={cn("text-sm text-destructive mt-2", className)}
       data-slot="message-input-error"
       {...props}
     >
