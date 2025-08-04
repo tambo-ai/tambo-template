@@ -9,6 +9,7 @@
  */
 
 import { Graph, graphSchema } from "@/components/tambo/graph";
+import { DataCard, dataCardSchema } from "@/components/ui/card-data";
 import {
   getCountryPopulations,
   getGlobalPopulationTrend,
@@ -79,6 +80,13 @@ export const components: TamboComponent[] = [
       "A component that renders various types of charts (bar, line, pie) using Recharts. Supports customizable data visualization with labels, datasets, and styling options.",
     component: Graph,
     propsSchema: graphSchema,
+  },
+  {
+    name: "DataCard",
+    description:
+      "A component that displays options as clickable cards with links and summaries with the ability to select multiple items.",
+    component: DataCard,
+    propsSchema: dataCardSchema,
   },
   // Add more components here
 ];
