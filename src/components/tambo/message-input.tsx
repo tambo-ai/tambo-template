@@ -6,7 +6,11 @@ import {
   TooltipProvider,
 } from "@/components/tambo/suggestions-tooltip";
 import { cn } from "@/lib/utils";
-import { useTamboThread, useTamboThreadInput } from "@tambo-ai/react";
+import {
+  useIsTamboTokenUpdating,
+  useTamboThread,
+  useTamboThreadInput,
+} from "@tambo-ai/react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { ArrowUp, Square } from "lucide-react";
 import * as React from "react";
@@ -91,7 +95,7 @@ const useMessageInputContext = () => {
   const context = React.useContext(MessageInputContext);
   if (!context) {
     throw new Error(
-      "MessageInput sub-components must be used within a MessageInput",
+      "MessageInput sub-components must be used within a MessageInput"
     );
   }
   return context;
@@ -164,7 +168,7 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
           setSubmitError(
             error instanceof Error
               ? error.message
-              : "Failed to send message. Please try again.",
+              : "Failed to send message. Please try again."
           );
 
           // Cancel the thread to reset loading state
@@ -182,7 +186,7 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
         setSubmitError,
         cancel,
         isSubmitting,
-      ],
+      ]
     );
 
     const contextValue = React.useMemo(
@@ -211,7 +215,7 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
         error,
         contextKey,
         submitError,
-      ],
+      ]
     );
     return (
       <MessageInputContext.Provider
@@ -230,7 +234,7 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
         </form>
       </MessageInputContext.Provider>
     );
-  },
+  }
 );
 MessageInput.displayName = "MessageInput";
 
@@ -263,6 +267,7 @@ const MessageInputTextarea = ({
   const { value, setValue, textareaRef, handleSubmit } =
     useMessageInputContext();
   const { isIdle } = useTamboThread();
+  const isUpdatingToken = useIsTamboTokenUpdating();
   const isPending = !isIdle;
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -286,9 +291,9 @@ const MessageInputTextarea = ({
       onKeyDown={handleKeyDown}
       className={cn(
         "flex-1 p-3 rounded-t-lg bg-background text-foreground resize-none text-sm min-h-[82px] max-h-[40vh] focus:outline-none placeholder:text-muted-foreground/50",
-        className,
+        className
       )}
-      disabled={isPending}
+      disabled={isPending || isUpdatingToken}
       placeholder={placeholder}
       aria-label="Chat Message Input"
       data-slot="message-input-textarea"
@@ -328,6 +333,7 @@ const MessageInputSubmitButton = React.forwardRef<
 >(({ className, children, ...props }, ref) => {
   const { isPending } = useMessageInputContext();
   const { cancel } = useTamboThread();
+  const isUpdatingToken = useIsTamboTokenUpdating();
 
   const handleCancel = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -336,14 +342,15 @@ const MessageInputSubmitButton = React.forwardRef<
   };
 
   const buttonClasses = cn(
-    "w-10 h-10 bg-black/80 text-white rounded-lg hover:bg-black/70 disabled:opacity-50 flex items-center justify-center cursor-pointer",
-    className,
+    "w-10 h-10 bg-black/80 text-white rounded-lg hover:bg-black/70 disabled:opacity-50 flex items-center justify-center enabled:cursor-pointer",
+    className
   );
 
   return (
     <button
       ref={ref}
       type={isPending ? "button" : "submit"}
+      disabled={isUpdatingToken}
       onClick={isPending ? handleCancel : undefined}
       className={buttonClasses}
       aria-label={isPending ? "Cancel message" : "Send message"}
@@ -383,7 +390,7 @@ const MessageInputMcpConfigButton = React.forwardRef<
 
   const buttonClasses = cn(
     "w-10 h-10 bg-muted text-primary rounded-lg hover:bg-muted/80 disabled:opacity-50 flex items-center justify-center cursor-pointer",
-    className,
+    className
   );
 
   const MCPIcon = () => {
@@ -507,7 +514,7 @@ const MessageInputToolbar = React.forwardRef<
       ref={ref}
       className={cn(
         "flex justify-between items-center mt-2 p-1 gap-2",
-        className,
+        className
       )}
       data-slot="message-input-toolbar"
       {...props}

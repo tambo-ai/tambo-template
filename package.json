@@ -13,7 +13,7 @@
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@tailwindcss/oxide": "^4.1.11",
-    "@tambo-ai/react": "^0.46.0",
+    "@tambo-ai/react": "^0.46.2",
     "@tambo-ai/typescript-sdk": "^0.66.0",
     "class-variance-authority": "^0.7.1",
     "dompurify": "^3.2.6",
