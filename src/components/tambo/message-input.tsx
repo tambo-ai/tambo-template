@@ -1,15 +1,15 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { useTamboThread, useTamboThreadInput } from "@tambo-ai/react";
-import { cva, type VariantProps } from "class-variance-authority";
-import { ArrowUp, Square } from "lucide-react";
-import * as React from "react";
 import { McpConfigModal } from "@/components/tambo/mcp-config-modal";
 import {
   Tooltip,
   TooltipProvider,
 } from "@/components/tambo/suggestions-tooltip";
+import { cn } from "@/lib/utils";
+import { useTamboThread, useTamboThreadInput } from "@tambo-ai/react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { ArrowUp, Square } from "lucide-react";
+import * as React from "react";
 
 /**
  * CSS variants for the message input container
@@ -126,8 +126,7 @@ export interface MessageInputProps
  */
 const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
   ({ children, className, contextKey, variant, ...props }, ref) => {
-    const { value, setValue, submit, isPending, error } =
-      useTamboThreadInput(contextKey);
+    const { value, setValue, submit, isPending, error } = useTamboThreadInput();
     const { cancel } = useTamboThread();
     const [displayValue, setDisplayValue] = React.useState("");
     const [submitError, setSubmitError] = React.useState<string | null>(null);
@@ -149,7 +148,7 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
         setSubmitError(null);
         setDisplayValue("");
         setIsSubmitting(true);
-        
+
         try {
           await submit({
             contextKey,
@@ -167,14 +166,23 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
               ? error.message
               : "Failed to send message. Please try again.",
           );
-          
+
           // Cancel the thread to reset loading state
           cancel();
         } finally {
           setIsSubmitting(false);
         }
       },
-      [value, submit, contextKey, setValue, setDisplayValue, setSubmitError, cancel, isSubmitting],
+      [
+        value,
+        submit,
+        contextKey,
+        setValue,
+        setDisplayValue,
+        setSubmitError,
+        cancel,
+        isSubmitting,
+      ],
     );
 
     const contextValue = React.useMemo(
@@ -380,12 +388,31 @@ const MessageInputMcpConfigButton = React.forwardRef<
 
   const MCPIcon = () => {
     return (
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" color="#000000" fill="none">
-        <path d="M3.49994 11.7501L11.6717 3.57855C12.7762 2.47398 14.5672 2.47398 15.6717 3.57855C16.7762 4.68312 16.7762 6.47398 15.6717 7.57855M15.6717 7.57855L9.49994 13.7501M15.6717 7.57855C16.7762 6.47398 18.5672 6.47398 19.6717 7.57855C20.7762 8.68312 20.7762 10.474 19.6717 11.5785L12.7072 18.543C12.3167 18.9335 12.3167 19.5667 12.7072 19.9572L13.9999 21.2499" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
-        <path d="M17.4999 9.74921L11.3282 15.921C10.2237 17.0255 8.43272 17.0255 7.32823 15.921C6.22373 14.8164 6.22373 13.0255 7.32823 11.921L13.4999 5.74939" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        width="24"
+        height="24"
+        color="#000000"
+        fill="none"
+      >
+        <path
+          d="M3.49994 11.7501L11.6717 3.57855C12.7762 2.47398 14.5672 2.47398 15.6717 3.57855C16.7762 4.68312 16.7762 6.47398 15.6717 7.57855M15.6717 7.57855L9.49994 13.7501M15.6717 7.57855C16.7762 6.47398 18.5672 6.47398 19.6717 7.57855C20.7762 8.68312 20.7762 10.474 19.6717 11.5785L12.7072 18.543C12.3167 18.9335 12.3167 19.5667 12.7072 19.9572L13.9999 21.2499"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        ></path>
+        <path
+          d="M17.4999 9.74921L11.3282 15.921C10.2237 17.0255 8.43272 17.0255 7.32823 15.921C6.22373 14.8164 6.22373 13.0255 7.32823 11.921L13.4999 5.74939"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        ></path>
       </svg>
-    )
-  }
+    );
+  };
 
   return (
     <TooltipProvider>
