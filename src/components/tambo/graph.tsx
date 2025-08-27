@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useTamboStreamStatus } from "@tambo-ai/react";
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 import * as RechartsCore from "recharts";
@@ -29,10 +28,10 @@ export const graphDataSchema = z.object({
 });
 
 export const graphSchema = z.object({
-  title: z.string().describe("Title for the chart"),
   data: graphDataSchema.describe(
     "Data object containing chart configuration and values",
   ),
+  title: z.string().describe("Title for the chart"),
   showLegend: z
     .boolean()
     .optional()
@@ -124,283 +123,315 @@ export const Graph = React.forwardRef<HTMLDivElement, GraphProps>(
     { className, variant, size, data, title, showLegend = true, ...props },
     ref,
   ) => {
-    // Get stream status
-    const { propStatus } = useTamboStreamStatus<GraphProps>();
-
-    const dataIsValid =
-      data?.labels &&
-      data.datasets &&
-      Array.isArray(data.labels) &&
-      Array.isArray(data.datasets);
-
-    // Check if data is still streaming
-    const dataIsStreaming = propStatus?.data?.isStreaming || false;
-
-    // Calculate current data points count
-    const currentDataPoints = data?.datasets?.[0]?.data?.length || 0;
-
-    // Main render
-    return (
-      <div
-        ref={ref}
-        className={cn(graphVariants({ variant, size }), className)}
-        {...props}
-      >
-        <div className="p-4 h-full">
-          {title && (
-            <h3 className="text-lg font-medium mb-4 text-foreground">
-              {title}
-            </h3>
-          )}
-          {/* Show loading state for chart area while data is streaming */}
-          {!dataIsValid || dataIsStreaming ? (
-            <div className="w-full h-[calc(100%-2rem)] flex items-center justify-center">
-              <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                <div className="flex items-center gap-1 h-4">
-                  <span className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                  <span className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.2s]"></span>
-                  <span className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.1s]"></span>
-                </div>
-                <span className="text-sm">
-                  {dataIsStreaming
-                    ? `Loading chart: ${currentDataPoints} data point${
-                        currentDataPoints !== 1 ? "s" : ""
-                      }`
-                    : data
-                      ? "Data ready"
-                      : "Awaiting data"}
-                </span>
-              </div>
-            </div>
-          ) : (
-            <RenderValidChart data={data!} showLegend={showLegend} />
-          )}
-        </div>
-      </div>
-    );
-  },
-);
-
-Graph.displayName = "Graph";
-
-// Helper component to render the chart when data is valid
-const RenderValidChart: React.FC<{
-  data: GraphDataType;
-  showLegend?: boolean;
-}> = ({ data, showLegend = true }) => {
-  try {
-    // Check for invalid data structure
-    if (
-      data.datasets.some(
-        (dataset) =>
-          !dataset.label ||
-          !dataset.data ||
-          !Array.isArray(dataset.data) ||
-          dataset.data.length !== data.labels.length,
-      )
-    ) {
-      console.error("Invalid graph data structure:", data);
+    // If no data received yet, show loading
+    if (!data) {
       return (
-        <div className="w-full h-[calc(100%-2rem)] flex items-center justify-center">
-          <div className="text-destructive text-center">
-            <p className="font-medium">Invalid Graph Data</p>
-            <p className="text-sm mt-1">The data structure is invalid.</p>
+        <div
+          ref={ref}
+          className={cn(graphVariants({ variant, size }), className)}
+          {...props}
+        >
+          <div className="p-4 h-full flex items-center justify-center">
+            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+              <div className="flex items-center gap-1 h-4">
+                <span className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                <span className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.2s]"></span>
+                <span className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.1s]"></span>
+              </div>
+              <span className="text-sm">Awaiting data...</span>
+            </div>
           </div>
         </div>
       );
     }
 
-    // Transform data for Recharts
-    const chartData = data.labels.map((label, index) => ({
-      name: label,
-      ...Object.fromEntries(
-        data.datasets.map((dataset) => [dataset.label, dataset.data[index]]),
-      ),
-    }));
+    // Check if we have the minimum viable data structure
+    const hasValidStructure =
+      data.type &&
+      data.labels &&
+      data.datasets &&
+      Array.isArray(data.labels) &&
+      Array.isArray(data.datasets) &&
+      data.labels.length > 0 &&
+      data.datasets.length > 0;
 
-    const renderChart = () => {
-      if (!data || !data.type || !["bar", "line", "pie"].includes(data.type)) {
-        console.error("Invalid chart type:", data?.type);
+    if (!hasValidStructure) {
+      return (
+        <div
+          ref={ref}
+          className={cn(graphVariants({ variant, size }), className)}
+          {...props}
+        >
+          <div className="p-4 h-full flex items-center justify-center">
+            <div className="text-muted-foreground text-center">
+              <p className="text-sm">Building chart...</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    try {
+      // Filter datasets to only include those with valid data
+      const validDatasets = data.datasets.filter(
+        (dataset) =>
+          dataset.label &&
+          dataset.data &&
+          Array.isArray(dataset.data) &&
+          dataset.data.length > 0,
+      );
+
+      if (validDatasets.length === 0) {
         return (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-destructive text-center">
-              <p className="font-medium">Error loading chart</p>
-              <p className="text-sm mt-1">
-                Invalid chart type. Supported types are: bar, line, pie
-              </p>
+          <div
+            ref={ref}
+            className={cn(graphVariants({ variant, size }), className)}
+            {...props}
+          >
+            <div className="p-4 h-full flex items-center justify-center">
+              <div className="text-muted-foreground text-center">
+                <p className="text-sm">Preparing datasets...</p>
+              </div>
             </div>
           </div>
         );
       }
 
-      switch (data.type) {
-        case "bar":
+      // Use the minimum length between labels and the shortest dataset
+      const maxDataPoints = Math.min(
+        data.labels.length,
+        Math.min(...validDatasets.map((d) => d.data.length)),
+      );
+
+      // Transform data for Recharts using only available data points
+      const chartData = data.labels
+        .slice(0, maxDataPoints)
+        .map((label, index) => ({
+          name: label,
+          ...Object.fromEntries(
+            validDatasets.map((dataset) => [
+              dataset.label,
+              dataset.data[index] ?? 0,
+            ]),
+          ),
+        }));
+
+      const renderChart = () => {
+        if (!["bar", "line", "pie"].includes(data.type)) {
           return (
-            <RechartsCore.BarChart data={chartData}>
-              <RechartsCore.CartesianGrid
-                strokeDasharray="3 3"
-                vertical={false}
-                stroke="var(--border)"
-              />
-              <RechartsCore.XAxis
-                dataKey="name"
-                stroke="var(--muted-foreground)"
-                axisLine={false}
-                tickLine={false}
-              />
-              <RechartsCore.YAxis
-                stroke="var(--muted-foreground)"
-                axisLine={false}
-                tickLine={false}
-              />
-              <RechartsCore.Tooltip
-                cursor={{
-                  fill: "var(--muted)",
-                  fillOpacity: 0.3,
-                  radius: 4,
-                }}
-                contentStyle={{
-                  backgroundColor: "var(--background)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "var(--radius)",
-                  color: "var(--foreground)",
-                }}
-              />
-              {showLegend && (
-                <RechartsCore.Legend
-                  wrapperStyle={{
-                    color: "var(--foreground)",
+            <div className="h-full flex items-center justify-center">
+              <div className="text-muted-foreground text-center">
+                <p className="text-sm">Unsupported chart type: {data.type}</p>
+              </div>
+            </div>
+          );
+        }
+
+        switch (data.type) {
+          case "bar":
+            return (
+              <RechartsCore.BarChart data={chartData}>
+                <RechartsCore.CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="hsl(var(--border))"
+                />
+                <RechartsCore.XAxis
+                  dataKey="name"
+                  stroke="hsl(var(--muted-foreground))"
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <RechartsCore.YAxis
+                  stroke="hsl(var(--muted-foreground))"
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <RechartsCore.Tooltip
+                  cursor={{
+                    fill: "hsl(var(--muted-foreground))",
+                    fillOpacity: 0.1,
+                    radius: 4,
+                  }}
+                  contentStyle={{
+                    backgroundColor: "white",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "var(--radius)",
+                    color: "hsl(var(--foreground))",
                   }}
                 />
-              )}
-              {data!.datasets.map((dataset, index) => (
-                <RechartsCore.Bar
-                  key={dataset.label}
-                  dataKey={dataset.label}
-                  fill={
-                    dataset.color ?? defaultColors[index % defaultColors.length]
-                  }
-                  radius={[4, 4, 0, 0]}
-                />
-              ))}
-            </RechartsCore.BarChart>
-          );
+                {showLegend && (
+                  <RechartsCore.Legend
+                    wrapperStyle={{
+                      color: "hsl(var(--foreground))",
+                    }}
+                  />
+                )}
+                {validDatasets.map((dataset, index) => (
+                  <RechartsCore.Bar
+                    key={dataset.label}
+                    dataKey={dataset.label}
+                    fill={
+                      dataset.color ??
+                      defaultColors[index % defaultColors.length]
+                    }
+                    radius={[4, 4, 0, 0]}
+                  />
+                ))}
+              </RechartsCore.BarChart>
+            );
 
-        case "line":
-          return (
-            <RechartsCore.LineChart data={chartData}>
-              <RechartsCore.CartesianGrid
-                strokeDasharray="3 3"
-                vertical={false}
-                stroke="var(--border)"
-              />
-              <RechartsCore.XAxis
-                dataKey="name"
-                stroke="var(--muted-foreground)"
-                axisLine={false}
-                tickLine={false}
-              />
-              <RechartsCore.YAxis
-                stroke="var(--muted-foreground)"
-                axisLine={false}
-                tickLine={false}
-              />
-              <RechartsCore.Tooltip
-                cursor={{
-                  stroke: "var(--muted)",
-                  strokeWidth: 2,
-                  strokeOpacity: 0.3,
-                }}
-                contentStyle={{
-                  backgroundColor: "var(--background)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "var(--radius)",
-                  color: "var(--foreground)",
-                }}
-              />
-              {showLegend && (
-                <RechartsCore.Legend
-                  wrapperStyle={{
-                    color: "var(--foreground)",
+          case "line":
+            return (
+              <RechartsCore.LineChart data={chartData}>
+                <RechartsCore.CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="hsl(var(--border))"
+                />
+                <RechartsCore.XAxis
+                  dataKey="name"
+                  stroke="hsl(var(--muted-foreground))"
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <RechartsCore.YAxis
+                  stroke="hsl(var(--muted-foreground))"
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <RechartsCore.Tooltip
+                  cursor={{
+                    stroke: "hsl(var(--muted))",
+                    strokeWidth: 2,
+                    strokeOpacity: 0.3,
+                  }}
+                  contentStyle={{
+                    backgroundColor: "white",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "var(--radius)",
+                    color: "hsl(var(--foreground))",
                   }}
                 />
-              )}
-              {data!.datasets.map((dataset, index) => (
-                <RechartsCore.Line
-                  key={dataset.label}
-                  type="monotone"
-                  dataKey={dataset.label}
-                  stroke={
-                    dataset.color ?? defaultColors[index % defaultColors.length]
-                  }
-                  dot={false}
-                />
-              ))}
-            </RechartsCore.LineChart>
-          );
+                {showLegend && (
+                  <RechartsCore.Legend
+                    wrapperStyle={{
+                      color: "hsl(var(--foreground))",
+                    }}
+                  />
+                )}
+                {validDatasets.map((dataset, index) => (
+                  <RechartsCore.Line
+                    key={dataset.label}
+                    type="monotone"
+                    dataKey={dataset.label}
+                    stroke={
+                      dataset.color ??
+                      defaultColors[index % defaultColors.length]
+                    }
+                    dot={false}
+                  />
+                ))}
+              </RechartsCore.LineChart>
+            );
 
-        case "pie":
-          return (
-            <RechartsCore.PieChart>
-              <RechartsCore.Pie
-                data={data!.datasets[0].data.map((value, index) => ({
-                  name: data!.labels[index],
-                  value,
-                  fill: defaultColors[index % defaultColors.length],
-                }))}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius={80}
-                fill="#8884d8"
-              />
-              <RechartsCore.Tooltip
-                contentStyle={{
-                  backgroundColor: "var(--background)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "var(--radius)",
-                  color: "var(--foreground)",
-                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                }}
-                itemStyle={{
-                  color: "var(--foreground)",
-                }}
-                labelStyle={{
-                  color: "var(--foreground)",
-                }}
-              />
-              {showLegend && (
-                <RechartsCore.Legend
-                  wrapperStyle={{
-                    color: "var(--foreground)",
+          case "pie": {
+            // For pie charts, use the first valid dataset
+            const pieDataset = validDatasets[0];
+            if (!pieDataset) {
+              return (
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-muted-foreground text-center">
+                    <p className="text-sm">No valid dataset for pie chart</p>
+                  </div>
+                </div>
+              );
+            }
+
+            return (
+              <RechartsCore.PieChart>
+                <RechartsCore.Pie
+                  data={pieDataset.data
+                    .slice(0, maxDataPoints)
+                    .map((value, index) => ({
+                      name: data.labels[index],
+                      value,
+                      fill: defaultColors[index % defaultColors.length],
+                    }))}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={80}
+                  fill="#8884d8"
+                />
+                <RechartsCore.Tooltip
+                  contentStyle={{
+                    backgroundColor: "white",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "var(--radius)",
+                    color: "hsl(var(--foreground))",
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  }}
+                  itemStyle={{
+                    color: "hsl(var(--foreground))",
+                  }}
+                  labelStyle={{
+                    color: "hsl(var(--foreground))",
                   }}
                 />
-              )}
-            </RechartsCore.PieChart>
-          );
-      }
-    };
+                {showLegend && (
+                  <RechartsCore.Legend
+                    wrapperStyle={{
+                      color: "hsl(var(--foreground))",
+                    }}
+                  />
+                )}
+              </RechartsCore.PieChart>
+            );
+          }
+        }
+      };
 
-    return (
-      <div className="w-full h-[calc(100%-2rem)]">
-        <RechartsCore.ResponsiveContainer width="100%" height="100%">
-          {renderChart()}
-        </RechartsCore.ResponsiveContainer>
-      </div>
-    );
-  } catch (error) {
-    console.error("Error rendering chart:", error);
-    return (
-      <div className="w-full h-[calc(100%-2rem)] flex items-center justify-center">
-        <div className="text-destructive text-center">
-          <p className="font-medium">Error loading chart</p>
-          <p className="text-sm mt-1">
-            An error occurred while transforming data. Please try again later.
-          </p>
+      return (
+        <div
+          ref={ref}
+          className={cn(graphVariants({ variant, size }), className)}
+          {...props}
+        >
+          <div className="p-4 h-full">
+            {title && (
+              <h3 className="text-lg font-medium mb-4 text-foreground">
+                {title}
+              </h3>
+            )}
+            <div className="w-full h-[calc(100%-2rem)]">
+              <RechartsCore.ResponsiveContainer width="100%" height="100%">
+                {renderChart()}
+              </RechartsCore.ResponsiveContainer>
+            </div>
+          </div>
         </div>
-      </div>
-    );
-  }
-};
+      );
+    } catch (error) {
+      console.error("Error rendering chart:", error);
+      return (
+        <div
+          className={cn(graphVariants({ variant, size }), className)}
+          {...props}
+        >
+          <div className="p-4 flex items-center justify-center h-full">
+            <div className="text-destructive text-center">
+              <p className="font-medium">Error loading chart</p>
+              <p className="text-sm mt-1">
+                An error occurred while rendering. Please try again.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  },
+);
+Graph.displayName = "Graph";

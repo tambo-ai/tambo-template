@@ -1,10 +1,7 @@
 "use client";
 
 import { McpConfigModal } from "@/components/tambo/mcp-config-modal";
-import {
-  Tooltip,
-  TooltipProvider,
-} from "@/components/tambo/suggestions-tooltip";
+import { Tooltip, TooltipProvider } from "@/components/tambo/suggestions-tooltip";
 import { cn } from "@/lib/utils";
 import {
   useIsTamboTokenUpdating,
@@ -186,7 +183,7 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
         setSubmitError,
         cancel,
         isSubmitting,
-      ]
+      ],
     );
 
     const contextValue = React.useMemo(
@@ -198,7 +195,7 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
         },
         submit,
         handleSubmit,
-        isPending: isPending || isSubmitting, // Combine both loading states
+        isPending: isPending ?? isSubmitting,
         error,
         contextKey,
         textareaRef,
@@ -211,7 +208,7 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
         submit,
         handleSubmit,
         isPending,
-        isSubmitting, // Add to dependencies
+        isSubmitting,
         error,
         contextKey,
         submitError,
@@ -343,7 +340,7 @@ const MessageInputSubmitButton = React.forwardRef<
 
   const buttonClasses = cn(
     "w-10 h-10 bg-black/80 text-white rounded-lg hover:bg-black/70 disabled:opacity-50 flex items-center justify-center enabled:cursor-pointer",
-    className
+    className,
   );
 
   return (
@@ -521,7 +518,7 @@ const MessageInputToolbar = React.forwardRef<
     >
       <div className="flex items-center gap-2">
         {/* Left side - everything except submit button */}
-        {React.Children.map(children, (child) => {
+        {React.Children.map(children, (child): React.ReactNode => {
           if (
             React.isValidElement(child) &&
             child.type === MessageInputSubmitButton
@@ -533,7 +530,7 @@ const MessageInputToolbar = React.forwardRef<
       </div>
       <div className="flex items-center gap-2">
         {/* Right side - only submit button */}
-        {React.Children.map(children, (child) => {
+        {React.Children.map(children, (child): React.ReactNode => {
           if (
             React.isValidElement(child) &&
             child.type === MessageInputSubmitButton
