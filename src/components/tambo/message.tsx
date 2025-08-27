@@ -1,5 +1,6 @@
 "use client";
 
+import { createMarkdownComponents } from "@/components/tambo/markdown-components";
 import { checkHasContent, getSafeContent } from "@/lib/thread-hooks";
 import { cn } from "@/lib/utils";
 import type { TamboThreadMessage } from "@tambo-ai/react";
@@ -11,7 +12,6 @@ import { Check, ChevronDown, ExternalLink, Loader2, X } from "lucide-react";
 import * as React from "react";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { createMarkdownComponents } from "./markdown-components";
 
 /**
  * CSS variants for the message container
@@ -107,11 +107,11 @@ export interface MessageProps
 const Message = React.forwardRef<HTMLDivElement, MessageProps>(
   (
     { children, className, role, variant, isLoading, message, ...props },
-    ref,
+    ref
   ) => {
     const contextValue = React.useMemo(
       () => ({ role, variant, isLoading, message }),
-      [role, variant, isLoading, message],
+      [role, variant, isLoading, message]
     );
 
     // Don't render tool response messages as they're shown in tool call dropdowns
@@ -131,7 +131,7 @@ const Message = React.forwardRef<HTMLDivElement, MessageProps>(
         </div>
       </MessageContext.Provider>
     );
-  },
+  }
 );
 Message.displayName = "Message";
 
@@ -180,18 +180,18 @@ export interface MessageContentProps
 const MessageContent = React.forwardRef<HTMLDivElement, MessageContentProps>(
   (
     { className, children, content: contentProp, markdown = true, ...props },
-    ref,
+    ref
   ) => {
     const { message, isLoading } = useMessageContext();
     const contentToRender = children ?? contentProp ?? message.content;
 
     const safeContent = React.useMemo(
       () => getSafeContent(contentToRender as TamboThreadMessage["content"]),
-      [contentToRender],
+      [contentToRender]
     );
     const hasContent = React.useMemo(
       () => checkHasContent(contentToRender as TamboThreadMessage["content"]),
-      [contentToRender],
+      [contentToRender]
     );
 
     const showLoading = isLoading && !hasContent;
@@ -201,7 +201,7 @@ const MessageContent = React.forwardRef<HTMLDivElement, MessageContentProps>(
         ref={ref}
         className={cn(
           "relative block rounded-3xl px-4 py-2 text-[15px] leading-relaxed transition-all duration-200 font-medium max-w-full [&_p]:py-1 [&_ul]:py-4 [&_ol]:py-4 [&_li]:list-item",
-          className,
+          className
         )}
         data-slot="message-content"
         {...props}
@@ -238,7 +238,7 @@ const MessageContent = React.forwardRef<HTMLDivElement, MessageContentProps>(
         )}
       </div>
     );
-  },
+  }
 );
 MessageContent.displayName = "MessageContent";
 
@@ -254,7 +254,7 @@ export interface ToolcallInfoProps
 
 function getToolStatusMessage(
   message: TamboThreadMessage,
-  isLoading: boolean | undefined,
+  isLoading: boolean | undefined
 ) {
   const isToolCall = message.actionType === "tool_call";
   if (!isToolCall) return null;
@@ -283,7 +283,7 @@ const ToolcallInfo = React.forwardRef<HTMLDivElement, ToolcallInfoProps>(
     const associatedToolResponse = React.useMemo(() => {
       if (!thread?.messages) return null;
       const currentMessageIndex = thread.messages.findIndex(
-        (m: TamboThreadMessage) => m.id === message.id,
+        (m: TamboThreadMessage) => m.id === message.id
       );
       if (currentMessageIndex === -1) return null;
       for (let i = currentMessageIndex + 1; i < thread.messages.length; i++) {
@@ -313,19 +313,19 @@ const ToolcallInfo = React.forwardRef<HTMLDivElement, ToolcallInfoProps>(
         ref={ref}
         className={cn(
           "flex flex-col items-start text-xs opacity-50",
-          className,
+          className
         )}
         data-slot="toolcall-info"
         {...props}
       >
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full">
           <button
             type="button"
             aria-expanded={isExpanded}
             aria-controls={toolDetailsId}
             onClick={() => setIsExpanded(!isExpanded)}
             className={cn(
-              "flex items-center gap-1 cursor-pointer hover:bg-gray-100 rounded-md p-1 select-none w-fit",
+              "flex items-center gap-1 cursor-pointer hover:bg-gray-100 rounded-md p-1 select-none w-fit"
             )}
           >
             {hasToolError ? (
@@ -339,7 +339,7 @@ const ToolcallInfo = React.forwardRef<HTMLDivElement, ToolcallInfoProps>(
             <ChevronDown
               className={cn(
                 "w-3 h-3 transition-transform duration-200",
-                !isExpanded && "-rotate-90",
+                !isExpanded && "-rotate-90"
               )}
             />
           </button>
@@ -347,7 +347,7 @@ const ToolcallInfo = React.forwardRef<HTMLDivElement, ToolcallInfoProps>(
             id={toolDetailsId}
             className={cn(
               "flex flex-col gap-1 p-3 overflow-hidden transition-[max-height,opacity,padding] duration-300 w-full",
-              isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0 p-0",
+              isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0 p-0"
             )}
           >
             <span className="whitespace-pre-wrap">
@@ -375,17 +375,17 @@ const ToolcallInfo = React.forwardRef<HTMLDivElement, ToolcallInfoProps>(
         </div>
       </div>
     );
-  },
+  }
 );
 
 ToolcallInfo.displayName = "ToolcallInfo";
 
 function keyifyParameters(
-  parameters: TamboAI.ToolCallRequest["parameters"] | undefined,
+  parameters: TamboAI.ToolCallRequest["parameters"] | undefined
 ) {
   if (!parameters) return;
   return Object.fromEntries(
-    parameters.map((p) => [p.parameterName, p.parameterValue]),
+    parameters.map((p) => [p.parameterName, p.parameterValue])
   );
 }
 
@@ -395,7 +395,7 @@ function keyifyParameters(
  * @returns Formatted content or original content if not JSON
  */
 function formatToolResult(
-  content: TamboThreadMessage["content"],
+  content: TamboThreadMessage["content"]
 ): React.ReactNode {
   if (!content) return content;
 
@@ -483,7 +483,7 @@ const MessageRenderedComponentArea = React.forwardRef<
                         messageId: message.id,
                         component: message.renderedComponent,
                       },
-                    }),
+                    })
                   );
                 }
               }}
