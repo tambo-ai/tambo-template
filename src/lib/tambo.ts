@@ -34,8 +34,7 @@ export const tools: TamboTool[] = [
     tool: getCountryPopulations,
     toolSchema: z
       .function()
-      .args(z.string().describe("The continent to filter countries by"))
-      .returns(
+      .args(
         z
           .object({
             continent: z.string().optional(),
@@ -43,7 +42,26 @@ export const tools: TamboTool[] = [
             limit: z.number().optional(),
             order: z.enum(["asc", "desc"]).optional(),
           })
-          .optional(),
+          .optional()
+      )
+      .returns(
+        z.array(
+          z.object({
+            countryCode: z.string(),
+            countryName: z.string(),
+            continent: z.enum([
+              "Asia",
+              "Africa",
+              "Europe",
+              "North America",
+              "South America",
+              "Oceania",
+            ]),
+            population: z.number(),
+            year: z.number(),
+            growthRate: z.number(),
+          })
+        )
       ),
   },
   {
@@ -53,14 +71,22 @@ export const tools: TamboTool[] = [
     tool: getGlobalPopulationTrend,
     toolSchema: z
       .function()
-      .args(z.string().describe("The continent to filter countries by"))
-      .returns(
+      .args(
         z
           .object({
             startYear: z.number().optional(),
             endYear: z.number().optional(),
           })
-          .optional(),
+          .optional()
+      )
+      .returns(
+        z.array(
+          z.object({
+            year: z.number(),
+            population: z.number(),
+            growthRate: z.number(),
+          })
+        )
       ),
   },
   // Add more tools here

@@ -88,19 +88,13 @@ export function ApiKeyCheck({ children }: ApiKeyCheckProps) {
     <div className="flex items-start gap-4">
       <div className="flex-grow">
         <div className="flex items-center gap-1">
-          <div className="min-w-6">
-            {isApiKeyMissing === null ? "⏳" : isApiKeyMissing ? "❌" : "✅"}
-          </div>
+          <div className="min-w-6">{isApiKeyMissing ? "❌" : "✅"}</div>
           <p>
-            {isApiKeyMissing === null
-              ? "Checking setup..."
-              : isApiKeyMissing
-                ? "Tambo not initialized"
-                : "Tambo initialized"}
+            {isApiKeyMissing ? "Tambo not initialized" : "Tambo initialized"}
           </p>
         </div>
         {isApiKeyMissing && <ApiKeyMissingAlert />}
-        {isApiKeyMissing === false && children}
+        {!isApiKeyMissing && children}
       </div>
     </div>
   );

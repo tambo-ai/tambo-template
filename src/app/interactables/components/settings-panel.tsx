@@ -57,7 +57,7 @@ function SettingsPanelBase(props: SettingsProps) {
         "Language changed:",
         prevProps.language,
         "->",
-        props.language,
+        props.language
       );
     }
 
@@ -134,7 +134,7 @@ function SettingsPanelBase(props: SettingsProps) {
                 value={settings.name}
                 onChange={(e) => handleChange({ name: e.target.value })}
                 className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  updatedFields.has("name") ? "animate-flash" : ""
+                  updatedFields.has("name") ? "animate-pulse" : ""
                 }`}
               />
             </div>
@@ -148,7 +148,7 @@ function SettingsPanelBase(props: SettingsProps) {
                 onChange={(e) => handleChange({ email: e.target.value })}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   emailError ? "border-red-500" : "border-gray-300"
-                } ${updatedFields.has("email") ? "animate-flash" : ""}`}
+                } ${updatedFields.has("email") ? "animate-pulse" : ""}`}
               />
               {emailError && (
                 <p className="mt-1 text-sm text-red-600">{emailError}</p>
@@ -165,7 +165,7 @@ function SettingsPanelBase(props: SettingsProps) {
           <div className="space-y-3">
             <label
               className={`flex items-center ${
-                updatedFields.has("notifications.email") ? "animate-flash" : ""
+                updatedFields.has("notifications.email") ? "animate-pulse" : ""
               }`}
             >
               <input
@@ -187,7 +187,7 @@ function SettingsPanelBase(props: SettingsProps) {
             </label>
             <label
               className={`flex items-center ${
-                updatedFields.has("notifications.push") ? "animate-flash" : ""
+                updatedFields.has("notifications.push") ? "animate-pulse" : ""
               }`}
             >
               <input
@@ -209,7 +209,7 @@ function SettingsPanelBase(props: SettingsProps) {
             </label>
             <label
               className={`flex items-center ${
-                updatedFields.has("notifications.sms") ? "animate-flash" : ""
+                updatedFields.has("notifications.sms") ? "animate-pulse" : ""
               }`}
             >
               <input
@@ -248,7 +248,7 @@ function SettingsPanelBase(props: SettingsProps) {
                   })
                 }
                 className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  updatedFields.has("theme") ? "animate-flash" : ""
+                  updatedFields.has("theme") ? "animate-pulse" : ""
                 }`}
               >
                 <option value="light">Light</option>
@@ -268,7 +268,7 @@ function SettingsPanelBase(props: SettingsProps) {
                   })
                 }
                 className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  updatedFields.has("language") ? "animate-flash" : ""
+                  updatedFields.has("language") ? "animate-pulse" : ""
                 }`}
               >
                 <option value="en">English</option>
@@ -287,7 +287,7 @@ function SettingsPanelBase(props: SettingsProps) {
             <label
               className={`flex items-center ${
                 updatedFields.has("privacy.shareAnalytics")
-                  ? "animate-flash"
+                  ? "animate-pulse"
                   : ""
               }`}
             >
@@ -311,7 +311,7 @@ function SettingsPanelBase(props: SettingsProps) {
             <label
               className={`flex items-center ${
                 updatedFields.has("privacy.personalizationEnabled")
-                  ? "animate-flash"
+                  ? "animate-pulse"
                   : ""
               }`}
             >
