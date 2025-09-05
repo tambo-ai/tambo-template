@@ -42,7 +42,7 @@ export const tools: TamboTool[] = [
             limit: z.number().optional(),
             order: z.enum(["asc", "desc"]).optional(),
           })
-          .optional()
+          .optional(),
       )
       .returns(
         z.array(
@@ -60,8 +60,8 @@ export const tools: TamboTool[] = [
             population: z.number(),
             year: z.number(),
             growthRate: z.number(),
-          })
-        )
+          }),
+        ),
       ),
   },
   {
@@ -77,7 +77,7 @@ export const tools: TamboTool[] = [
             startYear: z.number().optional(),
             endYear: z.number().optional(),
           })
-          .optional()
+          .optional(),
       )
       .returns(
         z.array(
@@ -85,8 +85,8 @@ export const tools: TamboTool[] = [
             year: z.number(),
             population: z.number(),
             growthRate: z.number(),
-          })
-        )
+          }),
+        ),
       ),
   },
   // Add more tools here

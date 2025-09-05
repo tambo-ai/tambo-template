@@ -57,7 +57,7 @@ function SettingsPanelBase(props: SettingsProps) {
         "Language changed:",
         prevProps.language,
         "->",
-        props.language
+        props.language,
       );
     }
 
