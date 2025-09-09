@@ -93,9 +93,9 @@ export const DataCard = React.forwardRef<HTMLDivElement, DataCardProps>(
         )}
 
         <div className="space-y-2">
-          {options?.map((card) => (
+          {options?.map((card, index) => (
             <div
-              key={card.id}
+              key={`${card.id || "card"}-${index}`}
               className="border-b border-gray-100 pb-2 last:border-0"
             >
               <div
