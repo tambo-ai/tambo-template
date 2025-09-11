@@ -3,6 +3,7 @@
 import {
   Message,
   MessageContent,
+  MessageImages,
   MessageRenderedComponentArea,
   ToolcallInfo,
   type messageVariants,
@@ -160,6 +161,7 @@ const ThreadContentMessages = React.forwardRef<
                   message.role === "assistant" ? "w-full" : "max-w-3xl",
                 )}
               >
+                <MessageImages />
                 <MessageContent
                   className={
                     message.role === "assistant"

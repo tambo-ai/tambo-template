@@ -1,39 +1,40 @@
 "use client";
 
+import type { messageVariants } from "@/components/tambo/message";
 import {
   MessageInput,
+  MessageInputError,
+  MessageInputSubmitButton,
   MessageInputTextarea,
   MessageInputToolbar,
-  MessageInputSubmitButton,
-  MessageInputError,
-  MessageInputMcpConfigButton,
 } from "@/components/tambo/message-input";
 import {
   MessageSuggestions,
-  MessageSuggestionsStatus,
   MessageSuggestionsList,
+  MessageSuggestionsStatus,
 } from "@/components/tambo/message-suggestions";
-import type { messageVariants } from "@/components/tambo/message";
+import { ScrollableMessageContainer } from "@/components/tambo/scrollable-message-container";
 import {
-  ThreadHistory,
-  ThreadHistoryHeader,
-  ThreadHistoryNewButton,
-  ThreadHistorySearch,
-  ThreadHistoryList,
-} from "@/components/tambo/thread-history";
+  ThreadContainer,
+  useThreadContainerContext,
+} from "@/components/tambo/thread-container";
 import {
   ThreadContent,
   ThreadContentMessages,
 } from "@/components/tambo/thread-content";
 import {
-  ThreadContainer,
-  useThreadContainerContext,
-} from "@/components/tambo/thread-container";
-import { ScrollableMessageContainer } from "@/components/tambo/scrollable-message-container";
+  ThreadHistory,
+  ThreadHistoryHeader,
+  ThreadHistoryList,
+  ThreadHistoryNewButton,
+  ThreadHistorySearch,
+} from "@/components/tambo/thread-history";
 import { useMergedRef } from "@/lib/thread-hooks";
 import type { Suggestion } from "@tambo-ai/react";
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
+import { MessageInputFileButton } from "@/components/tambo/message-input";
+import { MessageInputMcpConfigButton } from "@/components/tambo/message-input";
 
 /**
  * Props for the MessageThreadFull component
@@ -111,8 +112,9 @@ export const MessageThreadFull = React.forwardRef<
         {/* Message input */}
         <div className="p-4">
           <MessageInput contextKey={contextKey}>
-            <MessageInputTextarea />
+            <MessageInputTextarea placeholder="Type your message or paste images..." />
             <MessageInputToolbar>
+              <MessageInputFileButton />
               <MessageInputMcpConfigButton />
               <MessageInputSubmitButton />
             </MessageInputToolbar>
