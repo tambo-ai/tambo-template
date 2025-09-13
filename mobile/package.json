@@ -17,6 +17,7 @@
     "expo-image-picker": "^17.0.8",
     "expo-router": "^6.0.3",
     "expo-status-bar": "~3.0.8",
+    "lucide-react-native": "^0.544.0",
     "nativewind": "^4.2.0",
     "react": "19.1.0",
     "react-dom": "^19.1.0",

@@ -1,0 +1,35 @@
+import React from 'react';
+import { View, TextInput, TouchableOpacity, Text } from 'react-native';
+import { useTamboThreadInput } from '@tambo-ai/react';
+
+export function Composer() {
+  const { value, setValue, submit } = useTamboThreadInput();
+  return (
+    <View className="p-3 border-t border-gray-200 bg-white">
+      <View className="flex-row items-center gap-2">
+        <TextInput
+          className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
+          placeholder="Type a message"
+          value={value}
+          onChangeText={setValue}
+          onSubmitEditing={async () => {
+            if (!value.trim()) return;
+            await submit({ streamResponse: true });
+          }}
+          returnKeyType="send"
+        />
+        <TouchableOpacity
+          className="bg-black rounded-lg px-4 py-2"
+          disabled={!value.trim()}
+          onPress={async () => {
+            if (!value.trim()) return;
+            await submit({ streamResponse: true });
+          }}
+        >
+          <Text className="text-white font-medium">Send</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
