@@ -28,6 +28,9 @@
     },
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }

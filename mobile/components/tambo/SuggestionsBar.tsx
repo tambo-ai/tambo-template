@@ -1,10 +1,11 @@
 import React from 'react';
 import { ScrollView, TouchableOpacity, Text } from 'react-native';
-import { useTamboThreadInput } from '@tambo-ai/react';
+import { useTambo, useTamboThreadInput } from '@tambo-ai/react';
 import * as Haptics from 'expo-haptics';
 
 export function SuggestionsBar() {
-  const { setValue, submit, isPending } = useTamboThreadInput() as any;
+  const { isIdle } = useTambo();
+  const { setValue, submit } = useTamboThreadInput();
   const suggestions = [
     { id: 's-1', title: 'Get started', text: 'What can you help me with?' },
     { id: 's-2', title: 'Learn more', text: 'Tell me about your capabilities.' },
@@ -16,7 +17,7 @@ export function SuggestionsBar() {
         <TouchableOpacity
           key={s.id}
           className="bg-gray-100 dark:bg-zinc-800 px-3 py-2 rounded-full opacity-100"
-          disabled={isPending}
+          disabled={!isIdle}
           onPress={async () => {
             setValue(s.text);
             await Haptics.selectionAsync();

@@ -30,12 +30,12 @@ export function Messages() {
               >
                 {Array.isArray(m.content) ? (
                   <View className="gap-2">
-                    {m.content.map((c: any, i: number) => (
+                    {m.content.map((c: { type: 'text' | 'image_url'; text?: string; image_url?: { url?: string } }, i: number) => (
                       c?.type === 'image_url' && c?.image_url?.url ? (
                         <Image key={i} source={{ uri: c.image_url.url }} className="w-48 h-48 rounded-xl" contentFit="cover" />
                       ) : c?.type === 'text' ? (
                         <Text key={i} className={isAssistant ? 'text-gray-900 dark:text-gray-100 text-base leading-relaxed' : 'text-white text-base leading-relaxed'}>
-                          {c.text}
+                          {c.text ?? ''}
                         </Text>
                       ) : null
                     ))}

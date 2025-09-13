@@ -2,7 +2,7 @@ import { Stack } from 'expo-router';
 import { TamboProvider, type TamboComponent, type TamboTool } from '@tambo-ai/react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Graph, graphSchema } from '../components/tambo/Graph';
-import { tools as tamboTools } from '../lib/tambo';
+import { tools as tamboTools } from '../src/lib/tambo';
 
 export default function RootLayout() {
   return (

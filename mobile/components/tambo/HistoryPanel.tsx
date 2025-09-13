@@ -38,7 +38,7 @@ export function HistoryPanel({ open, onClose }: HistoryPanelProps) {
     <View pointerEvents={open ? 'auto' : 'none'} style={{ position: 'absolute', inset: 0 }}>
       {open && (
         <Pressable style={{ position: 'absolute', inset: 0 }} onPress={onClose}>
-          <BlurView intensity={25} tint="systemChromeMaterial" style={{ position: 'absolute', inset: 0 }} />
+          <BlurView intensity={25} tint="light" style={{ position: 'absolute', inset: 0 }} />
         </Pressable>
       )}
       <Animated.View
