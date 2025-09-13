@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollView, TouchableOpacity, Text } from 'react-native';
 import { useTamboThreadInput } from '@tambo-ai/react';
+import * as Haptics from 'expo-haptics';
 
 export function SuggestionsBar() {
   const { setValue, submit } = useTamboThreadInput();
@@ -17,6 +18,7 @@ export function SuggestionsBar() {
           className="bg-gray-100 dark:bg-zinc-800 px-3 py-2 rounded-full"
           onPress={async () => {
             setValue(s.text);
+            await Haptics.selectionAsync();
             await submit({ streamResponse: true });
           }}
         >
