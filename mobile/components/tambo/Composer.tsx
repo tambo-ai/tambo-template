@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity, Text } from 'react-native';
 import { useTamboThreadInput } from '@tambo-ai/react';
+import * as Haptics from 'expo-haptics';
 
 export function Composer() {
   const { value, setValue, submit } = useTamboThreadInput();
@@ -23,6 +24,7 @@ export function Composer() {
           disabled={!value.trim()}
           onPress={async () => {
             if (!value.trim()) return;
+            await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             await submit({ streamResponse: true });
           }}
         >
