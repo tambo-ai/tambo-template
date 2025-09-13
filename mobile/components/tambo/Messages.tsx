@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
-import { useTambo } from '@tambo-ai/react';
+import { useTambo, type TamboThreadMessage } from '@tambo-ai/react';
 import { saveThreadId } from '../../src/hooks/thread-storage';
 
 export function Messages() {
@@ -10,7 +10,7 @@ export function Messages() {
   React.useEffect(() => {
     if (thread?.id) void saveThreadId(undefined, thread.id);
   }, [thread?.id]);
-  const messages = thread?.messages ?? [];
+  const messages: TamboThreadMessage[] = (thread?.messages ?? []) as TamboThreadMessage[];
   return (
     <FlashList
       className="flex-1 p-4 bg-white dark:bg-black"
@@ -24,8 +24,8 @@ export function Messages() {
               <View
                 className={
                   isAssistant
-                    ? 'max-w-[85%] bg-gray-100 dark:bg-gray-800 rounded-2xl px-4 py-3'
-                    : 'max-w-[85%] bg-black rounded-2xl px-4 py-3'
+                    ? 'max-w-[85%] bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3'
+                    : 'max-w-[85%] bg-black rounded-2xl rounded-tr-sm px-4 py-3'
                 }
               >
                 {Array.isArray(m.content) ? (

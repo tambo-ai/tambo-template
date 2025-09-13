@@ -1,7 +1,8 @@
 import { Stack } from 'expo-router';
-import { TamboProvider } from '@tambo-ai/react';
+import { TamboProvider, type TamboComponent, type TamboTool } from '@tambo-ai/react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Graph, graphSchema } from '../components/tambo/Graph';
+import { tools as tamboTools } from '../lib/tambo';
 
 export default function RootLayout() {
   return (
@@ -9,7 +10,8 @@ export default function RootLayout() {
       <TamboProvider
         baseUrl={process.env.EXPO_PUBLIC_TAMBO_URL}
         apiKey={process.env.EXPO_PUBLIC_TAMBO_KEY}
-        components={[{ name: 'Graph', description: 'Mobile Graph', component: Graph, propsSchema: graphSchema }] as any}
+        components={[{ name: 'Graph', description: 'Mobile Graph', component: Graph, propsSchema: graphSchema }] as TamboComponent[]}
+        tools={tamboTools as TamboTool[]}
       >
         <Stack />
       </TamboProvider>

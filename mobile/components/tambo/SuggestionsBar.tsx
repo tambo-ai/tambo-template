@@ -4,7 +4,7 @@ import { useTamboThreadInput } from '@tambo-ai/react';
 import * as Haptics from 'expo-haptics';
 
 export function SuggestionsBar() {
-  const { setValue, submit } = useTamboThreadInput();
+  const { setValue, submit, isPending } = useTamboThreadInput() as any;
   const suggestions = [
     { id: 's-1', title: 'Get started', text: 'What can you help me with?' },
     { id: 's-2', title: 'Learn more', text: 'Tell me about your capabilities.' },
@@ -15,7 +15,8 @@ export function SuggestionsBar() {
       {suggestions.map((s) => (
         <TouchableOpacity
           key={s.id}
-          className="bg-gray-100 dark:bg-zinc-800 px-3 py-2 rounded-full"
+          className="bg-gray-100 dark:bg-zinc-800 px-3 py-2 rounded-full opacity-100"
+          disabled={isPending}
           onPress={async () => {
             setValue(s.text);
             await Haptics.selectionAsync();
