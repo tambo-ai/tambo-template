@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
 import { useTambo } from '@tambo-ai/react';
 import { saveThreadId } from '../../src/hooks/thread-storage';
@@ -9,12 +10,16 @@ export function Messages() {
   React.useEffect(() => {
     if (thread?.id) void saveThreadId(undefined, thread.id);
   }, [thread?.id]);
+  const messages = thread?.messages ?? [];
   return (
-    <ScrollView className="flex-1 p-4 bg-white dark:bg-black" contentContainerStyle={{ gap: 12 }}>
-      {(thread?.messages ?? []).map((m) => {
+    <FlashList
+      className="flex-1 p-4 bg-white dark:bg-black"
+      data={messages}
+      estimatedItemSize={100}
+      renderItem={({ item: m }) => {
         const isAssistant = m.role === 'assistant';
         return (
-          <View key={m.id} className="w-full">
+          <View className="w-full mb-3">
             <View className={isAssistant ? 'items-start' : 'items-end'}>
               <View
                 className={
@@ -49,8 +54,9 @@ export function Messages() {
             </View>
           </View>
         );
-      })}
-    </ScrollView>
+      }}
+      keyExtractor={(m) => m.id ?? `${m.role}-${m.createdAt}`}
+    />
   );
 }
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, Pressable, Animated, Dimensions } from 'react-native';
+import { FlatList } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useTamboThreadList, useTamboThread, type TamboThread } from '@tambo-ai/react';
 import { Search, X } from 'lucide-react-native';
@@ -77,19 +78,23 @@ export function HistoryPanel({ open, onClose }: HistoryPanelProps) {
           </View>
         </View>
         <View className="flex-1 px-4 py-3 bg-white">
-          {items.map((t: TamboThread) => (
-            <TouchableOpacity
-              key={t.id}
-              className="p-3 rounded-xl border border-gray-200 mb-2 bg-white"
-              onPress={() => {
-                switchCurrentThread(t.id);
-                onClose();
-              }}
-            >
-              <Text className="font-medium">{t.name ?? `Thread ${t.id.slice(0, 8)}`}</Text>
-              <Text className="text-xs text-gray-500">{new Date(t.createdAt).toLocaleString()}</Text>
-            </TouchableOpacity>
-          ))}
+          <FlatList
+            data={items}
+            keyExtractor={(t) => t.id}
+            renderItem={({ item: t }) => (
+              <TouchableOpacity
+                className="p-3 rounded-xl border border-gray-200 mb-2 bg-white"
+                accessibilityLabel={`Switch to thread ${t.name ?? t.id}`}
+                onPress={() => {
+                  switchCurrentThread(t.id);
+                  onClose();
+                }}
+              >
+                <Text className="font-medium">{t.name ?? `Thread ${t.id.slice(0, 8)}`}</Text>
+                <Text className="text-xs text-gray-500">{new Date(t.createdAt).toLocaleString()}</Text>
+              </TouchableOpacity>
+            )}
+          />
         </View>
       </Animated.View>
     </View>
