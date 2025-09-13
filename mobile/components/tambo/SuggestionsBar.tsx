@@ -10,17 +10,17 @@ export function SuggestionsBar() {
     { id: 's-3', title: 'Examples', text: 'Show me some example queries I can try.' },
   ];
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-3 pb-2" contentContainerStyle={{ gap: 8 }}>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-3 pb-2 bg-white dark:bg-black" contentContainerStyle={{ gap: 8 }}>
       {suggestions.map((s) => (
         <TouchableOpacity
           key={s.id}
-          className="bg-gray-100 px-3 py-2 rounded-full"
+          className="bg-gray-100 dark:bg-zinc-800 px-3 py-2 rounded-full"
           onPress={async () => {
             setValue(s.text);
             await submit({ streamResponse: true });
           }}
         >
-          <Text className="text-gray-900">{s.title}</Text>
+          <Text className="text-gray-900 dark:text-gray-100">{s.title}</Text>
         </TouchableOpacity>
       ))}
     </ScrollView>

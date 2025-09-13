@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, Pressable, Animated, Dimensions } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { useTamboThreadList, useTamboThread, type TamboThread } from '@tambo-ai/react';
 import { Search, X } from 'lucide-react-native';
 
@@ -33,32 +34,37 @@ export function HistoryPanel({ open, onClose }: HistoryPanelProps) {
   }, [threads?.items, query]);
 
   return (
-    <Animated.View
-      pointerEvents={open ? 'auto' : 'none'}
-      style={{
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        bottom: 0,
-        width: Math.min(360, SCREEN_WIDTH * 0.9),
-        transform: [{ translateX }],
-        backgroundColor: 'white',
-        borderLeftWidth: 1,
-        borderLeftColor: '#e5e7eb',
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-      }}
-    >
+    <View pointerEvents={open ? 'auto' : 'none'} style={{ position: 'absolute', inset: 0 }}>
+      {open && (
+        <Pressable style={{ position: 'absolute', inset: 0 }} onPress={onClose}>
+          <BlurView intensity={25} tint="systemChromeMaterial" style={{ position: 'absolute', inset: 0 }} />
+        </Pressable>
+      )}
+      <Animated.View
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          width: Math.min(360, SCREEN_WIDTH * 0.9),
+          transform: [{ translateX }],
+          backgroundColor: 'white',
+          borderLeftWidth: 1,
+          borderLeftColor: '#e5e7eb',
+          shadowColor: '#000',
+          shadowOpacity: 0.15,
+          shadowRadius: 12,
+        }}
+      >
       <View className="flex-1">
-        <View className="px-4 py-3 border-b border-gray-200 flex-row items-center justify-between">
+        <View className="px-4 py-3 border-b border-gray-200 bg-white flex-row items-center justify-between">
           <Text className="text-base font-semibold">History</Text>
           <Pressable className="p-2" onPress={onClose}>
             <X size={18} color="#111827" />
           </Pressable>
         </View>
-        <View className="px-4 py-3 border-b border-gray-200">
-          <View className="flex-row items-center gap-2 bg-gray-100 rounded-lg px-3 py-2">
+        <View className="px-4 py-3 border-b border-gray-200 bg-white">
+          <View className="flex-row items-center gap-2 bg-gray-100 rounded-xl px-3 py-2">
             <Search size={16} color="#6b7280" />
             <TextInput
               placeholder="Search threads"
@@ -70,11 +76,11 @@ export function HistoryPanel({ open, onClose }: HistoryPanelProps) {
             />
           </View>
         </View>
-        <View className="flex-1 px-4 py-3">
+        <View className="flex-1 px-4 py-3 bg-white">
           {items.map((t: TamboThread) => (
             <TouchableOpacity
               key={t.id}
-              className="p-3 rounded-lg border border-gray-200 mb-2"
+              className="p-3 rounded-xl border border-gray-200 mb-2 bg-white"
               onPress={() => {
                 switchCurrentThread(t.id);
                 onClose();
@@ -85,8 +91,8 @@ export function HistoryPanel({ open, onClose }: HistoryPanelProps) {
             </TouchableOpacity>
           ))}
         </View>
-      </View>
-    </Animated.View>
+      </Animated.View>
+    </View>
   );
 }
 

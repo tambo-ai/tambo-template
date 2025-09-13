@@ -5,10 +5,10 @@ import { useTamboThreadInput } from '@tambo-ai/react';
 export function Composer() {
   const { value, setValue, submit } = useTamboThreadInput();
   return (
-    <View className="p-3 border-t border-gray-200 bg-white">
+    <View className="p-3 border-t border-gray-200 bg-white dark:bg-black">
       <View className="flex-row items-center gap-2">
         <TextInput
-          className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
+          className="flex-1 border border-gray-300 dark:border-zinc-700 rounded-xl px-3 py-2 text-gray-900 dark:text-gray-100"
           placeholder="Type a message"
           value={value}
           onChangeText={setValue}
@@ -19,14 +19,14 @@ export function Composer() {
           returnKeyType="send"
         />
         <TouchableOpacity
-          className="bg-black rounded-lg px-4 py-2"
+          className="bg-black dark:bg-white rounded-xl px-4 py-2"
           disabled={!value.trim()}
           onPress={async () => {
             if (!value.trim()) return;
             await submit({ streamResponse: true });
           }}
         >
-          <Text className="text-white font-medium">Send</Text>
+          <Text className="text-white dark:text-black font-medium">Send</Text>
         </TouchableOpacity>
       </View>
     </View>
