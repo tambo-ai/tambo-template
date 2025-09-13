@@ -1,12 +1,21 @@
 import React from 'react';
 import { View } from 'react-native';
 import Svg, { Rect, Line, Text as SvgText } from 'react-native-svg';
+import { z } from 'zod';
 
-export type GraphProps = {
-  type?: 'bar' | 'line';
-  labels: string[];
-  datasets: { label?: string; data: number[]; color?: string }[];
-};
+export const graphSchema = z.object({
+  type: z.enum(['bar', 'line']).optional().default('bar'),
+  labels: z.array(z.string()),
+  datasets: z.array(
+    z.object({
+      label: z.string().optional(),
+      data: z.array(z.number()),
+      color: z.string().optional(),
+    })
+  ),
+});
+
+export type GraphProps = z.infer<typeof graphSchema>;
 
 export function Graph({ type = 'bar', labels, datasets }: GraphProps) {
   const width = 320;
