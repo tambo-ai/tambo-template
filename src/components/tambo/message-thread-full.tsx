@@ -4,6 +4,8 @@ import type { messageVariants } from "@/components/tambo/message";
 import {
   MessageInput,
   MessageInputError,
+  MessageInputFileButton,
+  MessageInputMcpPromptButton,
   MessageInputSubmitButton,
   MessageInputTextarea,
   MessageInputToolbar,
@@ -29,12 +31,10 @@ import {
   ThreadHistoryNewButton,
   ThreadHistorySearch,
 } from "@/components/tambo/thread-history";
-import { useMergedRef } from "@/lib/thread-hooks";
+import { useMergeRefs } from "@/lib/thread-hooks";
 import type { Suggestion } from "@tambo-ai/react";
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
-import { MessageInputFileButton } from "@/components/tambo/message-input";
-import { MessageInputMcpConfigButton } from "@/components/tambo/message-input";
 
 /**
  * Props for the MessageThreadFull component
@@ -60,7 +60,7 @@ export const MessageThreadFull = React.forwardRef<
   MessageThreadFullProps
 >(({ className, contextKey, variant, ...props }, ref) => {
   const { containerRef, historyPosition } = useThreadContainerContext();
-  const mergedRef = useMergedRef<HTMLDivElement | null>(ref, containerRef);
+  const mergedRef = useMergeRefs<HTMLDivElement | null>(ref, containerRef);
 
   const threadHistorySidebar = (
     <ThreadHistory contextKey={contextKey} position={historyPosition}>
@@ -93,11 +93,16 @@ export const MessageThreadFull = React.forwardRef<
   ];
 
   return (
-    <>
+    <div className="flex h-full w-full">
       {/* Thread History Sidebar - rendered first if history is on the left */}
       {historyPosition === "left" && threadHistorySidebar}
 
-      <ThreadContainer ref={mergedRef} className={className} {...props}>
+      <ThreadContainer
+        ref={mergedRef}
+        disableSidebarSpacing
+        className={className}
+        {...props}
+      >
         <ScrollableMessageContainer className="p-4">
           <ThreadContent variant={variant}>
             <ThreadContentMessages />
@@ -110,12 +115,14 @@ export const MessageThreadFull = React.forwardRef<
         </MessageSuggestions>
 
         {/* Message input */}
-        <div className="p-4">
+        <div className="px-4 pb-4">
           <MessageInput contextKey={contextKey}>
             <MessageInputTextarea placeholder="Type your message or paste images..." />
             <MessageInputToolbar>
               <MessageInputFileButton />
-              <MessageInputMcpConfigButton />
+              <MessageInputMcpPromptButton />
+              {/* Uncomment this to enable client-side MCP config modal button */}
+              {/* <MessageInputMcpConfigButton /> */}
               <MessageInputSubmitButton />
             </MessageInputToolbar>
             <MessageInputError />
@@ -130,7 +137,7 @@ export const MessageThreadFull = React.forwardRef<
 
       {/* Thread History Sidebar - rendered last if history is on the right */}
       {historyPosition === "right" && threadHistorySidebar}
-    </>
+    </div>
   );
 });
 MessageThreadFull.displayName = "MessageThreadFull";
