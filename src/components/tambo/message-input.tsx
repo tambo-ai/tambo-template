@@ -1,5 +1,10 @@
 "use client";
 
+import { ElicitationUI } from "@/components/tambo/elicitation-ui";
+import {
+  McpPromptButton,
+  McpResourceButton,
+} from "@/components/tambo/mcp-components";
 import { McpConfigModal } from "@/components/tambo/mcp-config-modal";
 import {
   Tooltip,
@@ -12,6 +17,11 @@ import {
   useTamboThreadInput,
   type StagedImage,
 } from "@tambo-ai/react";
+import {
+  useTamboElicitationContext,
+  type TamboElicitationRequest,
+  type TamboElicitationResponse,
+} from "@tambo-ai/react/mcp";
 import { cva, type VariantProps } from "class-variance-authority";
 import {
   ArrowUp,
@@ -20,8 +30,13 @@ import {
   Square,
   X,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import * as React from "react";
+// eslint-disable-next-line @typescript-eslint/promise-function-async
+const DictationButton = dynamic(() => import("./dictation-button"), {
+  ssr: false,
+});
 
 /**
  * CSS variants for the message input container
@@ -68,6 +83,8 @@ const messageInputVariants = cva("w-full", {
  * @property {HTMLTextAreaElement|null} textareaRef - Reference to the textarea element
  * @property {string | null} submitError - Error from the submission
  * @property {function} setSubmitError - Function to set the submission error
+ * @property {TamboElicitationRequest | null} elicitation - Current elicitation request (read-only)
+ * @property {function} resolveElicitation - Function to resolve the elicitation promise (automatically clears state)
  */
 interface MessageInputContextValue {
   value: string;
@@ -83,6 +100,8 @@ interface MessageInputContextValue {
   textareaRef: React.RefObject<HTMLTextAreaElement>;
   submitError: string | null;
   setSubmitError: React.Dispatch<React.SetStateAction<string | null>>;
+  elicitation: TamboElicitationRequest | null;
+  resolveElicitation: ((response: TamboElicitationResponse) => void) | null;
 }
 
 /**
@@ -148,7 +167,7 @@ const MessageInput = React.forwardRef<HTMLFormElement, MessageInputProps>(
         variant={variant}
         {...props}
       >
-        {children}
+        <TooltipProvider>{children}</TooltipProvider>
       </MessageInputInternal>
     );
   },
@@ -179,6 +198,9 @@ const MessageInputInternal = React.forwardRef<
   const [isDragging, setIsDragging] = React.useState(false);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const dragCounter = React.useRef(0);
+
+  // Use elicitation context (optional)
+  const { elicitation, resolveElicitation } = useTamboElicitationContext();
 
   React.useEffect(() => {
     setDisplayValue(value);
@@ -290,6 +312,16 @@ const MessageInputInternal = React.forwardRef<
     [addImages],
   );
 
+  const handleElicitationResponse = React.useCallback(
+    (response: TamboElicitationResponse) => {
+      // Calling resolveElicitation automatically clears the elicitation state
+      if (resolveElicitation) {
+        resolveElicitation(response);
+      }
+    },
+    [resolveElicitation],
+  );
+
   const contextValue = React.useMemo(
     () => ({
       value: displayValue,
@@ -305,6 +337,8 @@ const MessageInputInternal = React.forwardRef<
       textareaRef: inputRef ?? textareaRef,
       submitError,
       setSubmitError,
+      elicitation,
+      resolveElicitation,
     }),
     [
       displayValue,
@@ -318,6 +352,8 @@ const MessageInputInternal = React.forwardRef<
       inputRef,
       textareaRef,
       submitError,
+      elicitation,
+      resolveElicitation,
     ],
   );
   return (
@@ -350,8 +386,17 @@ const MessageInputInternal = React.forwardRef<
               </p>
             </div>
           )}
-          <MessageInputStagedImages />
-          {children}
+          {elicitation ? (
+            <ElicitationUI
+              request={elicitation}
+              onResponse={handleElicitationResponse}
+            />
+          ) : (
+            <>
+              <MessageInputStagedImages />
+              {children}
+            </>
+          )}
         </div>
       </form>
     </MessageInputContext.Provider>
@@ -365,7 +410,7 @@ MessageInput.displayName = "MessageInput";
  */
 const IS_PASTED_IMAGE = Symbol("is-pasted-image");
 
-/** 
+/**
  * Extend the File interface to include IS_PASTED_IMAGE symbol
  */
 declare global {
@@ -535,6 +580,33 @@ const MessageInputSubmitButton = React.forwardRef<
 });
 MessageInputSubmitButton.displayName = "MessageInput.SubmitButton";
 
+const MCPIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width="24"
+      height="24"
+      color="#000000"
+      fill="none"
+    >
+      <path
+        d="M3.49994 11.7501L11.6717 3.57855C12.7762 2.47398 14.5672 2.47398 15.6717 3.57855C16.7762 4.68312 16.7762 6.47398 15.6717 7.57855M15.6717 7.57855L9.49994 13.7501M15.6717 7.57855C16.7762 6.47398 18.5672 6.47398 19.6717 7.57855C20.7762 8.68312 20.7762 10.474 19.6717 11.5785L12.7072 18.543C12.3167 18.9335 12.3167 19.5667 12.7072 19.9572L13.9999 21.2499"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></path>
+      <path
+        d="M17.4999 9.74921L11.3282 15.921C10.2237 17.0255 8.43272 17.0255 7.32823 15.921C6.22373 14.8164 6.22373 13.0255 7.32823 11.921L13.4999 5.74939"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></path>
+    </svg>
+  );
+};
 /**
  * MCP Config Button component for opening the MCP configuration modal.
  * @component MessageInput.McpConfigButton
@@ -558,45 +630,13 @@ const MessageInputMcpConfigButton = React.forwardRef<
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   const buttonClasses = cn(
-    "w-10 h-10 bg-muted text-primary rounded-lg hover:bg-muted/80 disabled:opacity-50 flex items-center justify-center cursor-pointer",
+    "w-10 h-10 rounded-lg border border-border bg-background text-foreground transition-colors hover:bg-muted disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
     className,
   );
 
-  const MCPIcon = () => {
-    return (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        width="24"
-        height="24"
-        color="#000000"
-        fill="none"
-      >
-        <path
-          d="M3.49994 11.7501L11.6717 3.57855C12.7762 2.47398 14.5672 2.47398 15.6717 3.57855C16.7762 4.68312 16.7762 6.47398 15.6717 7.57855M15.6717 7.57855L9.49994 13.7501M15.6717 7.57855C16.7762 6.47398 18.5672 6.47398 19.6717 7.57855C20.7762 8.68312 20.7762 10.474 19.6717 11.5785L12.7072 18.543C12.3167 18.9335 12.3167 19.5667 12.7072 19.9572L13.9999 21.2499"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        ></path>
-        <path
-          d="M17.4999 9.74921L11.3282 15.921C10.2237 17.0255 8.43272 17.0255 7.32823 15.921C6.22373 14.8164 6.22373 13.0255 7.32823 11.921L13.4999 5.74939"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        ></path>
-      </svg>
-    );
-  };
-
   return (
-    <TooltipProvider>
-      <Tooltip
-        content="Configure MCP Servers"
-        side="right"
-        className="bg-muted text-primary"
-      >
+    <>
+      <Tooltip content="Configure MCP Servers" side="right">
         <button
           ref={ref}
           type="button"
@@ -613,7 +653,7 @@ const MessageInputMcpConfigButton = React.forwardRef<
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
-    </TooltipProvider>
+    </>
   );
 });
 MessageInputMcpConfigButton.displayName = "MessageInput.McpConfigButton";
@@ -708,42 +748,113 @@ const MessageInputFileButton = React.forwardRef<
   };
 
   const buttonClasses = cn(
-    "w-10 h-10 bg-muted text-primary rounded-lg hover:bg-muted/80 disabled:opacity-50 flex items-center justify-center cursor-pointer",
+    "w-10 h-10 rounded-lg border border-border bg-background text-foreground transition-colors hover:bg-muted disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
     className,
   );
 
   return (
-    <TooltipProvider>
-      <Tooltip
-        content="Attach Images"
-        side="top"
-        className="bg-muted text-primary"
+    <Tooltip content="Attach Images" side="top">
+      <button
+        ref={ref}
+        type="button"
+        onClick={handleClick}
+        className={buttonClasses}
+        aria-label="Attach Images"
+        data-slot="message-input-file-button"
+        {...props}
       >
-        <button
-          ref={ref}
-          type="button"
-          onClick={handleClick}
-          className={buttonClasses}
-          aria-label="Attach Images"
-          data-slot="message-input-file-button"
-          {...props}
-        >
-          <Paperclip className="w-4 h-4" />
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept={accept}
-            multiple={multiple}
-            onChange={handleFileChange}
-            className="hidden"
-            aria-hidden="true"
-          />
-        </button>
-      </Tooltip>
-    </TooltipProvider>
+        <Paperclip className="w-4 h-4" />
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={accept}
+          multiple={multiple}
+          onChange={handleFileChange}
+          className="hidden"
+          aria-hidden="true"
+        />
+      </button>
+    </Tooltip>
   );
 });
 MessageInputFileButton.displayName = "MessageInput.FileButton";
+
+/**
+ * Props for the MessageInputMcpPromptButton component.
+ */
+export type MessageInputMcpPromptButtonProps =
+  React.ButtonHTMLAttributes<HTMLButtonElement>;
+
+/**
+ * MCP Prompt picker button component for inserting prompts from MCP servers.
+ * Wraps McpPromptButton and connects it to MessageInput context.
+ * @component MessageInput.McpPromptButton
+ * @example
+ * ```tsx
+ * <MessageInput>
+ *   <MessageInput.Textarea />
+ *   <MessageInput.Toolbar>
+ *     <MessageInput.FileButton />
+ *     <MessageInput.McpPromptButton />
+ *     <MessageInput.SubmitButton />
+ *   </MessageInput.Toolbar>
+ * </MessageInput>
+ * ```
+ */
+const MessageInputMcpPromptButton = React.forwardRef<
+  HTMLButtonElement,
+  MessageInputMcpPromptButtonProps
+>(({ ...props }, ref) => {
+  const { setValue, value } = useMessageInputContext();
+  return (
+    <McpPromptButton
+      ref={ref}
+      {...props}
+      value={value as string}
+      onInsertText={setValue}
+    />
+  );
+});
+MessageInputMcpPromptButton.displayName = "MessageInput.McpPromptButton";
+
+/**
+ * Props for the MessageInputMcpResourceButton component.
+ */
+export type MessageInputMcpResourceButtonProps =
+  React.ButtonHTMLAttributes<HTMLButtonElement>;
+
+/**
+ * MCP Resource picker button component for inserting resource references from MCP servers.
+ * Wraps McpResourceButton and connects it to MessageInput context.
+ * @component MessageInput.McpResourceButton
+ * @example
+ * ```tsx
+ * <MessageInput>
+ *   <MessageInput.Textarea />
+ *   <MessageInput.Toolbar>
+ *     <MessageInput.FileButton />
+ *     <MessageInput.McpPromptButton />
+ *     <MessageInput.McpResourceButton />
+ *     <MessageInput.SubmitButton />
+ *   </MessageInput.Toolbar>
+ * </MessageInput>
+ * ```
+ */
+const MessageInputMcpResourceButton = React.forwardRef<
+  HTMLButtonElement,
+  MessageInputMcpResourceButtonProps
+>(({ ...props }, ref) => {
+  const { setValue, value } = useMessageInputContext();
+  return (
+    <McpResourceButton
+      ref={ref}
+      {...props}
+      value={value as string}
+      onInsertText={setValue}
+    />
+  );
+});
+MessageInputMcpResourceButton.displayName = "MessageInput.McpResourceButton";
 
 /**
  * Props for the ImageContextBadge component.
@@ -937,6 +1048,7 @@ const MessageInputToolbar = React.forwardRef<
         })}
       </div>
       <div className="flex items-center gap-2">
+        <DictationButton />
         {/* Right side - only submit button */}
         {React.Children.map(children, (child): React.ReactNode => {
           if (
@@ -955,10 +1067,13 @@ MessageInputToolbar.displayName = "MessageInput.Toolbar";
 
 // --- Exports ---
 export {
+  DictationButton,
   MessageInput,
   MessageInputError,
   MessageInputFileButton,
   MessageInputMcpConfigButton,
+  MessageInputMcpPromptButton,
+  MessageInputMcpResourceButton,
   MessageInputStagedImages,
   MessageInputSubmitButton,
   MessageInputTextarea,

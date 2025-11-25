@@ -40,10 +40,6 @@ export default function InteractablesPage() {
                 <h2 className="text-lg font-semibold text-gray-900">
                   Chat Assistant
                 </h2>
-                <p className="text-sm text-gray-600 mt-1">
-                  Try: &quot;Change the name to John Doe&quot; or &quot;Enable
-                  dark mode&quot;
-                </p>
               </div>
 
               <ScrollableMessageContainer className="flex-1 p-4">

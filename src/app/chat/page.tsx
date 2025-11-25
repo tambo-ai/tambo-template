@@ -11,19 +11,17 @@ export default function Home() {
   const mcpServers = useMcpServers();
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden relative">
-      <TamboProvider
-        apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}
-        components={components}
-        tools={tools}
-        tamboUrl={process.env.NEXT_PUBLIC_TAMBO_URL}
-      >
-        <TamboMcpProvider mcpServers={mcpServers}>
-          <div className="w-full max-w-4xl mx-auto">
-            <MessageThreadFull contextKey="tambo-template" />
-          </div>
-        </TamboMcpProvider>
-      </TamboProvider>
-    </div>
+    <TamboProvider
+      apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}
+      components={components}
+      tools={tools}
+      tamboUrl={process.env.NEXT_PUBLIC_TAMBO_URL}
+    >
+      <TamboMcpProvider mcpServers={mcpServers}>
+        <div className="h-screen">
+          <MessageThreadFull contextKey="tambo-template" />
+        </div>
+      </TamboMcpProvider>
+    </TamboProvider>
   );
 }
