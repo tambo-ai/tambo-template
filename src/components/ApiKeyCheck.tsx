@@ -82,7 +82,7 @@ const CopyButton = ({ text }: { text: string }) => {
 };
 
 export function ApiKeyCheck({ children }: ApiKeyCheckProps) {
-  const isApiKeyMissing = !process.env.NEXT_PUBLIC_TAMBO_API_KEY;
+  const isApiKeyMissing = !import.meta.env.VITE_TAMBO_API_KEY;
 
   return (
     <div className="flex items-start gap-4">
