@@ -293,7 +293,7 @@ function isSingleEntryMode(request: TamboElicitationRequest): boolean {
     return false;
   }
 
-  const [, schema] = fields[0];
+  const [, schema] = fields[0] as [string, { type: string; [key: string]: unknown }];
 
   return (
     schema.type === "boolean" || (schema.type === "string" && "enum" in schema)
@@ -510,7 +510,9 @@ export const ElicitationUI: React.FC<ElicitationUIProps> = ({
   });
 
   if (singleEntry) {
-    const [fieldName, fieldSchema] = fields[0];
+    const fieldEntry = fields[0];
+    if (!fieldEntry) return null;
+    const [fieldName, fieldSchema] = fieldEntry;
     const validationError = touchedFields.has(fieldName)
       ? getValidationError(
           formData[fieldName],

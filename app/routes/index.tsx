@@ -1,5 +1,5 @@
-import { ApiKeyCheck } from "@/components/ApiKeyCheck";
-import Image from "next/image";
+import { createFileRoute } from '@tanstack/react-router';
+import { ApiKeyCheck } from '@/components/ApiKeyCheck';
 
 const KeyFilesSection = () => (
   <div className="bg-white px-8 py-4">
@@ -8,14 +8,14 @@ const KeyFilesSection = () => (
       <li className="flex items-start gap-2">
         <span>📄</span>
         <span>
-          <code className="font-medium">src/app/layout.tsx</code> - Main layout
-          with TamboProvider
+          <code className="font-medium">app/routes/__root.tsx</code> - Main layout
+          with router configuration
         </span>
       </li>
       <li className="flex items-start gap-2">
         <span>📄</span>
         <span>
-          <code className="font-medium font-mono">src/app/chat/page.tsx</code> -
+          <code className="font-medium font-mono">app/routes/chat.tsx</code> -
           Chat page with TamboProvider and MCP integration
         </span>
       </li>
@@ -23,8 +23,8 @@ const KeyFilesSection = () => (
         <span>📄</span>
         <span>
           <code className="font-medium font-mono">
-            src/app/interactables/page.tsx
-          </code>{" "}
+            app/routes/interactables.tsx
+          </code>{' '}
           - Interactive demo page with tools and components
         </span>
       </li>
@@ -33,7 +33,7 @@ const KeyFilesSection = () => (
         <span>
           <code className="font-medium font-mono">
             src/components/tambo/message-thread-full.tsx
-          </code>{" "}
+          </code>{' '}
           - Chat UI
         </span>
       </li>
@@ -42,7 +42,7 @@ const KeyFilesSection = () => (
         <span>
           <code className="font-medium font-mono">
             src/components/tambo/graph.tsx
-          </code>{" "}
+          </code>{' '}
           - A generative graph component
         </span>
       </li>
@@ -51,7 +51,7 @@ const KeyFilesSection = () => (
         <span>
           <code className="font-medium font-mono">
             src/services/population-stats.ts
-          </code>{" "}
+          </code>{' '}
           - Example tool implementation with mock population data
         </span>
       </li>
@@ -91,13 +91,17 @@ const KeyFilesSection = () => (
   </div>
 );
 
-export default function Home() {
+export const Route = createFileRoute('/')({
+  component: Home,
+});
+
+function Home() {
   return (
     <div className="min-h-screen p-8 flex flex-col items-center justify-center font-[family-name:var(--font-geist-sans)]">
       <main className="max-w-2xl w-full space-y-8">
         <div className="flex flex-col items-center">
           <a href="https://tambo.co" target="_blank" rel="noopener noreferrer">
-            <Image
+            <img
               src="/Octo-Icon.svg"
               alt="Tambo AI Logo"
               width={80}

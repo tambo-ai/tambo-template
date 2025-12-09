@@ -1,6 +1,6 @@
 # Tambo Template
 
-This is a starter NextJS app with Tambo hooked up to get your AI app development started quickly.
+This is a starter template built with **TanStack Router** and **Vite** with Tambo hooked up to get your AI app development started quickly.
 
 ## Get Started
 
@@ -12,7 +12,7 @@ This is a starter NextJS app with Tambo hooked up to get your AI app development
 
 - or rename `example.env.local` to `.env.local` and add your tambo API key you can get for free [here](https://tambo.co/dashboard).
 
-4. Run `npm run dev` and go to `localhost:3000` to use the app!
+4. Run `npm run dev` and go to `localhost:5173` to use the app!
 
 ## Customizing
 
@@ -117,7 +117,7 @@ Make sure in the TamboProvider wrapped around your app:
 ```tsx
 ...
 <TamboProvider
-  apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}
+  apiKey={import.meta.env.VITE_TAMBO_API_KEY!}
   components={components} // Array of components to control
   tools={tools} // Array of tools it can use
 >
@@ -125,7 +125,7 @@ Make sure in the TamboProvider wrapped around your app:
 </TamboProvider>
 ```
 
-In this example we do this in the `Layout.tsx` file, but you can do it anywhere in your app that is a client component.
+In this example we do this in the chat route (`app/routes/chat.tsx`), but you can do it anywhere in your app.
 
 ### Change where component responses are shown
 
