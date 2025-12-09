@@ -1,5 +1,3 @@
-"use client";
-
 import { markdownComponents } from "@/components/tambo/markdown-components";
 import {
   checkHasContent,
@@ -13,7 +11,6 @@ import type TamboAI from "@tambo-ai/typescript-sdk";
 import { cva, type VariantProps } from "class-variance-authority";
 import stringify from "json-stringify-pretty-compact";
 import { Check, ChevronDown, ExternalLink, Loader2, X } from "lucide-react";
-
 import * as React from "react";
 import { useState } from "react";
 import { Streamdown } from "streamdown";
@@ -206,12 +203,14 @@ const MessageImages = React.forwardRef<HTMLDivElement, MessageImagesProps>(
         {images.map((imageUrl: string, index: number) => (
           <div
             key={index}
-            className="relative w-32 h-32 rounded-lg overflow-hidden"
+            className="w-32 h-32 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200"
           >
             <img
               src={imageUrl}
               alt={`Image ${index + 1}`}
-              className="object-cover w-full h-full"
+              width={128}
+              height={128}
+              className="w-full h-full object-cover"
             />
           </div>
         ))}
@@ -350,11 +349,11 @@ const ToolcallInfo = React.forwardRef<HTMLDivElement, ToolcallInfoProps>(
       if (currentMessageIndex === -1) return null;
       for (let i = currentMessageIndex + 1; i < thread.messages.length; i++) {
         const nextMessage = thread.messages[i];
-        if (nextMessage?.role === "tool") {
+        if (nextMessage.role === "tool") {
           return nextMessage;
         }
         if (
-          nextMessage?.role === "assistant" &&
+          nextMessage.role === "assistant" &&
           getToolCallRequest(nextMessage)
         ) {
           break;

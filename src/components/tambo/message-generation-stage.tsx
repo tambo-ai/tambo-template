@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "@/lib/utils";
 import { type GenerationStage, useTambo } from "@tambo-ai/react";
 import { Loader2Icon } from "lucide-react";

@@ -125,7 +125,7 @@ Make sure in the TamboProvider wrapped around your app:
 </TamboProvider>
 ```
 
-In this example we do this in the chat route (`app/routes/chat.tsx`), but you can do it anywhere in your app.
+In this example we do this in the chat route (`src/routes/chat.tsx`), but you can do it anywhere in your app.
 
 ### Change where component responses are shown
 

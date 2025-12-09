@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Copy, Check, ExternalLink } from "lucide-react";
@@ -101,7 +99,7 @@ export const createMarkdownComponents = (): Record<
     const highlighted = React.useMemo(() => {
       if (!match || !looksLikeCode(deferredContent)) return null;
       try {
-        return hljs.highlight(deferredContent, { language: match[1] || 'plaintext' }).value;
+        return hljs.highlight(deferredContent, { language: match[1] }).value;
       } catch {
         return deferredContent;
       }

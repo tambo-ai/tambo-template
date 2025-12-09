@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "@/lib/utils";
 import { useTamboComponentState } from "@tambo-ai/react";
 import * as React from "react";
