@@ -1,5 +1,3 @@
-"use client";
-
 import { MessageGenerationStage } from "@/components/tambo/message-generation-stage";
 import {
   Tooltip,

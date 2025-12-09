@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "@/lib/utils";
 import {
   type TamboElicitationRequest,
@@ -293,7 +291,7 @@ function isSingleEntryMode(request: TamboElicitationRequest): boolean {
     return false;
   }
 
-  const [, schema] = fields[0] as [string, { type: string; [key: string]: unknown }];
+  const [, schema] = fields[0];
 
   return (
     schema.type === "boolean" || (schema.type === "string" && "enum" in schema)
@@ -510,9 +508,7 @@ export const ElicitationUI: React.FC<ElicitationUIProps> = ({
   });
 
   if (singleEntry) {
-    const fieldEntry = fields[0];
-    if (!fieldEntry) return null;
-    const [fieldName, fieldSchema] = fieldEntry;
+    const [fieldName, fieldSchema] = fields[0];
     const validationError = touchedFields.has(fieldName)
       ? getValidationError(
           formData[fieldName],

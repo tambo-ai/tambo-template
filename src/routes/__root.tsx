@@ -1,6 +1,6 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
-import '../globals.css';
+import '../styles/globals.css';
 
 export const Route = createRootRoute({
   component: RootComponent,

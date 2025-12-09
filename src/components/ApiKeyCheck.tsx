@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 
 interface ApiKeyCheckProps {
@@ -24,7 +22,7 @@ const ApiKeyMissingAlert = () => (
         tambo.co/cli-auth
       </a>{" "}
       to get your API key and set it in{" "}
-      <code className="bg-yellow-100 px-2 py-1 rounded">.env.local</code>
+      <code className="bg-yellow-100 px-2 py-1 rounded">.env</code>
     </p>
   </div>
 );

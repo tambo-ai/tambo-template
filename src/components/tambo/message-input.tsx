@@ -1,5 +1,3 @@
-"use client";
-
 import { ElicitationUI } from "@/components/tambo/elicitation-ui";
 import {
   McpPromptButton,
@@ -30,11 +28,9 @@ import {
   Square,
   X,
 } from "lucide-react";
-
 import * as React from "react";
-import { lazy, Suspense } from "react";
 
-const DictationButton = lazy(() => import("./dictation-button"));
+const DictationButton = React.lazy(() => import("./dictation-button"));
 
 /**
  * CSS variants for the message input container
@@ -911,7 +907,7 @@ const ImageContextBadge: React.FC<ImageContextBadgeProps> = ({
             <img
               src={image.dataUrl}
               alt={displayName}
-              className="object-cover w-full h-full"
+              className="absolute inset-0 w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             <div className="absolute bottom-1 left-2 right-2 text-white text-xs font-medium truncate">
@@ -1044,9 +1040,7 @@ const MessageInputToolbar = React.forwardRef<
         })}
       </div>
       <div className="flex items-center gap-2">
-        <Suspense fallback={null}>
-          <DictationButton />
-        </Suspense>
+        <DictationButton />
         {/* Right side - only submit button */}
         {React.Children.map(children, (child): React.ReactNode => {
           if (
