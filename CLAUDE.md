@@ -23,11 +23,12 @@ npm run lint:fix     # Run ESLint with auto-fix
 
 ## Architecture Overview
 
-This is a Next.js 15 app with Tambo AI integration for building generative UI/UX applications. The architecture enables AI to dynamically generate and control React components.
+This is a Vite + TanStack Router app with Tambo AI integration for building generative UI/UX applications. The architecture enables AI to dynamically generate and control React components.
 
 ### Core Technologies
-- **Next.js 15.4.1** with App Router
-- **React 19.1.0** with TypeScript
+- **TanStack Router** with file-based routing
+- **Vite** for fast development and builds
+- **React 19** with TypeScript
 - **Tambo AI SDK**
 - **Tailwind CSS v4** with dark mode support
 - **Zod** for schema validation
@@ -45,7 +46,7 @@ This is a Next.js 15 app with Tambo AI integration for building generative UI/UX
    - Tools have schemas defining their inputs and outputs
 
 3. **Provider Pattern**
-   - `TamboProvider` wraps the app in `src/app/layout.tsx`
+   - `TamboProvider` wraps the app in `src/routes/__root.tsx`
    - Provides API key, registered components, and tools to the entire app
 
 4. **Streaming Architecture**
@@ -57,10 +58,11 @@ This is a Next.js 15 app with Tambo AI integration for building generative UI/UX
 ```
 
 src/
-├── app/ # Next.js App Router pages
-│ ├── chat/ # Chat interface route
-│ ├── interactables/ # Interactive components demo
-│ └── layout.tsx # Root layout with TamboProvider
+├── routes/ # TanStack Router pages
+│ ├── __root.tsx # Root layout with TamboProvider
+│ ├── index.tsx # Home page
+│ ├── chat.tsx # Chat interface route
+│ └── interactables.tsx # Interactive components demo
 ├── components/
 │ ├── tambo/ # Tambo-specific components
 │ │ ├── graph.tsx # Recharts data visualization
