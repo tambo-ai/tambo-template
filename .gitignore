@@ -13,9 +13,12 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
+# TanStack Start / Vite / Vinxi
+/.vinxi
+/.output
+/dist
+.nitro
+.cache
 
 # production
 /build
@@ -33,12 +36,11 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
-# vercel
-.vercel
-
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 
 #claude
 .claude/
+app.config.timestamp_*.js
+tsr.config.json
+app.config.ts

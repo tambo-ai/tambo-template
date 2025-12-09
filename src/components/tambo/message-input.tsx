@@ -1,5 +1,3 @@
-"use client";
-
 import { ElicitationUI } from "@/components/tambo/elicitation-ui";
 import {
   McpPromptButton,
@@ -30,13 +28,9 @@ import {
   Square,
   X,
 } from "lucide-react";
-import dynamic from "next/dynamic";
-import Image from "next/image";
 import * as React from "react";
-// eslint-disable-next-line @typescript-eslint/promise-function-async
-const DictationButton = dynamic(() => import("./dictation-button"), {
-  ssr: false,
-});
+
+const DictationButton = React.lazy(() => import("./dictation-button"));
 
 /**
  * CSS variants for the message input container
@@ -910,12 +904,10 @@ const ImageContextBadge: React.FC<ImageContextBadgeProps> = ({
           )}
         >
           <div className="relative w-full h-full">
-            <Image
+            <img
               src={image.dataUrl}
               alt={displayName}
-              fill
-              unoptimized
-              className="object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             <div className="absolute bottom-1 left-2 right-2 text-white text-xs font-medium truncate">

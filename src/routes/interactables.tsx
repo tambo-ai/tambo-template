@@ -1,37 +1,40 @@
-"use client";
-
+import { createFileRoute } from '@tanstack/react-router';
 import {
   MessageInput,
   MessageInputSubmitButton,
   MessageInputTextarea,
   MessageInputToolbar,
-} from "@/components/tambo/message-input";
-import { ScrollableMessageContainer } from "@/components/tambo/scrollable-message-container";
+} from '@/components/tambo/message-input';
+import { ScrollableMessageContainer } from '@/components/tambo/scrollable-message-container';
 import {
   ThreadContent,
   ThreadContentMessages,
-} from "@/components/tambo/thread-content";
-import { components, tools } from "@/lib/tambo";
-import { TamboProvider } from "@tambo-ai/react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
-import { SettingsPanel } from "./components/settings-panel";
+} from '@/components/tambo/thread-content';
+import { components, tools } from '@/lib/tambo';
+import { TamboProvider } from '@tambo-ai/react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import { SettingsPanel } from '../interactables/components/settings-panel';
 
-export default function InteractablesPage() {
+export const Route = createFileRoute('/interactables')({
+  component: InteractablesPage,
+});
+
+function InteractablesPage() {
   const [isChatOpen, setIsChatOpen] = useState(true);
 
   return (
     <TamboProvider
-      apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}
+      apiKey={import.meta.env.VITE_TAMBO_API_KEY!}
       components={components}
       tools={tools}
-      tamboUrl={process.env.NEXT_PUBLIC_TAMBO_URL}
+      tamboUrl={import.meta.env.VITE_TAMBO_URL}
     >
       <div className="flex h-screen bg-gray-50">
         {/* Chat Sidebar */}
         <div
           className={`${
-            isChatOpen ? "w-80" : "w-0"
+            isChatOpen ? 'w-80' : 'w-0'
           } border-r border-gray-200 bg-white transition-all duration-300 flex flex-col relative`}
         >
           {isChatOpen && (

@@ -107,12 +107,17 @@
 }
 
 @layer base {
+  :root {
+    --font-geist-sans: 'Geist Sans', system-ui, -apple-system, sans-serif;
+    --font-geist-mono: 'Geist Mono', 'Courier New', monospace;
+  }
+  
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: var(--font-geist-sans);
   }
 }
 
