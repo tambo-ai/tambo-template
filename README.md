@@ -18,58 +18,22 @@ This is a starter NextJS app with Tambo hooked up to get your AI app development
 
 ### Change what components tambo can control
 
-You can see how the `Graph` component is registered with tambo in `src/lib/tambo.ts`:
+You can see how components are registered with tambo in `src/lib/tambo.ts`:
 
 ```tsx
-const components: TamboComponent[] = [
+export const components: TamboComponent[] = [
   {
     name: "Graph",
     description:
       "A component that renders various types of charts (bar, line, pie) using Recharts. Supports customizable data visualization with labels, datasets, and styling options.",
     component: Graph,
-    propsSchema: z.object({
-      data: z
-        .object({
-          type: z
-            .enum(["bar", "line", "pie"])
-            .describe("Type of graph to render"),
-          labels: z.array(z.string()).describe("Labels for the graph"),
-          datasets: z
-            .array(
-              z.object({
-                label: z.string().describe("Label for the dataset"),
-                data: z
-                  .array(z.number())
-                  .describe("Data points for the dataset"),
-                color: z
-                  .string()
-                  .optional()
-                  .describe("Optional color for the dataset"),
-              }),
-            )
-            .describe("Data for the graph"),
-        })
-        .describe("Data object containing chart configuration and values"),
-      title: z.string().optional().describe("Optional title for the chart"),
-      showLegend: z
-        .boolean()
-        .optional()
-        .describe("Whether to show the legend (default: true)"),
-      variant: z
-        .enum(["default", "solid", "bordered"])
-        .optional()
-        .describe("Visual style variant of the graph"),
-      size: z
-        .enum(["default", "sm", "lg"])
-        .optional()
-        .describe("Size of the graph"),
-    }),
+    propsSchema: graphSchema,
   },
-  // Add more components for Tambo to control here!
+  // Add more components here
 ];
 ```
 
-You can install this graph component into any project with:
+You can install the graph component into any project with:
 
 ```bash
 npx tambo add graph
@@ -85,9 +49,11 @@ The example Graph component demonstrates several key features:
 
 Update the `components` array with any component(s) you want tambo to be able to use in a response!
 
-You can find more information about the options [here](https://tambo.co/docs/concepts/registering-components)
+You can find more information about the options [here](https://docs.tambo.co/concepts/generative-interfaces/generative-components)
 
 ### Add tools for tambo to use
+
+Tools are defined with `inputSchema` and `outputSchema`:
 
 ```tsx
 export const tools: TamboTool[] = [
@@ -96,19 +62,22 @@ export const tools: TamboTool[] = [
     description:
       "A tool to get global population trends with optional year range filtering",
     tool: getGlobalPopulationTrend,
-    toolSchema: z.function().args(
-      z
-        .object({
-          startYear: z.number().optional(),
-          endYear: z.number().optional(),
-        })
-        .optional(),
+    inputSchema: z.object({
+      startYear: z.number().optional(),
+      endYear: z.number().optional(),
+    }),
+    outputSchema: z.array(
+      z.object({
+        year: z.number(),
+        population: z.number(),
+        growthRate: z.number(),
+      }),
     ),
   },
 ];
 ```
 
-Find more information about tools [here.](https://tambo.co/docs/concepts/tools)
+Find more information about tools [here.](https://docs.tambo.co/concepts/tools)
 
 ### The Magic of Tambo Requires the TamboProvider
 
@@ -127,9 +96,23 @@ Make sure in the TamboProvider wrapped around your app:
 
 In this example we do this in the `Layout.tsx` file, but you can do it anywhere in your app that is a client component.
 
+### Voice input
+
+The template includes a `DictationButton` component using the `useTamboVoice` hook for speech-to-text input.
+
+### MCP (Model Context Protocol)
+
+The template includes MCP support for connecting to external tools and resources. You can use the MCP hooks from `@tambo-ai/react/mcp`:
+
+- `useTamboMcpPromptList` - List available prompts from MCP servers
+- `useTamboMcpPrompt` - Get a specific prompt
+- `useTamboMcpResourceList` - List available resources
+
+See `src/components/tambo/mcp-components.tsx` for example usage.
+
 ### Change where component responses are shown
 
-The components used by tambo are shown alongside the message resopnse from tambo within the chat thread, but you can have the result components show wherever you like by accessing the latest thread message's `renderedComponent` field:
+The components used by tambo are shown alongside the message response from tambo within the chat thread, but you can have the result components show wherever you like by accessing the latest thread message's `renderedComponent` field:
 
 ```tsx
 const { thread } = useTambo();
