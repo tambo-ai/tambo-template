@@ -5,6 +5,7 @@ import {
   MessageInput,
   MessageInputError,
   MessageInputFileButton,
+  MessageInputMcpConfigButton,
   MessageInputMcpPromptButton,
   MessageInputMcpResourceButton,
   MessageInputSubmitButton,
@@ -17,7 +18,6 @@ import {
   MessageSuggestionsStatus,
 } from "@/components/tambo/message-suggestions";
 import { ScrollableMessageContainer } from "@/components/tambo/scrollable-message-container";
-import { MessageInputMcpConfigButton } from "@/components/tambo/message-input";
 import { ThreadContainer, useThreadContainerContext } from "./thread-container";
 import {
   ThreadContent,

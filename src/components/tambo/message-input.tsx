@@ -465,6 +465,7 @@ const MessageInputInternal = React.forwardRef<
   const [isDragging, setIsDragging] = React.useState(false);
   const editorRef = React.useRef<TamboEditor>(null!);
   const dragCounter = React.useRef(0);
+  const submittingRef = React.useRef(false);
 
   // Use elicitation context (optional)
   const { elicitation, resolveElicitation } = useTamboElicitationContext();
@@ -477,6 +478,7 @@ const MessageInputInternal = React.forwardRef<
   }, [setValue, currentThreadId]);
 
   React.useEffect(() => {
+    if (submittingRef.current) return;
     setDisplayValue(value);
     storeValueInSessionStorage(currentThreadId, value);
     if (value && editorRef.current) {
@@ -494,6 +496,7 @@ const MessageInputInternal = React.forwardRef<
       setImageError(null);
       setDisplayValue("");
       storeValueInSessionStorage(currentThreadId);
+      submittingRef.current = true;
       setIsSubmitting(true);
 
       const imageIdsAtSubmitTime = images.map((image) => image.id);
@@ -524,6 +527,7 @@ const MessageInputInternal = React.forwardRef<
         // Cancel the run to reset loading state
         await cancelRun();
       } finally {
+        submittingRef.current = false;
         setIsSubmitting(false);
       }
     },
