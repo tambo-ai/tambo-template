@@ -1,57 +1,165 @@
 # Tambo Template
 
-This is a starter NextJS app with Tambo hooked up to get your AI app development started quickly.
+A starter Next.js app with [Tambo AI](https://tambo.co) integration for building generative UI/UX applications. Tambo enables AI to dynamically generate and control React components in real time.
 
 ## Get Started
 
-1. Run `npm create-tambo@latest my-tambo-app` for a new project
+1. Create a new project:
 
-2. `npm install`
+```bash
+npm create-tambo@latest my-tambo-app
+```
 
-3. `npx tambo init`
+2. Install dependencies:
 
-- or rename `example.env.local` to `.env.local` and add your tambo API key you can get for free [here](https://tambo.co/dashboard).
+```bash
+npm install
+```
 
-4. Run `npm run dev` and go to `localhost:3000` to use the app!
+3. Initialize Tambo (sets up your API key):
+
+```bash
+npx tambo init
+```
+
+Or rename `example.env.local` to `.env.local` and add your Tambo API key (get one free at [tambo.co/dashboard](https://tambo.co/dashboard)).
+
+4. Start the dev server:
+
+```bash
+npm run dev
+```
+
+Open [localhost:3000](http://localhost:3000) to use the app.
+
+## Routes
+
+| Route | Description |
+|-------|-------------|
+| `/` | Home page with setup checklist and links to demos |
+| `/chat` | Full chat interface with MCP support, voice input, and generative components |
+| `/interactables` | Interactive demo with a chat sidebar controlling a settings panel |
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── page.tsx                 # Home page with setup checklist
+│   ├── layout.tsx               # Root layout (Geist fonts, global styles)
+│   ├── globals.css              # Global styles and CSS variables
+│   ├── chat/
+│   │   └── page.tsx             # Chat page with TamboProvider and MCP
+│   └── interactables/
+│       ├── page.tsx             # Interactables demo page
+│       └── components/
+│           └── settings-panel.tsx  # AI-controlled settings form
+├── components/
+│   ├── ApiKeyCheck.tsx          # API key validation UI
+│   ├── tambo/                   # Tambo-specific components
+│   │   ├── message-thread-full.tsx  # Full chat layout
+│   │   ├── message-input.tsx        # Input with toolbar, file upload, MCP
+│   │   ├── message.tsx              # Single message display
+│   │   ├── graph.tsx                # Generative chart component (bar/line/pie)
+│   │   ├── mcp-components.tsx       # MCP prompt and resource UI
+│   │   ├── mcp-config-modal.tsx     # MCP server configuration modal
+│   │   ├── dictation-button.tsx     # Voice input button
+│   │   ├── elicitation-ui.tsx       # MCP elicitation forms
+│   │   ├── message-suggestions.tsx  # AI-powered suggestions
+│   │   ├── thread-history.tsx       # Thread history sidebar
+│   │   └── ...                      # Additional UI components
+│   └── ui/
+│       └── card-data.tsx        # Generative DataCard component
+├── lib/
+│   ├── tambo.ts                 # Central config: component and tool registration
+│   ├── thread-hooks.ts          # Custom thread management hooks
+│   ├── use-anonymous-user-key.ts  # Anonymous user ID persistence
+│   └── utils.ts                 # Utility functions
+└── services/
+    └── population-stats.ts      # Demo data service (population statistics)
+```
+
+## Features
+
+### Generative Components
+
+AI dynamically renders registered React components based on user input. The template includes two example components:
+
+- **Graph** - Recharts-based data visualization (bar, line, pie charts)
+- **DataCard** - Selectable cards with links and descriptions
+
+### Tools
+
+AI can invoke registered tools to fetch data or perform actions. The template includes:
+
+- **countryPopulation** - Country population stats with filtering by continent, sorting, and limits
+- **globalPopulation** - Global population trends with year range filtering
+
+### MCP (Model Context Protocol)
+
+Full MCP support for connecting to external tool servers:
+
+- Configure MCP servers via the in-app modal (HTTP/SSE transport)
+- Browse and insert MCP prompts and resources
+- Elicitation UI for multi-step MCP forms
+
+### Voice Input
+
+Speech-to-text via the `DictationButton` component using the `useTamboVoice` hook.
+
+### Interactables
+
+Components wrapped with `withTamboInteractable` allow AI to control their state directly. The demo shows a settings panel whose fields update in real time as the AI responds.
+
+### Streaming
+
+Real-time streaming of AI-generated content with progressive UI updates and generation stage indicators.
+
+### Thread Management
+
+Full thread history sidebar with search, thread switching, and new thread creation.
 
 ## Customizing
 
-### Change what components tambo can control
+### Register Components
 
-You can see how components are registered with tambo in `src/lib/tambo.ts`:
+Components are registered in `src/lib/tambo.ts`:
 
 ```tsx
 export const components: TamboComponent[] = [
   {
     name: "Graph",
     description:
-      "A component that renders various types of charts (bar, line, pie) using Recharts. Supports customizable data visualization with labels, datasets, and styling options.",
+      "A component that renders various types of charts (bar, line, pie) using Recharts.",
     component: Graph,
     propsSchema: graphSchema,
+  },
+  {
+    name: "DataCard",
+    description:
+      "A component that displays options as clickable cards with links and summaries.",
+    component: DataCard,
+    propsSchema: dataCardSchema,
   },
   // Add more components here
 ];
 ```
 
-You can install the graph component into any project with:
+To add a new component:
+
+1. Create the component in `src/components/tambo/`
+2. Define a Zod schema for its props
+3. Register it in the `components` array in `src/lib/tambo.ts`
+
+You can also install pre-built components:
 
 ```bash
 npx tambo add graph
 ```
 
-The example Graph component demonstrates several key features:
+More info: [Generative Components docs](https://docs.tambo.co/concepts/generative-interfaces/generative-components)
 
-- Different prop types (strings, arrays, enums, nested objects)
-- Multiple chart types (bar, line, pie)
-- Customizable styling (variants, sizes)
-- Optional configurations (title, legend, colors)
-- Data visualization capabilities
-
-Update the `components` array with any component(s) you want tambo to be able to use in a response!
-
-You can find more information about the options [here](https://docs.tambo.co/concepts/generative-interfaces/generative-components)
-
-### Add tools for tambo to use
+### Register Tools
 
 Tools are defined with `inputSchema` and `outputSchema`:
 
@@ -59,8 +167,7 @@ Tools are defined with `inputSchema` and `outputSchema`:
 export const tools: TamboTool[] = [
   {
     name: "globalPopulation",
-    description:
-      "A tool to get global population trends with optional year range filtering",
+    description: "A tool to get global population trends with optional year range filtering",
     tool: getGlobalPopulationTrend,
     inputSchema: z.object({
       startYear: z.number().optional(),
@@ -77,42 +184,28 @@ export const tools: TamboTool[] = [
 ];
 ```
 
-Find more information about tools [here.](https://docs.tambo.co/concepts/tools)
+More info: [Tools docs](https://docs.tambo.co/concepts/tools)
 
-### The Magic of Tambo Requires the TamboProvider
+### TamboProvider
 
-Make sure in the TamboProvider wrapped around your app:
+The `TamboProvider` wraps each page that uses Tambo (see `src/app/chat/page.tsx`):
 
 ```tsx
-...
 <TamboProvider
   apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}
-  components={components} // Array of components to control
-  tools={tools} // Array of tools it can use
+  components={components}
+  tools={tools}
+  tamboUrl={process.env.NEXT_PUBLIC_TAMBO_URL}
+  mcpServers={mcpServers}
+  userKey={userKey}
 >
   {children}
 </TamboProvider>
 ```
 
-In this example we do this in the `Layout.tsx` file, but you can do it anywhere in your app that is a client component.
+### Display Components Outside the Chat
 
-### Voice input
-
-The template includes a `DictationButton` component using the `useTamboVoice` hook for speech-to-text input.
-
-### MCP (Model Context Protocol)
-
-The template includes MCP support for connecting to external tools and resources. You can use the MCP hooks from `@tambo-ai/react/mcp`:
-
-- `useTamboMcpPromptList` - List available prompts from MCP servers
-- `useTamboMcpPrompt` - Get a specific prompt
-- `useTamboMcpResourceList` - List available resources
-
-See `src/components/tambo/mcp-components.tsx` for example usage.
-
-### Change where component responses are shown
-
-The components used by tambo are shown alongside the message response from tambo within the chat thread, but you can have the result components show wherever you like by accessing the latest thread message's `renderedComponent` field:
+Access rendered components from the thread to display them anywhere:
 
 ```tsx
 const { thread } = useTambo();
@@ -128,4 +221,25 @@ return (
 );
 ```
 
-For more detailed documentation, visit [Tambo's official docs](https://docs.tambo.co).
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm run lint:fix` | Run ESLint with auto-fix |
+
+## Tech Stack
+
+- [Next.js](https://nextjs.org) 15 with App Router
+- [React](https://react.dev) 19
+- [Tambo AI SDK](https://tambo.co) (`@tambo-ai/react`)
+- [Tailwind CSS](https://tailwindcss.com) v4
+- [Recharts](https://recharts.org) for data visualization
+- [TipTap](https://tiptap.dev) for rich text editing
+- [Zod](https://zod.dev) for schema validation
+- [Framer Motion](https://motion.dev) for animations
+
+For full documentation, visit [docs.tambo.co](https://docs.tambo.co).
