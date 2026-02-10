@@ -5,88 +5,135 @@ import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 
 const settingsSchema = z.object({
-  name: z.string(),
-  email: z.string().email(),
-  notifications: z.object({
-    email: z.boolean(),
-    push: z.boolean(),
-    sms: z.boolean(),
-  }),
-  theme: z.enum(["light", "dark", "system"]),
-  language: z.enum(["en", "es", "fr", "de"]),
-  privacy: z.object({
-    shareAnalytics: z.boolean(),
-    personalizationEnabled: z.boolean(),
-  }),
+  name: z.string().optional(),
+  email: z.string().email().optional(),
+  notifications: z
+    .object({
+      email: z.boolean().optional(),
+      push: z.boolean().optional(),
+      sms: z.boolean().optional(),
+    })
+    .optional(),
+  theme: z.enum(["light", "dark", "system"]).optional(),
+  language: z.enum(["en", "es", "fr", "de"]).optional(),
+  privacy: z
+    .object({
+      shareAnalytics: z.boolean().optional(),
+      personalizationEnabled: z.boolean().optional(),
+    })
+    .optional(),
 });
 
 type SettingsProps = z.infer<typeof settingsSchema>;
 
+/** Internal state type where all values are resolved (non-null). */
+type SettingsState = {
+  name: string;
+  email: string;
+  notifications: { email: boolean; push: boolean; sms: boolean };
+  theme: "light" | "dark" | "system";
+  language: "en" | "es" | "fr" | "de";
+  privacy: { shareAnalytics: boolean; personalizationEnabled: boolean };
+};
+
 function SettingsPanelBase(props: SettingsProps) {
-  const [settings, setSettings] = useState<SettingsProps>(props);
+  const [settings, setSettings] = useState<SettingsState>({
+    name: props.name ?? "",
+    email: props.email ?? "",
+    notifications: {
+      email: props.notifications?.email ?? false,
+      push: props.notifications?.push ?? false,
+      sms: props.notifications?.sms ?? false,
+    },
+    theme: props.theme ?? "light",
+    language: props.language ?? "en",
+    privacy: {
+      shareAnalytics: props.privacy?.shareAnalytics ?? false,
+      personalizationEnabled: props.privacy?.personalizationEnabled ?? false,
+    },
+  });
   const [emailError, setEmailError] = useState<string>("");
   const [updatedFields, setUpdatedFields] = useState<Set<string>>(new Set());
   const prevPropsRef = useRef<SettingsProps>(props);
 
-  // Update local state when props change from Tambo
+  // Update local state when props change from Tambo, skipping null values
   useEffect(() => {
     const prevProps = prevPropsRef.current;
-    console.log("Props effect triggered");
-    console.log("Previous props:", prevProps);
-    console.log("Current props:", props);
 
-    // Find which fields changed
+    // Find which fields actually changed (ignoring nulls)
     const changedFields = new Set<string>();
 
-    // Check each field for changes
-    if (props.name !== prevProps.name) {
+    if (props.name != null && props.name !== prevProps.name) {
       changedFields.add("name");
-      console.log("Name changed:", prevProps.name, "->", props.name);
     }
-    if (props.email !== prevProps.email) {
+    if (props.email != null && props.email !== prevProps.email) {
       changedFields.add("email");
-      console.log("Email changed:", prevProps.email, "->", props.email);
     }
-    if (props.theme !== prevProps.theme) {
+    if (props.theme != null && props.theme !== prevProps.theme) {
       changedFields.add("theme");
-      console.log("Theme changed:", prevProps.theme, "->", props.theme);
     }
-    if (props.language !== prevProps.language) {
+    if (props.language != null && props.language !== prevProps.language) {
       changedFields.add("language");
-      console.log(
-        "Language changed:",
-        prevProps.language,
-        "->",
-        props.language,
-      );
     }
 
-    // Check notification fields
-    if (props.notifications.email !== prevProps.notifications.email) {
-      changedFields.add("notifications.email");
-    }
-    if (props.notifications.push !== prevProps.notifications.push) {
-      changedFields.add("notifications.push");
-    }
-    if (props.notifications.sms !== prevProps.notifications.sms) {
-      changedFields.add("notifications.sms");
+    // Check notification fields (guard against null parent and null children)
+    if (props.notifications != null) {
+      if (
+        props.notifications.email != null &&
+        props.notifications.email !== prevProps.notifications?.email
+      ) {
+        changedFields.add("notifications.email");
+      }
+      if (
+        props.notifications.push != null &&
+        props.notifications.push !== prevProps.notifications?.push
+      ) {
+        changedFields.add("notifications.push");
+      }
+      if (
+        props.notifications.sms != null &&
+        props.notifications.sms !== prevProps.notifications?.sms
+      ) {
+        changedFields.add("notifications.sms");
+      }
     }
 
     // Check privacy fields
-    if (props.privacy.shareAnalytics !== prevProps.privacy.shareAnalytics) {
-      changedFields.add("privacy.shareAnalytics");
-    }
-    if (
-      props.privacy.personalizationEnabled !==
-      prevProps.privacy.personalizationEnabled
-    ) {
-      changedFields.add("privacy.personalizationEnabled");
+    if (props.privacy != null) {
+      if (
+        props.privacy.shareAnalytics != null &&
+        props.privacy.shareAnalytics !== prevProps.privacy?.shareAnalytics
+      ) {
+        changedFields.add("privacy.shareAnalytics");
+      }
+      if (
+        props.privacy.personalizationEnabled != null &&
+        props.privacy.personalizationEnabled !==
+          prevProps.privacy?.personalizationEnabled
+      ) {
+        changedFields.add("privacy.personalizationEnabled");
+      }
     }
 
-    console.log("Changed fields:", Array.from(changedFields));
-
-    // Update state and ref
-    setSettings(props);
+    // Merge only non-null values into current state
+    setSettings((prev) => ({
+      name: props.name ?? prev.name,
+      email: props.email ?? prev.email,
+      theme: props.theme ?? prev.theme,
+      language: props.language ?? prev.language,
+      notifications: {
+        email: props.notifications?.email ?? prev.notifications.email,
+        push: props.notifications?.push ?? prev.notifications.push,
+        sms: props.notifications?.sms ?? prev.notifications.sms,
+      },
+      privacy: {
+        shareAnalytics:
+          props.privacy?.shareAnalytics ?? prev.privacy.shareAnalytics,
+        personalizationEnabled:
+          props.privacy?.personalizationEnabled ??
+          prev.privacy.personalizationEnabled,
+      },
+    }));
     prevPropsRef.current = props;
 
     if (changedFields.size > 0) {
@@ -94,13 +141,12 @@ function SettingsPanelBase(props: SettingsProps) {
       // Clear highlights after animation
       const timer = setTimeout(() => {
         setUpdatedFields(new Set());
-        console.log("Cleared animation fields");
       }, 1000);
       return () => clearTimeout(timer);
     }
   }, [props]);
 
-  const handleChange = (updates: Partial<SettingsProps>) => {
+  const handleChange = (updates: Partial<SettingsState>) => {
     setSettings((prev) => ({ ...prev, ...updates }));
 
     // Validate email if it's being updated
