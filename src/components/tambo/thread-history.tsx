@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import {
   type TamboThread,
-  useTamboThread,
+  useTambo,
   useTamboThreadList,
 } from "@tambo-ai/react";
 import {
@@ -14,7 +14,6 @@ import {
   Pencil,
   PlusIcon,
   SearchIcon,
-  Sparkles,
 } from "lucide-react";
 import React, { useMemo } from "react";
 
@@ -26,7 +25,7 @@ interface ThreadHistoryContextValue {
   isLoading: boolean;
   error: Error | null;
   refetch: () => Promise<unknown>;
-  currentThread: TamboThread;
+  currentThread: TamboThread | undefined;
   switchCurrentThread: (threadId: string) => void;
   startNewThread: () => void;
   searchQuery: string;
@@ -35,8 +34,7 @@ interface ThreadHistoryContextValue {
   setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
   onThreadChange?: () => void;
   position?: "left" | "right";
-  updateThreadName: (newName: string, threadId?: string) => Promise<void>;
-  generateThreadName: (threadId: string) => Promise<TamboThread>;
+  updateThreadName: (threadId: string, name: string) => Promise<void>;
 }
 
 const ThreadHistoryContext =
@@ -81,12 +79,13 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
     const { data: threads, isLoading, error, refetch } = useTamboThreadList();
 
     const {
-      switchCurrentThread,
+      switchThread,
       startNewThread,
-      thread: currentThread,
+      thread,
       updateThreadName,
-      generateThreadName,
-    } = useTamboThread();
+    } = useTambo();
+
+    const currentThread = thread?.thread;
 
     // Update CSS variable when sidebar collapses/expands
     React.useEffect(() => {
@@ -111,7 +110,7 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
         error,
         refetch,
         currentThread,
-        switchCurrentThread,
+        switchCurrentThread: switchThread,
         startNewThread,
         searchQuery,
         setSearchQuery,
@@ -120,7 +119,6 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
         onThreadChange,
         position,
         updateThreadName,
-        generateThreadName,
       }),
       [
         threads,
@@ -128,14 +126,13 @@ const ThreadHistory = React.forwardRef<HTMLDivElement, ThreadHistoryProps>(
         error,
         refetch,
         currentThread,
-        switchCurrentThread,
+        switchThread,
         startNewThread,
         searchQuery,
         isCollapsed,
         onThreadChange,
         position,
         updateThreadName,
-        generateThreadName,
       ],
     );
 
@@ -368,7 +365,6 @@ const ThreadHistoryList = React.forwardRef<
     switchCurrentThread,
     onThreadChange,
     updateThreadName,
-    generateThreadName,
     refetch,
   } = useThreadHistoryContext();
 
@@ -444,21 +440,12 @@ const ThreadHistoryList = React.forwardRef<
     setNewName(thread.name ?? "");
   };
 
-  const handleGenerateName = async (thread: TamboThread) => {
-    try {
-      await generateThreadName(thread.id);
-      await refetch();
-    } catch (error) {
-      console.error("Failed to generate name:", error);
-    }
-  };
-
   const handleNameSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingThread) return;
 
     try {
-      await updateThreadName(newName, editingThread.id);
+      await updateThreadName(editingThread.id, newName);
       await refetch();
       setEditingThread(null);
     } catch (error) {
@@ -561,7 +548,6 @@ const ThreadHistoryList = React.forwardRef<
             <ThreadOptionsDropdown
               thread={thread}
               onRename={handleRename}
-              onGenerateName={handleGenerateName}
             />
           </div>
         ))}
@@ -593,11 +579,9 @@ ThreadHistoryList.displayName = "ThreadHistory.List";
 const ThreadOptionsDropdown = ({
   thread,
   onRename,
-  onGenerateName,
 }: {
   thread: TamboThread;
   onRename: (thread: TamboThread) => void;
-  onGenerateName: (thread: TamboThread) => void;
 }) => {
   return (
     <DropdownMenu.Root>
@@ -624,16 +608,6 @@ const ThreadOptionsDropdown = ({
           >
             <Pencil className="h-3 w-3" />
             Rename
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            className="flex items-center gap-2 px-2 py-1.5 text-foreground hover:bg-backdrop rounded-sm cursor-pointer outline-none transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              onGenerateName(thread);
-            }}
-          >
-            <Sparkles className="h-3 w-3" />
-            Generate Name
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
