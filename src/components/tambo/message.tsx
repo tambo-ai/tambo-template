@@ -7,9 +7,13 @@ import {
   getSafeContent,
 } from "@/lib/thread-hooks";
 import { cn } from "@/lib/utils";
-import type { TamboThreadMessage } from "@tambo-ai/react";
+import type {
+  TamboThreadMessage,
+  TamboToolUseContent,
+  TamboComponentContent,
+  Content,
+} from "@tambo-ai/react";
 import { useTambo } from "@tambo-ai/react";
-import type TamboAI from "@tambo-ai/typescript-sdk";
 import { cva, type VariantProps } from "class-variance-authority";
 import stringify from "json-stringify-pretty-compact";
 import { Check, ChevronDown, ExternalLink, Loader2, X } from "lucide-react";
@@ -89,12 +93,14 @@ const messageVariants = cva("flex", {
  * @property {VariantProps<typeof messageVariants>["variant"]} [variant] - Optional styling variant for the message container.
  * @property {TamboThreadMessage} message - The full Tambo thread message object.
  * @property {boolean} [isLoading] - Optional flag to indicate if the message is in a loading state.
+ * @property {boolean} [lastRunCancelled] - Whether the last run was cancelled (from TamboThread).
  */
 interface MessageContextValue {
   role: "user" | "assistant";
   variant?: VariantProps<typeof messageVariants>["variant"];
   message: TamboThreadMessage;
   isLoading?: boolean;
+  lastRunCancelled?: boolean;
 }
 
 /**
@@ -119,15 +125,31 @@ const useMessageContext = () => {
 };
 
 /**
- * Get the tool call request from the message, or the component tool call request
+ * Extract tool_use content blocks from a message.
  *
- * @param message - The message to get the tool call request from
- * @returns The tool call request
+ * @param message - The message to extract tool use blocks from
+ * @returns Array of TamboToolUseContent blocks
  */
-export function getToolCallRequest(
+export function getToolUseBlocks(
   message: TamboThreadMessage,
-): TamboAI.ToolCallRequest | undefined {
-  return message.toolCallRequest ?? message.component?.toolCallRequest;
+): TamboToolUseContent[] {
+  return message.content.filter(
+    (c): c is TamboToolUseContent => c.type === "tool_use",
+  );
+}
+
+/**
+ * Extract component content blocks from a message.
+ *
+ * @param message - The message to extract component blocks from
+ * @returns Array of TamboComponentContent blocks
+ */
+export function getComponentBlocks(
+  message: TamboThreadMessage,
+): TamboComponentContent[] {
+  return message.content.filter(
+    (c): c is TamboComponentContent => c.type === "component",
+  );
 }
 
 // --- Sub-Components ---
@@ -169,15 +191,13 @@ const Message = React.forwardRef<HTMLDivElement, MessageProps>(
     { children, className, role, variant, isLoading, message, ...props },
     ref,
   ) => {
-    const contextValue = React.useMemo(
-      () => ({ role, variant, isLoading, message }),
-      [role, variant, isLoading, message],
-    );
+    const { thread } = useTambo();
+    const lastRunCancelled = thread?.thread.lastRunCancelled ?? false;
 
-    // Don't render tool response messages as they're shown in tool call dropdowns
-    if (message.role === "tool") {
-      return null;
-    }
+    const contextValue = React.useMemo(
+      () => ({ role, variant, isLoading, message, lastRunCancelled }),
+      [role, variant, isLoading, message, lastRunCancelled],
+    );
 
     return (
       <MessageContext.Provider value={contextValue}>
@@ -318,7 +338,7 @@ const MessageContent = React.forwardRef<HTMLDivElement, MessageContentProps>(
     { className, children, content: contentProp, markdown = true, ...props },
     ref,
   ) => {
-    const { message, isLoading } = useMessageContext();
+    const { message, isLoading, lastRunCancelled } = useMessageContext();
     const contentToRender = children ?? contentProp ?? message.content;
 
     const markdownContent = React.useMemo(() => {
@@ -359,7 +379,7 @@ const MessageContent = React.forwardRef<HTMLDivElement, MessageContentProps>(
               markdownContent={markdownContent}
               markdown={markdown}
             />
-            {message.isCancelled && (
+            {lastRunCancelled && (
               <span className="text-muted-foreground text-xs">cancelled</span>
             )}
           </div>
@@ -386,17 +406,11 @@ function getToolStatusMessage(
   message: TamboThreadMessage,
   isLoading: boolean | undefined,
 ) {
-  if (message.role !== "assistant" || !getToolCallRequest(message)) {
-    return null;
-  }
-
-  const toolCallMessage = isLoading
-    ? `Calling ${getToolCallRequest(message)?.toolName ?? "tool"}`
-    : `Called ${getToolCallRequest(message)?.toolName ?? "tool"}`;
-  const toolStatusMessage = isLoading
-    ? message.component?.statusMessage
-    : message.component?.completionStatusMessage;
-  return toolStatusMessage ?? toolCallMessage;
+  if (message.role !== "assistant") return null;
+  const toolUseBlocks = getToolUseBlocks(message);
+  if (toolUseBlocks.length === 0) return null;
+  const toolUse = toolUseBlocks[0];
+  return toolUse.statusMessage ?? (isLoading ? `Calling ${toolUse.name}` : `Called ${toolUse.name}`);
 }
 
 /**
@@ -432,34 +446,51 @@ const ToolcallInfo = React.forwardRef<HTMLDivElement, ToolcallInfoProps>(
     const { thread } = useTambo();
     const toolDetailsId = React.useId();
 
-    const associatedToolResponse = React.useMemo(() => {
-      if (!thread?.messages) return null;
-      const currentMessageIndex = thread.messages.findIndex(
+    const toolUse = getToolUseBlocks(message)[0];
+
+    // Find the associated tool result: look for a tool_result content block in subsequent messages
+    // that matches the tool_use id, or check for tool_result blocks within this message's content.
+    const associatedToolResult = React.useMemo(() => {
+      if (!toolUse) return null;
+
+      // First check for tool_result blocks in the same message
+      const inlineResult = message.content.find(
+        (c): c is Extract<Content, { type: "tool_result" }> =>
+          c.type === "tool_result" && c.toolUseId === toolUse.id,
+      );
+      if (inlineResult) return inlineResult;
+
+      // Then look in subsequent messages for tool_result content blocks
+      const messages = thread?.thread.messages;
+      if (!messages) return null;
+      const currentMessageIndex = messages.findIndex(
         (m: TamboThreadMessage) => m.id === message.id,
       );
       if (currentMessageIndex === -1) return null;
-      for (let i = currentMessageIndex + 1; i < thread.messages.length; i++) {
-        const nextMessage = thread.messages[i];
-        if (nextMessage.role === "tool") {
-          return nextMessage;
+      for (let i = currentMessageIndex + 1; i < messages.length; i++) {
+        const nextMessage = messages[i];
+        // Look for tool_result blocks in this message's content
+        for (const block of nextMessage.content) {
+          if (
+            block.type === "tool_result" &&
+            block.toolUseId === toolUse.id
+          ) {
+            return block as Extract<Content, { type: "tool_result" }>;
+          }
         }
-        if (
-          nextMessage.role === "assistant" &&
-          getToolCallRequest(nextMessage)
-        ) {
+        // If this is another assistant message with tool_use, stop searching
+        if (nextMessage.role === "assistant" && getToolUseBlocks(nextMessage).length > 0) {
           break;
         }
       }
       return null;
-    }, [message, thread?.messages]);
+    }, [message, toolUse, thread?.thread.messages]);
 
-    if (message.role !== "assistant" || !getToolCallRequest(message)) {
+    if (message.role !== "assistant" || !toolUse) {
       return null;
     }
 
-    const toolCallRequest: TamboAI.ToolCallRequest | undefined =
-      getToolCallRequest(message);
-    const hasToolError = !!message.error;
+    const hasToolError = !!associatedToolResult?.isError;
 
     const toolStatusMessage = getToolStatusMessage(message, isLoading);
 
@@ -503,23 +534,26 @@ const ToolcallInfo = React.forwardRef<HTMLDivElement, ToolcallInfoProps>(
             )}
           >
             <span className="whitespace-pre-wrap pl-2">
-              tool: {toolCallRequest?.toolName}
+              tool: {toolUse.name}
             </span>
             <span className="whitespace-pre-wrap pl-2">
               parameters:{"\n"}
-              {stringify(keyifyParameters(toolCallRequest?.parameters))}
+              {stringify(toolUse.input)}
             </span>
-            <SamplingSubThread parentMessageId={message.id} />
-            {associatedToolResponse && (
+            {associatedToolResult && (
               <div className="pl-2">
                 <span className="whitespace-pre-wrap">result:</span>
                 <div>
-                  {!associatedToolResponse.content ? (
+                  {!associatedToolResult.content ||
+                  associatedToolResult.content.length === 0 ? (
                     <span className="text-muted-foreground italic">
                       Empty response
                     </span>
                   ) : (
-                    formatToolResult(associatedToolResponse.content, markdown)
+                    formatToolResult(
+                      associatedToolResult.content as Content[],
+                      markdown,
+                    )
                   )}
                 </div>
               </div>
@@ -532,82 +566,6 @@ const ToolcallInfo = React.forwardRef<HTMLDivElement, ToolcallInfoProps>(
 );
 
 ToolcallInfo.displayName = "ToolcallInfo";
-
-/**
- * Displays a message's child messages in a collapsible dropdown.
- * Used for MCP sampling sub-threads.
- * @component SamplingSubThread
- */
-const SamplingSubThread = ({
-  parentMessageId,
-  titleText = "finished additional work",
-}: {
-  parentMessageId: string;
-  titleText?: string;
-}) => {
-  const { thread } = useTambo();
-  const [isExpanded, setIsExpanded] = useState(false);
-  const samplingDetailsId = React.useId();
-
-  const childMessages = React.useMemo(() => {
-    return thread?.messages?.filter(
-      (m: TamboThreadMessage) => m.parentMessageId === parentMessageId,
-    );
-  }, [thread?.messages, parentMessageId]);
-
-  if (!childMessages?.length) return null;
-
-  return (
-    <div className="flex flex-col gap-1">
-      <button
-        type="button"
-        aria-expanded={isExpanded}
-        aria-controls={samplingDetailsId}
-        onClick={() => setIsExpanded(!isExpanded)}
-        className={cn(
-          "flex items-center gap-1 cursor-pointer hover:bg-muted-foreground/10 rounded-md p-2 select-none w-fit",
-        )}
-      >
-        <span>{titleText}</span>
-        <ChevronDown
-          className={cn(
-            "w-3 h-3 transition-transform duration-200",
-            !isExpanded && "-rotate-90",
-          )}
-        />
-      </button>
-      <div
-        id={samplingDetailsId}
-        className={cn(
-          "transition-[max-height,opacity] duration-300",
-          isExpanded
-            ? "max-h-96 opacity-100 overflow-auto"
-            : "max-h-0 opacity-0 overflow-hidden",
-        )}
-        aria-hidden={!isExpanded}
-      >
-        <div className="pl-2">
-          <div className="border-l-2 border-muted-foreground p-2 flex flex-col gap-4">
-            {childMessages?.map((m: TamboThreadMessage) => (
-              <div key={m.id} className={`${m.role === "user" && "pl-2"}`}>
-                <span
-                  className={cn(
-                    "whitespace-pre-wrap",
-                    m.role === "assistant" &&
-                      "bg-muted/50 rounded-md p-2 inline-block w-fit",
-                  )}
-                >
-                  {getSafeContent(m.content)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-SamplingSubThread.displayName = "SamplingSubThread";
 
 /**
  * Props for the ReasoningInfo component.
@@ -734,13 +692,6 @@ const ReasoningInfo = React.forwardRef<HTMLDivElement, ReasoningInfoProps>(
 
 ReasoningInfo.displayName = "ReasoningInfo";
 
-function keyifyParameters(parameters: TamboAI.ToolCallParameter[] | undefined) {
-  if (!parameters) return;
-  return Object.fromEntries(
-    parameters.map((p) => [p.parameterName, p.parameterValue]),
-  );
-}
-
 /**
  * Internal component to render reasoning status text
  */
@@ -786,29 +737,6 @@ function formatReasoningDuration(durationMS: number) {
   if (minutes < 60)
     return `Thought for ${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
   return `Thought for ${hours} ${hours === 1 ? "hour" : "hours"}`;
-}
-
-/**
- * Renders an image content part from a tool result.
- * @param url - The image URL
- * @param index - Index for unique key generation
- * @returns Image element
- */
-function renderImageContent(url: string, index: number): React.ReactNode {
-  return (
-    <div
-      key={`image-${index}`}
-      className="rounded-md overflow-hidden shadow-sm max-w-xs"
-    >
-      <img
-        src={url}
-        alt={`Tool result image ${index + 1}`}
-        loading="lazy"
-        decoding="async"
-        className="max-w-full h-auto object-contain"
-      />
-    </div>
-  );
 }
 
 /**
@@ -878,7 +806,7 @@ function renderResourceContent(
 
 /**
  * Helper function to detect if content is JSON and format it nicely.
- * Handles text, image, and MCP resource content types.
+ * Handles text and resource content types from V1 content blocks.
  * @param content - The content to check and format
  * @param enableMarkdown - Whether to render text as markdown
  * @returns Formatted content or original content if not JSON
@@ -904,8 +832,6 @@ function formatToolResult(
 
       if (item.type === "text" && item.text) {
         textParts.push(item.text);
-      } else if (item.type === "image_url" && item.image_url?.url) {
-        nonTextParts.push(renderImageContent(item.image_url.url, index));
       } else if (item.type === "resource" && item.resource) {
         const resourceNode = renderResourceContent(item.resource, index);
         if (resourceNode) {
@@ -982,14 +908,14 @@ export type MessageRenderedComponentAreaProps =
 /**
  * Displays the `renderedComponent` associated with an assistant message.
  * Shows a button to view in canvas if a canvas space exists, otherwise renders inline.
- * Only renders if the message role is 'assistant' and `message.renderedComponent` exists.
+ * Only renders if the message role is 'assistant' and a component content block has a renderedComponent.
  * @component Message.RenderedComponentArea
  */
 const MessageRenderedComponentArea = React.forwardRef<
   HTMLDivElement,
   MessageRenderedComponentAreaProps
 >(({ className, children, ...props }, ref) => {
-  const { message, role } = useMessageContext();
+  const { message, role, lastRunCancelled } = useMessageContext();
   const [canvasExists, setCanvasExists] = React.useState(false);
 
   // Check if canvas exists on mount and window resize
@@ -1011,10 +937,16 @@ const MessageRenderedComponentArea = React.forwardRef<
     };
   }, []);
 
+  // Get rendered component from component content blocks
+  const renderedComponent = React.useMemo(() => {
+    const componentBlocks = getComponentBlocks(message);
+    return componentBlocks.find((c) => c.renderedComponent)?.renderedComponent ?? null;
+  }, [message]);
+
   if (
-    !message.renderedComponent ||
+    !renderedComponent ||
     role !== "assistant" ||
-    message.isCancelled
+    lastRunCancelled
   ) {
     return null;
   }
@@ -1036,7 +968,7 @@ const MessageRenderedComponentArea = React.forwardRef<
                     new CustomEvent("tambo:showComponent", {
                       detail: {
                         messageId: message.id,
-                        component: message.renderedComponent,
+                        component: renderedComponent,
                       },
                     }),
                   );
@@ -1050,7 +982,7 @@ const MessageRenderedComponentArea = React.forwardRef<
             </button>
           </div>
         ) : (
-          <div className="w-full pt-2 px-2">{message.renderedComponent}</div>
+          <div className="w-full pt-2 px-2">{renderedComponent}</div>
         ))}
     </div>
   );

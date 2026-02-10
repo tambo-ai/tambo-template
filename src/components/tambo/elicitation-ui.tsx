@@ -6,7 +6,7 @@ import {
   type TamboElicitationResponse,
 } from "@tambo-ai/react/mcp";
 import * as React from "react";
-import { useId, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 type FieldSchema =
   TamboElicitationRequest["requestedSchema"]["properties"][string];
@@ -133,7 +133,8 @@ const StringField: React.FC<FieldProps> = ({
   autoFocus,
   validationError,
 }) => {
-  const inputId = useId();
+  const inputId = React.useId();
+
   if (schema.type !== "string") {
     return null;
   }
@@ -206,7 +207,8 @@ const NumberField: React.FC<FieldProps> = ({
   autoFocus,
   validationError,
 }) => {
-  const inputId = useId();
+  const inputId = React.useId();
+
   if (schema.type !== "number" && schema.type !== "integer") {
     return null;
   }

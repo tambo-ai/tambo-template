@@ -3,6 +3,7 @@
 import { MessageThreadFull } from "@/components/tambo/message-thread-full";
 import { useMcpServers } from "@/components/tambo/mcp-config-modal";
 import { components, tools } from "@/lib/tambo";
+import { useAnonymousUserKey } from "@/lib/use-anonymous-user-key";
 import { TamboProvider } from "@tambo-ai/react";
 
 /**
@@ -18,6 +19,7 @@ import { TamboProvider } from "@tambo-ai/react";
 export default function Home() {
   // Load MCP server configurations
   const mcpServers = useMcpServers();
+  const userKey = useAnonymousUserKey();
 
   return (
     <TamboProvider
@@ -26,6 +28,7 @@ export default function Home() {
       tools={tools}
       tamboUrl={process.env.NEXT_PUBLIC_TAMBO_URL}
       mcpServers={mcpServers}
+      userKey={userKey}
     >
       <div className="h-screen">
         <MessageThreadFull className="max-w-4xl mx-auto"/>

@@ -12,6 +12,7 @@ import {
   ThreadContentMessages,
 } from "@/components/tambo/thread-content";
 import { components, tools } from "@/lib/tambo";
+import { useAnonymousUserKey } from "@/lib/use-anonymous-user-key";
 import { TamboProvider } from "@tambo-ai/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
@@ -19,6 +20,7 @@ import { SettingsPanel } from "./components/settings-panel";
 
 export default function InteractablesPage() {
   const [isChatOpen, setIsChatOpen] = useState(true);
+  const userKey = useAnonymousUserKey();
 
   return (
     <TamboProvider
@@ -26,6 +28,7 @@ export default function InteractablesPage() {
       components={components}
       tools={tools}
       tamboUrl={process.env.NEXT_PUBLIC_TAMBO_URL}
+      userKey={userKey}
     >
       <div className="flex h-screen bg-gray-50">
         {/* Chat Sidebar */}
