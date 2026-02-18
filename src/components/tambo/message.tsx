@@ -400,16 +400,15 @@ export interface ToolcallInfoProps extends Omit<
 > {
   /** Optional flag to render response content as Markdown. Default is true. */
   markdown?: boolean;
+  /** Optional specific tool_use block to render. If not provided, uses the first tool_use block from the message. */
+  toolUse?: TamboToolUseContent;
 }
 
 function getToolStatusMessage(
-  message: TamboThreadMessage,
+  toolUse: TamboToolUseContent | undefined,
   isLoading: boolean | undefined,
 ) {
-  if (message.role !== "assistant") return null;
-  const toolUseBlocks = getToolUseBlocks(message);
-  if (toolUseBlocks.length === 0) return null;
-  const toolUse = toolUseBlocks[0];
+  if (!toolUse) return null;
   return toolUse.statusMessage ?? (isLoading ? `Calling ${toolUse.name}` : `Called ${toolUse.name}`);
 }
 
@@ -440,13 +439,13 @@ function ToolcallStatusIcon({
  * @component ToolcallInfo
  */
 const ToolcallInfo = React.forwardRef<HTMLDivElement, ToolcallInfoProps>(
-  ({ className, markdown = true, ...props }, ref) => {
+  ({ className, markdown = true, toolUse: toolUseProp, ...props }, ref) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const { message, isLoading } = useMessageContext();
     const { thread } = useTambo();
     const toolDetailsId = React.useId();
 
-    const toolUse = getToolUseBlocks(message)[0];
+    const toolUse = toolUseProp ?? getToolUseBlocks(message)[0];
 
     // Find the associated tool result: look for a tool_result content block in subsequent messages
     // that matches the tool_use id, or check for tool_result blocks within this message's content.
@@ -492,7 +491,7 @@ const ToolcallInfo = React.forwardRef<HTMLDivElement, ToolcallInfoProps>(
 
     const hasToolError = !!associatedToolResult?.isError;
 
-    const toolStatusMessage = getToolStatusMessage(message, isLoading);
+    const toolStatusMessage = getToolStatusMessage(toolUse, isLoading);
 
     return (
       <div
