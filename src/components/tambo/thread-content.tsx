@@ -10,7 +10,7 @@ import {
   type messageVariants,
 } from "@/components/tambo/message";
 import { cn } from "@/lib/utils";
-import { type TamboThreadMessage, useTambo } from "@tambo-ai/react";
+import { type Content, type TamboThreadMessage, useTambo } from "@tambo-ai/react";
 import { type VariantProps } from "class-variance-authority";
 import * as React from "react";
 
@@ -168,24 +168,37 @@ const ThreadContentMessages = React.forwardRef<
                 <ReasoningInfo />
                 <MessageImages />
                 {message.content.map((block, blockIndex) => {
-                  if (block.type === "text" || block.type === "resource") {
-                    return (
-                      <MessageContent
-                        key={`content-${blockIndex}`}
-                        content={[block]}
-                        className={messageContentClassName}
-                      />
-                    );
+                  switch (block.type) {
+                    case "text":
+                    case "resource":
+                      return (
+                        <MessageContent
+                          key={`content-${blockIndex}`}
+                          content={[block]}
+                          className={messageContentClassName}
+                        />
+                      );
+                    case "tool_use":
+                      return (
+                        <ToolcallInfo
+                          key={`tool-${block.id ?? blockIndex}`}
+                          toolUse={block}
+                        />
+                      );
+                    case "tool_result":
+                    case "component":
+                      // tool_result is rendered by ToolcallInfo on the preceding assistant message.
+                      // component is rendered by MessageRenderedComponentArea below.
+                      return null;
+                    default: {
+                      const _exhaustive: never = block;
+                      console.error(
+                        "Unknown content block type:",
+                        (_exhaustive as Content).type,
+                      );
+                      return null;
+                    }
                   }
-                  if (block.type === "tool_use") {
-                    return (
-                      <ToolcallInfo
-                        key={`tool-${block.id ?? blockIndex}`}
-                        toolUse={block}
-                      />
-                    );
-                  }
-                  return null;
                 })}
                 <MessageRenderedComponentArea className="w-full" />
               </div>
