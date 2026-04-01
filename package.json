@@ -14,7 +14,7 @@
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-popover": "^1.1.15",
     "@tailwindcss/oxide": "^4.1.17",
-    "@tambo-ai/react": "^1.0.1",
+    "@tambo-ai/react": "^1.2.5",
     "@tambo-ai/typescript-sdk": "^0.89.0",
     "@tiptap/extension-document": "^3.17.1",
     "@tiptap/extension-hard-break": "^3.17.1",
