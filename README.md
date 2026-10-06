@@ -1,3 +1,5 @@
+> **Archived:** This repository is no longer maintained. Our current work is [Charming](https://usecharming.com), the collaborative cloud for apps you build.
+
 # Tambo Template
 
 A starter Next.js app with [Tambo AI](https://tambo.co) integration for building generative UI/UX applications. Tambo enables AI to dynamically generate and control React components in real time.
